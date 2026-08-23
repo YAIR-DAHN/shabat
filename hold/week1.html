@@ -1,0 +1,699 @@
+<!DOCTYPE html>
+<html dir="rtl" lang="he">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="description" content="מיזם השבת של אור ישראלי · שבוע א׳ - מלאכת מחשבת: מה באמת אסור בשבת.">
+<meta name="theme-color" content="#12294A">
+<title>מלאכת מחשבת</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Secular+One&family=Frank+Ruhl+Libre:wght@400;500;700;900&family=Assistant:wght@300;400;500;600;700&display=swap">
+<style>
+:root{
+  --bg:#EFEBE1; --surface:#FCFAF4; --surface-2:#F4F0E6;
+  --ink:#16233A; --ink-soft:#5B6B81; --ink-faint:#8A97A8;
+  --line:rgba(22,35,58,.13); --line-strong:rgba(22,35,58,.26);
+  --navy:#12294A; --navy-2:#1B3A63; --on-navy:#F3F0E7; --on-navy-soft:#A9BDD6;
+  --green:#4B8A2B; --green-ink:#3C7021; --green-soft:#E6F0DA; --green-line:rgba(75,138,43,.32);
+  --gold:#AD7F22; --gold-soft:#F7EDD6; --gold-line:rgba(173,127,34,.34);
+  --tchelet:#256F94; --wrong:#B0402F; --wrong-soft:#FBE8E4;
+  --shadow-s:0 1px 2px rgba(18,41,74,.08), 0 4px 14px rgba(18,41,74,.06);
+  --shadow-m:0 2px 6px rgba(18,41,74,.10), 0 18px 44px rgba(18,41,74,.12);
+  --f-display:'Secular One','Arial Hebrew',system-ui,sans-serif;
+  --f-serif:'Frank Ruhl Libre',Georgia,'Times New Roman',serif;
+  --f-body:'Assistant','Helvetica Neue',system-ui,sans-serif;
+  --r-s:10px; --r-m:16px; --r-l:22px;
+  --wrap:min(680px, 100% - 2rem);
+  color-scheme:light;
+}
+@media (prefers-color-scheme:dark){ :root:not([data-theme="light"]){
+  --bg:#0B1A2F; --surface:#132846; --surface-2:#173055;
+  --ink:#EAF0F7; --ink-soft:#9EB1C8; --ink-faint:#7C8FA6;
+  --line:rgba(234,240,247,.15); --line-strong:rgba(234,240,247,.3);
+  --navy:#071223; --navy-2:#102341; --on-navy:#EDF2F8; --on-navy-soft:#96AECC;
+  --green:#7DC750; --green-ink:#96D96E; --green-soft:rgba(125,199,80,.13); --green-line:rgba(125,199,80,.36);
+  --gold:#E4B65E; --gold-soft:rgba(228,182,94,.13); --gold-line:rgba(228,182,94,.36);
+  --tchelet:#5CBEE0; --wrong:#F08D79; --wrong-soft:rgba(240,141,121,.14);
+  --shadow-s:0 1px 2px rgba(0,0,0,.3), 0 4px 14px rgba(0,0,0,.24);
+  --shadow-m:0 2px 8px rgba(0,0,0,.36), 0 20px 46px rgba(0,0,0,.34);
+  color-scheme:dark;
+}}
+:root[data-theme="dark"]{
+  --bg:#0B1A2F; --surface:#132846; --surface-2:#173055;
+  --ink:#EAF0F7; --ink-soft:#9EB1C8; --ink-faint:#7C8FA6;
+  --line:rgba(234,240,247,.15); --line-strong:rgba(234,240,247,.3);
+  --navy:#071223; --navy-2:#102341; --on-navy:#EDF2F8; --on-navy-soft:#96AECC;
+  --green:#7DC750; --green-ink:#96D96E; --green-soft:rgba(125,199,80,.13); --green-line:rgba(125,199,80,.36);
+  --gold:#E4B65E; --gold-soft:rgba(228,182,94,.13); --gold-line:rgba(228,182,94,.36);
+  --tchelet:#5CBEE0; --wrong:#F08D79; --wrong-soft:rgba(240,141,121,.14);
+  --shadow-s:0 1px 2px rgba(0,0,0,.3), 0 4px 14px rgba(0,0,0,.24);
+  --shadow-m:0 2px 8px rgba(0,0,0,.36), 0 20px 46px rgba(0,0,0,.34);
+  color-scheme:dark;
+}
+
+*,*::before,*::after{box-sizing:border-box}
+html{scroll-behavior:smooth}
+@media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
+body{
+  margin:0; background:var(--bg); color:var(--ink);
+  font-family:var(--f-body); font-size:17px; line-height:1.72;
+  -webkit-font-smoothing:antialiased; text-rendering:optimizeLegibility;
+  overflow-x:hidden;
+}
+[dir]{direction:rtl}
+.unit{direction:rtl; text-align:right}
+h1,h2,h3,h4{margin:0; text-wrap:balance; line-height:1.2; font-weight:400}
+p{margin:0}
+a{color:inherit}
+button{font:inherit; color:inherit; margin:0}
+:where(a,button,summary,[tabindex]):focus-visible{outline:2.5px solid var(--gold); outline-offset:3px; border-radius:6px}
+@media (prefers-reduced-motion:reduce){ *,*::before,*::after{animation-duration:.01ms !important; transition-duration:.01ms !important; scroll-behavior:auto !important} }
+
+/* ---------- sticky progress bar ---------- */
+.bar{position:sticky; top:0; z-index:60; background:color-mix(in srgb, var(--bg) 88%, transparent); backdrop-filter:blur(14px) saturate(1.3); border-bottom:1px solid var(--line)}
+.bar__track{height:3px; background:var(--line); position:relative}
+.bar__fill{height:100%; width:0%; background:linear-gradient(90deg,var(--tchelet),var(--green)); transition:width .18s linear}
+.bar__row{display:flex; align-items:center; gap:.6rem; width:var(--wrap); margin-inline:auto; padding:.55rem 0}
+.bar__week{font-family:var(--f-display); font-size:.82rem; letter-spacing:.02em; background:var(--navy); color:var(--on-navy); padding:.22rem .6rem; border-radius:999px; white-space:nowrap}
+.bar__chapter{font-size:.86rem; color:var(--ink-soft); font-weight:600; flex:1; min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap}
+.bar__pct{font-size:.78rem; font-weight:700; color:var(--green-ink); font-variant-numeric:tabular-nums; letter-spacing:.02em}
+
+/* ---------- layout ---------- */
+.wrap{width:var(--wrap); margin-inline:auto}
+.stack{display:flex; flex-direction:column}
+section{scroll-margin-top:74px}
+
+/* ---------- hero ---------- */
+.hero{position:relative; background:var(--navy); color:var(--on-navy); overflow:hidden; padding:2.6rem 0 4.4rem}
+.hero__sky{position:absolute; inset:0; background:
+  radial-gradient(120% 90% at 78% 8%, rgba(228,182,94,.22), transparent 58%),
+  radial-gradient(90% 70% at 12% 0%, rgba(92,190,224,.16), transparent 60%);
+  pointer-events:none}
+#trail{position:absolute; inset:0; width:100%; height:100%; opacity:.5; pointer-events:none}
+.hero .wrap{position:relative; z-index:2}
+.hero__eyebrow{display:inline-flex; align-items:center; gap:.45rem; font-size:.74rem; font-weight:700; letter-spacing:.16em; color:var(--on-navy-soft); text-transform:none; margin-bottom:1rem}
+.hero__eyebrow::before{content:""; width:26px; height:2px; background:var(--green); border-radius:2px}
+.hero__title{font-family:var(--f-display); font-size:clamp(2.9rem,13vw,4.2rem); line-height:.98; letter-spacing:-.015em}
+.hero__title em{font-style:normal; color:var(--green); display:block}
+.hero__lead{font-family:var(--f-serif); font-size:1.12rem; line-height:1.7; color:var(--on-navy-soft); margin-top:1rem; max-width:34ch}
+.hero__meta{display:flex; flex-wrap:wrap; gap:.45rem; margin-top:1.5rem}
+.tag{display:inline-flex; align-items:center; gap:.35rem; font-size:.8rem; font-weight:600; padding:.34rem .7rem; border-radius:999px; border:1px solid rgba(255,255,255,.2); color:var(--on-navy-soft)}
+.tag b{color:var(--on-navy); font-weight:700}
+.hero__cta{display:inline-flex; align-items:center; justify-content:center; gap:.5rem; margin-top:1.8rem; background:var(--green); color:#0B1A10; font-family:var(--f-display); font-size:1.06rem; padding:.9rem 1.6rem; border:0; border-radius:999px; cursor:pointer; box-shadow:0 10px 26px rgba(75,138,43,.34); transition:transform .16s ease, box-shadow .16s ease; text-decoration:none}
+.hero__cta:hover{transform:translateY(-2px); box-shadow:0 16px 34px rgba(75,138,43,.42)}
+.hero__cta:active{transform:translateY(0)}
+
+/* torn paper edges */
+.tear{display:block; width:100%; height:30px; position:relative; z-index:3; margin-block:-1px}
+.tear svg{display:block; width:100%; height:100%}
+
+/* ---------- station ---------- */
+.station{padding:2.6rem 0 0}
+.station__head{display:flex; align-items:flex-start; gap:.85rem; margin-bottom:1.4rem}
+.station__num{flex:none; width:44px; height:44px; border-radius:50%; display:grid; place-items:center; font-family:var(--f-display); font-size:1.15rem; background:var(--surface); color:var(--ink); border:1.5px solid var(--line-strong); box-shadow:var(--shadow-s)}
+.station.is-open .station__num{background:var(--green); color:#0B1A10; border-color:transparent}
+.station__label{font-size:.72rem; letter-spacing:.16em; font-weight:700; color:var(--ink-faint)}
+.station__title{font-family:var(--f-display); font-size:clamp(1.45rem,6.4vw,1.9rem); line-height:1.15; margin-top:.15rem}
+
+/* ---------- story panel (navy) ---------- */
+.story{background:var(--navy); color:var(--on-navy); position:relative}
+.story__inner{width:var(--wrap); margin-inline:auto; padding:.4rem 0 1.9rem}
+.story__kicker{display:inline-flex; align-items:center; gap:.4rem; font-family:var(--f-display); font-size:.78rem; letter-spacing:.1em; color:var(--gold); border:1px solid var(--gold-line); padding:.26rem .7rem; border-radius:999px; margin-bottom:1.1rem}
+.story p{font-family:var(--f-serif); font-size:1.12rem; line-height:1.85; color:#E6E9E2; margin-bottom:.95rem; max-width:38ch}
+.story p:last-child{margin-bottom:0}
+.story p.beat{color:var(--gold); font-weight:700; font-size:1.16rem; border-inline-start:3px solid var(--gold-line); padding-inline-start:.85rem}
+.story .say{color:var(--on-navy)}
+.story .drop{font-size:1.24rem; line-height:1.7; color:#F1F3EE}
+.story .drop::after{content:""; display:block; width:44px; height:2px; background:var(--tchelet); border-radius:2px; margin-top:1.1rem; opacity:.8}
+
+/* ---------- question ---------- */
+.quiz{background:var(--surface); border:1px solid var(--line); border-radius:var(--r-l); padding:1.3rem 1.15rem; box-shadow:var(--shadow-m); margin-top:1.6rem}
+.quiz__label{font-size:.72rem; letter-spacing:.15em; font-weight:700; color:var(--green-ink); margin-bottom:.5rem}
+.quiz__q{font-family:var(--f-display); font-size:1.2rem; line-height:1.35; margin-bottom:1.05rem}
+.opts{display:flex; flex-direction:column; gap:.55rem}
+.opt{display:flex; align-items:flex-start; gap:.7rem; width:100%; text-align:right; background:var(--surface-2); border:1.5px solid var(--line); border-radius:var(--r-m); padding:.8rem .9rem; cursor:pointer; font-size:1rem; line-height:1.5; transition:border-color .18s, background .18s, transform .12s}
+.opt:hover:not(:disabled){border-color:var(--line-strong); transform:translateX(-2px)}
+.opt:disabled{cursor:default}
+.opt__key{flex:none; width:26px; height:26px; border-radius:8px; display:grid; place-items:center; font-family:var(--f-display); font-size:.85rem; background:var(--bg); border:1px solid var(--line); margin-top:.1rem}
+.opt__txt{flex:1}
+.opt.is-right{border-color:var(--green-line); background:var(--green-soft)}
+.opt.is-right .opt__key{background:var(--green); color:#0B1A10; border-color:transparent}
+.opt.is-wrong{border-color:var(--wrong); background:var(--wrong-soft)}
+.opt.is-wrong .opt__key{background:var(--wrong); color:#fff; border-color:transparent}
+.opt.is-dim{opacity:.5}
+@keyframes nudge{0%,100%{transform:translateX(0)}25%{transform:translateX(6px)}75%{transform:translateX(-6px)}}
+.opt.shake{animation:nudge .32s ease}
+.verdict{display:none; gap:.55rem; margin-top:.95rem; padding:.75rem .85rem; border-radius:var(--r-m); font-size:.96rem; line-height:1.6; align-items:flex-start}
+.verdict.show{display:flex}
+.verdict b{font-family:var(--f-display); font-weight:400}
+.verdict--yes{background:var(--green-soft); color:var(--ink); border:1px solid var(--green-line)}
+.verdict--no{background:var(--gold-soft); color:var(--ink); border:1px solid var(--gold-line)}
+.verdict__i{flex:none; font-size:1.1rem; line-height:1.45}
+
+/* ---------- halacha card (parchment) ---------- */
+.reveal{overflow:hidden; max-height:0; opacity:0; transition:max-height .6s cubic-bezier(.22,1,.36,1), opacity .45s ease .1s}
+.reveal.open{max-height:5200px; opacity:1}
+.din{margin-top:1.4rem; background:var(--surface); border:1px solid var(--line); border-radius:var(--r-l); box-shadow:var(--shadow-m); overflow:hidden}
+.din__top{display:flex; align-items:center; gap:.55rem; padding:.85rem 1.15rem; background:var(--green-soft); border-bottom:1px solid var(--green-line)}
+.din__top span{font-family:var(--f-display); font-size:1rem; color:var(--green-ink); letter-spacing:.01em}
+.din__body{padding:1.15rem 1.15rem 1.3rem; display:flex; flex-direction:column; gap:.9rem}
+.din__body p{font-size:1.02rem; line-height:1.78}
+.lede{font-family:var(--f-display); font-size:1.24rem !important; line-height:1.4 !important; letter-spacing:-.005em}
+.hl{background:linear-gradient(to top, var(--gold-soft) 0 42%, transparent 42%); padding-inline:.12em; font-weight:700}
+.rule{display:flex; gap:.7rem; align-items:flex-start; background:var(--surface-2); border-radius:var(--r-m); padding:.8rem .9rem; border:1px solid var(--line)}
+.rule__mark{flex:none; font-family:var(--f-display); font-size:1.05rem; width:24px; text-align:center; line-height:1.5}
+.rule--yes .rule__mark{color:var(--green-ink)}
+.rule--no .rule__mark{color:var(--wrong)}
+.rule p{font-size:.98rem !important; line-height:1.62 !important}
+.rule strong{font-weight:700}
+.pasuk{font-family:var(--f-serif); font-size:1.06rem; line-height:1.8; background:var(--navy); color:#E6E9E2; border-radius:var(--r-m); padding:1rem 1.05rem; position:relative}
+.pasuk cite{display:block; font-family:var(--f-body); font-style:normal; font-size:.8rem; color:var(--on-navy-soft); margin-top:.5rem; letter-spacing:.02em}
+
+/* ---------- expand ---------- */
+.more{margin-top:.3rem; border:1px dashed var(--line-strong); border-radius:var(--r-m); background:transparent; overflow:hidden}
+.more summary{list-style:none; cursor:pointer; display:flex; align-items:center; gap:.6rem; padding:.85rem 1rem; font-weight:700; font-size:.95rem; color:var(--tchelet)}
+.more summary::-webkit-details-marker{display:none}
+.more summary::after{content:"＋"; margin-inline-start:auto; font-family:var(--f-display); font-size:1.1rem; transition:transform .25s ease; color:var(--ink-faint)}
+.more[open] summary::after{transform:rotate(45deg)}
+.more__in{padding:0 1rem 1.05rem; display:flex; flex-direction:column; gap:.8rem; border-top:1px solid var(--line)}
+.more__in p{font-size:.96rem; line-height:1.72; color:var(--ink-soft); padding-top:.9rem}
+.more__in p+p{padding-top:0}
+.more__in h4{font-family:var(--f-display); font-size:1rem; color:var(--ink); padding-top:.4rem}
+.src{font-family:var(--f-serif); font-size:1rem; line-height:1.75; border-inline-start:3px solid var(--gold-line); padding-inline-start:.9rem; color:var(--ink)}
+.src cite{display:block; font-family:var(--f-body); font-style:normal; font-size:.78rem; color:var(--ink-faint); margin-top:.35rem}
+
+/* ---------- map of 39 ---------- */
+.map{margin-top:2.2rem}
+.map__eyebrow{font-size:.72rem; letter-spacing:.15em; font-weight:700; color:var(--green-ink); margin-bottom:.4rem}
+.map__t{font-family:var(--f-display); font-size:clamp(1.3rem,5.6vw,1.6rem); line-height:1.25}
+.map__sub{font-size:.95rem; color:var(--ink-soft); margin-top:.45rem; line-height:1.6}
+.seder{margin-top:1.5rem}
+.seder__t{display:flex; align-items:center; gap:.5rem; font-family:var(--f-display); font-size:.98rem; font-weight:400; padding-bottom:.55rem; border-bottom:1.5px solid var(--gc); margin-bottom:.75rem}
+.seder__t i{flex:none; width:10px; height:10px; border-radius:50%; background:var(--gc)}
+.seder__t em{margin-inline-start:auto; font-style:normal; font-size:.78rem; color:var(--ink-faint); font-variant-numeric:tabular-nums; letter-spacing:.04em}
+.pills{display:flex; flex-wrap:wrap; gap:.4rem}
+.pill{display:inline-flex; align-items:center; gap:.4rem; background:var(--surface); border:1.5px solid var(--line); border-radius:999px; padding-block:.42rem; padding-inline:.5rem .85rem; font-size:.92rem; font-weight:600; cursor:pointer; line-height:1.35; transition:.15s}
+.pill:hover{border-color:var(--gc); transform:translateY(-1px); box-shadow:var(--shadow-s)}
+.pill b{font-family:var(--f-display); font-weight:400; font-size:.72rem; color:var(--ink-faint); background:var(--surface-2); border-radius:999px; min-width:20px; height:20px; display:grid; place-items:center; font-variant-numeric:tabular-nums; transition:.15s}
+.pill.seen{border-color:var(--gc)}
+.pill.seen b{background:var(--gc); color:#fff}
+.map__hint{font-size:.86rem; color:var(--ink-faint); text-align:center; margin-top:1.4rem; padding-top:1rem; border-top:1px solid var(--line)}
+.map__hint b{color:var(--green-ink); font-variant-numeric:tabular-nums; font-size:1rem}
+
+/* ---------- sheet ---------- */
+.scrim{position:fixed; inset:0; background:rgba(7,18,35,.55); backdrop-filter:blur(3px); opacity:0; pointer-events:none; transition:opacity .28s ease; z-index:90}
+.scrim.on{opacity:1; pointer-events:auto}
+.sheet{position:fixed; inset-inline:0; bottom:0; z-index:100; background:var(--surface); border-radius:22px 22px 0 0; box-shadow:0 -14px 50px rgba(7,18,35,.4); transform:translateY(102%); transition:transform .34s cubic-bezier(.22,1,.36,1); max-height:82vh; overflow-y:auto; padding:.7rem 1.15rem 2rem; direction:rtl; text-align:right}
+.sheet.on{transform:translateY(0)}
+.sheet__grab{width:42px; height:4px; border-radius:4px; background:var(--line-strong); margin:.2rem auto 1rem}
+.sheet__n{font-family:var(--f-display); font-size:.78rem; color:var(--ink-faint); letter-spacing:.1em}
+.sheet__t{font-family:var(--f-display); font-size:1.6rem; margin:.15rem 0 .2rem}
+.sheet__g{display:inline-flex; align-items:center; gap:.4rem; font-size:.8rem; font-weight:700; padding:.24rem .6rem; border-radius:999px; margin-bottom:1rem}
+.sheet__sec{margin-top:1rem}
+.sheet__sec h5{margin:0 0 .3rem; font-size:.72rem; letter-spacing:.14em; color:var(--ink-faint); font-weight:700}
+.sheet__sec p{font-size:1rem; line-height:1.7}
+.sheet__sec--mish p{font-family:var(--f-serif)}
+.sheet__close{width:100%; margin-top:1.4rem; padding:.85rem; border-radius:999px; border:1.5px solid var(--line-strong); background:transparent; font-weight:700; cursor:pointer}
+@media (min-width:720px){ .sheet{inset-inline:auto; inset-inline-start:50%; transform:translate(0,102%); width:460px; margin-inline-start:-230px; border-radius:22px; bottom:24px} .sheet.on{transform:translate(0,0)} }
+
+/* ---------- finish ---------- */
+.finish{background:var(--navy); color:var(--on-navy); padding:.6rem 0 2.6rem; position:relative}
+.finish .wrap{position:relative; z-index:2}
+.finish__glow{position:absolute; inset:0; background:radial-gradient(80% 60% at 50% 0%, rgba(125,199,80,.2), transparent 62%); pointer-events:none}
+.finish__t{font-family:var(--f-display); font-size:clamp(1.7rem,7.5vw,2.3rem); line-height:1.12; margin:.6rem 0 1.1rem}
+.take{display:flex; gap:.75rem; align-items:flex-start; padding:.9rem 0; border-bottom:1px solid rgba(255,255,255,.13)}
+.take:last-of-type{border-bottom:0}
+.take__n{flex:none; font-family:var(--f-display); font-size:.85rem; color:var(--gold); border:1px solid var(--gold-line); width:26px; height:26px; border-radius:50%; display:grid; place-items:center; margin-top:.15rem}
+.take p{font-size:1rem; line-height:1.62; color:#E6E9E2}
+.take b{color:var(--on-navy)}
+.done{display:flex; align-items:center; justify-content:center; gap:.6rem; width:100%; margin-top:1.5rem; padding:1rem; border-radius:999px; border:2px solid var(--green); background:transparent; color:var(--green); font-family:var(--f-display); font-size:1.08rem; cursor:pointer; transition:.2s}
+.done:hover{background:rgba(125,199,80,.1)}
+.done.is-done{background:var(--green); color:#0B1A10; border-color:var(--green)}
+.acts{display:grid; grid-template-columns:1fr 1fr; gap:.6rem; margin-top:.6rem}
+.act--wide{grid-column:1 / -1; background:rgba(228,182,94,.1); font-family:var(--f-display); font-size:1.02rem; padding:.95rem}
+.act{display:flex; align-items:center; justify-content:center; gap:.45rem; padding:.85rem .6rem; border-radius:var(--r-m); border:1px solid rgba(255,255,255,.2); background:rgba(255,255,255,.05); color:var(--on-navy); font-weight:700; font-size:.94rem; cursor:pointer; text-decoration:none; transition:.18s}
+.act:hover{background:rgba(255,255,255,.1)}
+.act--gold{border-color:var(--gold-line); color:var(--gold)}
+.next{margin-top:1.6rem; border:1px dashed rgba(255,255,255,.24); border-radius:var(--r-m); padding:1rem}
+.next small{font-size:.72rem; letter-spacing:.15em; color:var(--on-navy-soft); font-weight:700}
+.next p{font-family:var(--f-display); font-size:1.14rem; margin-top:.3rem}
+.foot{width:var(--wrap); margin:1.6rem auto 2.4rem; font-size:.8rem; line-height:1.65; color:var(--ink-faint); text-align:center}
+.foot b{color:var(--ink-soft)}
+
+/* reveal on scroll */
+.rise{opacity:0; transform:translateY(18px); transition:opacity .6s ease, transform .6s cubic-bezier(.22,1,.36,1)}
+.rise.in{opacity:1; transform:none}
+
+@media (min-width:720px){
+  body{font-size:18px}
+  .hero{padding:3.6rem 0 5rem}
+  .acts{grid-template-columns:1fr 1fr}
+}
+.toast{position:fixed; inset-inline:0; bottom:20px; z-index:200; display:flex; justify-content:center; pointer-events:none}
+.toast span{background:var(--navy); color:var(--on-navy); padding:.6rem 1.1rem; border-radius:999px; font-size:.9rem; font-weight:600; opacity:0; transform:translateY(10px); transition:.28s; box-shadow:var(--shadow-m)}
+.toast.on span{opacity:1; transform:none}
+</style>
+<style>
+.tear{background:var(--from,var(--navy))}
+.tear path{fill:var(--to,var(--bg))}
+.tear--paper{--from:var(--navy); --to:var(--bg)}
+.tear--navy{--from:var(--bg); --to:var(--navy)}
+.tear--flip svg{transform:scaleY(-1)}
+</style>
+</head>
+<body>
+<div class="unit">
+
+<div class="bar">
+  <div class="bar__track"><div class="bar__fill" id="fill"></div></div>
+  <div class="bar__row">
+    <span class="bar__week">שבוע א׳</span>
+    <span class="bar__chapter" id="chapter">מלאכת מחשבת</span>
+    <span class="bar__pct" id="pct">0%</span>
+  </div>
+</div>
+
+<!-- ============ HERO ============ -->
+<header class="hero">
+  <div class="hero__sky"></div>
+  <canvas id="trail" aria-hidden="true"></canvas>
+  <div class="wrap">
+    <p class="hero__eyebrow">מיזם השבת · אור ישראלי</p>
+    <h1 class="hero__title">מלאכת <em>מחשבת</em></h1>
+    <p class="hero__lead">אחד הזיע עשר דקות. השני הרים אצבע אחת. רק אחד מהם עבר על איסור תורה - ורוב הסיכויים שתנחשו הפוך.</p>
+    <div class="hero__meta">
+      <span class="tag">⏱ <b>12</b> דקות</span>
+      <span class="tag">📖 <b>3</b> מעשים שהיו</span>
+      <span class="tag">🗺 <b>39</b> מלאכות</span>
+    </div>
+    <a href="#s1" class="hero__cta">מתחילים ↓</a>
+  </div>
+</header>
+<div class="tear tear--paper"><svg viewBox="0 0 1200 30" preserveAspectRatio="none" aria-hidden="true"><path d="M0,30 L0,14 L41,8 L90,18 L120,4 L176,12 L237,11 L275,18 L335,18 L386,8 L426,8 L485,16 L511,6 L547,5 L592,4 L635,18 L685,17 L736,3 L770,15 L802,5 L836,18 L875,12 L928,13 L980,16 L1042,15 L1102,17 L1142,14 L1169,12 L1200,14 L1200,30 Z"/></svg></div>
+
+<!-- ============ STATION 1 ============ -->
+<section class="station" id="s1" data-chapter="שער א׳ · מלאכה זה לא מאמץ">
+  <div class="wrap rise">
+    <div class="station__head">
+      <div class="station__num">א</div>
+      <div>
+        <p class="station__label">שער ראשון</p>
+        <h2 class="station__title">מלאכה זה לא מאמץ</h2>
+      </div>
+    </div>
+  </div>
+</section>
+<div class="tear tear--navy tear--flip"><svg viewBox="0 0 1200 30" preserveAspectRatio="none" aria-hidden="true"><path d="M0,30 L0,6 L59,17 L104,15 L148,9 L208,12 L241,4 L282,16 L334,12 L392,14 L443,8 L504,5 L538,10 L573,10 L620,7 L650,13 L702,6 L760,18 L795,17 L853,14 L880,17 L929,5 L977,5 L1033,15 L1059,16 L1100,7 L1161,10 L1200,15 L1200,30 Z"/></svg></div>
+<div class="story">
+  <div class="story__inner rise">
+    <span class="story__kicker">מעשה שהיה</span>
+    <p class="drop">שבת בצהריים. אלישע ונדב יוצאים מהסעודה אל החצר המרוצפת שמאחורי הבית.</p>
+    <p>אלישע רואה שהספסל הכבד עומד בשמש הקופחת. הוא מתכופף, אוחז בשתי ידיים, וגורר אותו לצל. עשר דקות. הוא נושם בכבדות, החולצה דבוקה לגב.</p>
+    <p class="say">״אחי,״ הוא אומר בין נשימה לנשימה, ״אני יודע שבשבת אסור לעבוד - אבל זו מצווה. עשיתי טובה לכולם.״</p>
+    <p>נדב, שיושב על הגדר ומסתכל עליו, מושיט יד בעצלנות אל השיח שלידו. תולש עלה אחד. מסובב אותו בין האצבעות, ומעיף אותו ברוח.</p>
+    <p class="beat">אחד משניהם עבר בדיוק עכשיו על איסור תורה. השני לא עשה כלום.</p>
+  </div>
+</div>
+<div class="tear tear--paper"><svg viewBox="0 0 1200 30" preserveAspectRatio="none" aria-hidden="true"><path d="M0,30 L0,10 L61,6 L109,13 L140,15 L191,17 L218,5 L250,3 L290,15 L321,18 L368,17 L406,3 L442,11 L495,17 L557,10 L617,17 L662,12 L720,11 L772,18 L831,8 L876,13 L932,16 L964,15 L998,12 L1033,14 L1063,16 L1099,17 L1152,3 L1196,8 L1200,10 L1200,30 Z"/></svg></div>
+
+<div class="wrap">
+  <div class="quiz rise" data-quiz="1" data-answer="1">
+    <p class="quiz__label">מה היית עונה?</p>
+    <h3 class="quiz__q">מי מהשניים עבר על איסור תורה?</h3>
+    <div class="opts">
+      <button class="opt" data-i="0"><span class="opt__key">א</span><span class="opt__txt">אלישע - הוא הזיע עשר דקות מול ספסל כבד</span></button>
+      <button class="opt" data-i="1"><span class="opt__key">ב</span><span class="opt__txt">נדב - הוא תלש עלה אחד בלי לשים לב</span></button>
+      <button class="opt" data-i="2"><span class="opt__key">ג</span><span class="opt__txt">שניהם, כל אחד באיסור אחר</span></button>
+      <button class="opt" data-i="3"><span class="opt__key">ד</span><span class="opt__txt">אף אחד - שניהם עשו דברים מותרים</span></button>
+    </div>
+    <div class="verdict verdict--yes" data-v="yes"><span class="verdict__i">✓</span><span><b>בול.</b> נדב. העלה הקטן הזה הוא מלאכה גמורה מן התורה - והזיעה של אלישע לא שווה כלום מבחינה הלכתית.</span></div>
+    <div class="verdict verdict--no" data-v="no"><span class="verdict__i">→</span><span><b>הגיוני - ולא נכון.</b> התשובה היא <b>נדב</b>, שתלש עלה אחד. וזה בדיוק הרעיון של השבוע הזה.</span></div>
+  </div>
+
+  <div class="reveal" data-reveal="1">
+  <div class="din">
+    <div class="din__top"><span>⚖ ומה ההלכה?</span></div>
+    <div class="din__body">
+      <p class="lede">מלאכה בשבת היא לא מאמץ. היא <span class="hl">יצירה</span>.</p>
+      <p>אנחנו רגילים לחשוב ש״לא לעשות מלאכה״ פירושו לנוח מעמל. זו טעות נפוצה - ומרכזית. התורה לא אסרה להתאמץ בשבת; היא אסרה שלושים ותשע פעולות יוצרות מוגדרות, ואת מה שדומה להן. הזיעה איננה קריטריון.</p>
+      <div class="rule rule--no"><span class="rule__mark">✕</span><p><strong>נדב תלש עלה.</strong> תלישת דבר ממקום גידולו היא מלאכת <strong>קוצר</strong> - אחת מל״ט המלאכות. שנייה אחת, אצבע אחת, איסור תורה.</p></div>
+      <div class="rule rule--yes"><span class="rule__mark">✓</span><p><strong>אלישע גרר ספסל על ריצוף.</strong> אין כאן שום פעולה יוצרת - רק העברת חפץ במקום. מותר, גם אם זה קשה ומזיע. <em>(ובחצר של אדמה התמונה משתנה - ראו ההרחבה.)</em></p></div>
+      <div class="pasuk">״שֵׁשֶׁת יָמִים תַּעֲשֶׂה מַעֲשֶׂיךָ וּבַיּוֹם הַשְּׁבִיעִי תִּשְׁבֹּת״<cite>שמות כ״ג, י״ב</cite></div>
+      <p>המונח שחז״ל טבעו לזה הוא <span class="hl">מְלֶאכֶת מַחֲשֶׁבֶת</span> - מלאכת אומן. פעולה מכוונת, בעלת תכלית, שיוצרת שינוי. בדיוק כמו העבודה שנעשתה במשכן, שהתורה עצמה קוראת לה ״מלאכת מחשבת״.</p>
+
+      <details class="more">
+        <summary>🔎 רוצה להעמיק?</summary>
+        <div class="more__in">
+          <h4>ורגע - ומה עם ״מנוחה״?</h4>
+          <p>יש בשבת שני מישורים נפרדים שקל לבלבל ביניהם. <b>איסור מלאכה</b> מן התורה - שאינו תלוי במאמץ כלל. ולצידו <b>עונג שבת ושביתה</b>, ובכללם גזרות חכמים כמו איסור ״עובדין דחול״ ומוקצה, ששייכים דווקא לאווירת היום. אלישע לא עבר על איסור תורה - אבל שאלה נפרדת היא אם גרירת ספסל מזיעה מתאימה לרוח השבת.</p>
+          <h4>ואם החצר הייתה אדמה?</h4>
+          <p>אז התמונה מתהפכת: גרירת חפץ כבד על קרקע לא מרוצפת עלולה ליצור חריץ באדמה - וזו תולדה של מלאכת <b>חורש</b>. אותה פעולה בדיוק, אותו מאמץ בדיוק, ורק המצע שמתחת קובע. זו דוגמה יפה לכך שהמלאכה נמדדת בתוצאה היוצרת, לא בקושי.</p>
+          <h4>המקור</h4>
+          <p class="src">״לא תעשה כל מלאכה״ - ובתורה שבכתב כמעט לא מפורש מהי מלאכה. על כך אמרו חז״ל שהלכות שבת ״הרי הם כהררים התלויין בשערה, שהן מקרא מועט והלכות מרובות״.<cite>שמות כ׳, י׳ · בבלי חגיגה י׳ ע״א</cite></p>
+          <p class="src">״מלאכת מחשבת אסרה תורה״ - הכלל שממנו נלמד שהאיסור הוא על פעולה יוצרת ומכוונת.<cite>בבלי ביצה י״ג ע״ב · חגיגה י׳ ע״ב</cite></p>
+        </div>
+      </details>
+    </div>
+  </div>
+  </div>
+</div>
+
+<!-- ============ STATION 2 ============ -->
+<section class="station" id="s2" data-chapter="שער ב׳ · למה דווקא 39?">
+  <div class="wrap rise">
+    <div class="station__head">
+      <div class="station__num">ב</div>
+      <div>
+        <p class="station__label">שער שני</p>
+        <h2 class="station__title">למה דווקא שלושים ותשע?</h2>
+      </div>
+    </div>
+  </div>
+</section>
+<div class="tear tear--navy tear--flip"><svg viewBox="0 0 1200 30" preserveAspectRatio="none" aria-hidden="true"><path d="M0,30 L0,14 L50,14 L90,9 L140,13 L201,12 L251,4 L292,4 L346,8 L381,14 L417,12 L446,7 L474,17 L518,10 L548,15 L604,8 L665,4 L698,7 L733,9 L762,12 L808,11 L835,9 L888,5 L933,16 L968,7 L999,17 L1026,18 L1077,11 L1104,6 L1138,6 L1193,16 L1200,12 L1200,30 Z"/></svg></div>
+<div class="story">
+  <div class="story__inner rise">
+    <span class="story__kicker">מעשה שהיה</span>
+    <p class="drop">״רגע,״ קטע יונתן את השיעור. ״מי בכלל החליט שיש בדיוק שלושים ותשע? למה לא ארבעים? למה לא שתים־עשרה?״</p>
+    <p>הרב סגר את הגמרא. ״שאלה מצוינת. תפתח חומש שמות, פרק ל״א.״</p>
+    <p>יונתן פתח. עמוד שלם של הוראות: בצלאל, אהליאב, הזהב, הכסף, הבדים, הקרשים, שמן המשחה. ואז, פתאום, בלי שום מעבר, באמצע העניין:</p>
+    <p class="beat">״אַךְ אֶת שַׁבְּתֹתַי תִּשְׁמֹרוּ.״</p>
+    <p class="say">״מה הקשר?״ שאל יונתן. ״למה שבת נכנסה דווקא לכאן, באמצע הוראות הבנייה?״</p>
+    <p>הרב חייך. ״זה בדיוק הקשר.״</p>
+  </div>
+</div>
+<div class="tear tear--paper"><svg viewBox="0 0 1200 30" preserveAspectRatio="none" aria-hidden="true"><path d="M0,30 L0,12 L31,10 L66,13 L97,9 L142,6 L190,18 L250,16 L300,16 L346,17 L406,5 L448,5 L488,4 L550,3 L590,5 L640,11 L671,17 L709,11 L748,17 L784,13 L831,4 L863,17 L908,14 L957,10 L998,3 L1035,9 L1075,13 L1136,9 L1190,10 L1200,8 L1200,30 Z"/></svg></div>
+
+<div class="wrap">
+  <div class="quiz rise" data-quiz="2" data-answer="2">
+    <p class="quiz__label">מה היית עונה?</p>
+    <h3 class="quiz__q">לפי ההיגיון הזה - מה קובע אם פעולה אסורה בשבת?</h3>
+    <div class="opts">
+      <button class="opt" data-i="0"><span class="opt__key">א</span><span class="opt__txt">כמה זמן היא לוקחת</span></button>
+      <button class="opt" data-i="1"><span class="opt__key">ב</span><span class="opt__txt">האם היא נעשית מחוץ לבית</span></button>
+      <button class="opt" data-i="2"><span class="opt__key">ג</span><span class="opt__txt">האם היא הייתה נחוצה לבניית המשכן</span></button>
+      <button class="opt" data-i="3"><span class="opt__key">ד</span><span class="opt__txt">האם היא כרוכה במאמץ גופני</span></button>
+    </div>
+    <div class="verdict verdict--yes" data-v="yes"><span class="verdict__i">✓</span><span><b>מדויק.</b> המשכן הוא הסרגל. כל פעולה שנדרשה כדי להקים אותו - היא ״אב מלאכה״.</span></div>
+    <div class="verdict verdict--no" data-v="no"><span class="verdict__i">→</span><span><b>לא הפעם.</b> התשובה היא <b>המשכן</b> - הוא הרשימה המקורית, והוא הסיבה שהמספר הוא בדיוק 39.</span></div>
+  </div>
+
+  <div class="reveal" data-reveal="2">
+  <div class="din">
+    <div class="din__top"><span>⚖ ומה ההלכה?</span></div>
+    <div class="din__body">
+      <p class="lede">המשכן הוא <span class="hl">רשימת המלאכות</span>.</p>
+      <p>התורה שתלה את מצוות השבת בתוך הוראות בניית המשכן - ומכאן למדו חז״ל את ההגדרה: מלאכה אסורה היא כל אחת מ־39 הפעולות שנדרשו להקמת המשכן, וכל פעולה הדומה להן.</p>
+      <div class="pasuk">״רְאֵה קָרָאתִי בְשֵׁם בְּצַלְאֵל... וַעֲשׂוּ אֵת כָּל אֲשֶׁר צִוִּיתִךָ... אַךְ אֶת שַׁבְּתֹתַי תִּשְׁמֹרוּ״<cite>שמות ל״א, א׳–י״ז</cite></div>
+      <p>שימו לב לתוצאה: מספר המלאכות אינו שרירותי, והוא גם לא רשימה של ״דברים מעייפים״. זו רשימה של <span class="hl">כל סוגי היצירה שאדם מסוגל לעשות בעולם</span> - מהצמחת זרע ועד המכה האחרונה בפטיש. בשבת אנחנו מחזירים לבורא את המפתחות.</p>
+
+      <details class="more">
+        <summary>🔎 רוצה להעמיק?</summary>
+        <div class="more__in">
+          <h4>מקרא מועט, הלכות מרובות</h4>
+          <p>בתורה שבכתב נזכרות במפורש רק מלאכות בודדות: <b>הבערת אש</b>, <b>קצירה</b>, ו<b>הוצאה מרשות לרשות</b>. כל השאר - עשרות פרקים בגמרא ואלפי הלכות - נלמדו מן המשכן. חז״ל עצמם עמדו על הפער הזה וכינו את הלכות שבת ״כהררים התלויין בשערה״.</p>
+          <p class="src">״הלכות שבת... הן כהררים התלויין בשערה, שהן מקרא מועט והלכות מרובות״.<cite>בבלי חגיגה י׳ ע״א</cite></p>
+          <h4>ארבע קבוצות, לפי סדר העבודה</h4>
+          <p>39 המלאכות אינן רשימה מבולגנת. הן מסודרות לפי <b>סדר העשייה בפועל</b> במשכן: קודם הכנת הסממנים לצבע, אחר כך אריגת היריעות, אחר כך עורות הכיסוי, ולבסוף הקמת המבנה עצמו. בסוף השער הבא תמצא את המפה המלאה.</p>
+        </div>
+      </details>
+    </div>
+  </div>
+  </div>
+</div>
+
+<!-- ============ STATION 3 ============ -->
+<section class="station" id="s3" data-chapter="שער ג׳ · אבות ותולדות">
+  <div class="wrap rise">
+    <div class="station__head">
+      <div class="station__num">ג</div>
+      <div>
+        <p class="station__label">שער שלישי</p>
+        <h2 class="station__title">אבות, תולדות, ומכונת הכביסה</h2>
+      </div>
+    </div>
+  </div>
+</section>
+<div class="tear tear--navy tear--flip"><svg viewBox="0 0 1200 30" preserveAspectRatio="none" aria-hidden="true"><path d="M0,30 L0,6 L54,3 L98,12 L154,6 L204,6 L234,10 L278,6 L323,5 L363,8 L410,11 L453,4 L481,9 L521,17 L574,15 L631,10 L663,5 L691,14 L738,7 L765,9 L791,16 L845,5 L894,5 L943,5 L991,17 L1021,12 L1081,6 L1119,11 L1181,17 L1200,9 L1200,30 Z"/></svg></div>
+<div class="story">
+  <div class="story__inner rise">
+    <span class="story__kicker">מעשה שהיה · המשך</span>
+    <p class="drop">בדרך הביתה מהשיעור, יונתן עצר באמצע המדרכה.</p>
+    <p class="say">״רגע. במשכן לא הייתה מכונת כביסה. לא היה מקרר, לא הייתה מגרדת ירקות ולא הייתה נורה חשמלית. אז איך כל הדברים האלה אסורים בשבת?״</p>
+    <p>הרב שהלך לצידו הרים גבה. ״ומי אמר שצריך שהם יהיו במשכן?״</p>
+    <p>״אבל אמרת שהרשימה היא מהמשכן.״</p>
+    <p class="say">״הרשימה - כן. אבל הרשימה היא של <b>רעיונות</b>, לא של מכשירים. במשכן שחקו סממנים באבן כדי להפיק צבע. אתה מגרד גזר במגרדת. אותו רעיון בדיוק: לוקחים גוף מוצק ומפוררים אותו.״</p>
+    <p class="beat">״ומבחינת האיסור - אין שום הבדל בין השניים.״</p>
+  </div>
+</div>
+<div class="tear tear--paper"><svg viewBox="0 0 1200 30" preserveAspectRatio="none" aria-hidden="true"><path d="M0,30 L0,13 L46,4 L88,8 L126,12 L157,10 L215,5 L253,4 L312,15 L367,8 L415,9 L443,15 L470,16 L508,8 L554,17 L608,7 L635,11 L670,8 L711,15 L756,4 L798,15 L837,16 L864,6 L896,11 L928,13 L962,17 L1018,18 L1080,15 L1124,7 L1163,13 L1200,9 L1200,30 Z"/></svg></div>
+
+<div class="wrap">
+  <div class="quiz rise" data-quiz="3" data-answer="1">
+    <p class="quiz__label">מה היית עונה?</p>
+    <h3 class="quiz__q">סחיטת תפוז לתוך כוס - תולדה של איזו מלאכה?</h3>
+    <div class="opts">
+      <button class="opt" data-i="0"><span class="opt__key">א</span><span class="opt__txt">בורר - מפרידים את המיץ מהחלקים המוצקים</span></button>
+      <button class="opt" data-i="1"><span class="opt__key">ב</span><span class="opt__txt">דש - מוציאים את התוכן מתוך מה שעוטף אותו</span></button>
+      <button class="opt" data-i="2"><span class="opt__key">ג</span><span class="opt__txt">טוחן - מפוררים את הפרי</span></button>
+      <button class="opt" data-i="3"><span class="opt__key">ד</span><span class="opt__txt">מבשל - מכינים משקה לשתייה</span></button>
+    </div>
+    <div class="verdict verdict--yes" data-v="yes"><span class="verdict__i">✓</span><span><b>יפה מאוד.</b> דש. בשדה מוציאים את הגרעין מהשיבולת; בכוס מוציאים את המיץ מהפרי. אותה מלאכה.</span></div>
+    <div class="verdict verdict--no" data-v="no"><span class="verdict__i">→</span><span><b>קרוב.</b> התשובה היא <b>דש</b> - הפרדת התוכן ממה שעוטף אותו. סחיטת פירות שדרכם להיסחט היא תולדה שלה.</span></div>
+  </div>
+
+  <div class="reveal" data-reveal="3">
+  <div class="din">
+    <div class="din__top"><span>⚖ ומה ההלכה?</span></div>
+    <div class="din__body">
+      <p class="lede">אָב ותולדה - <span class="hl">אותו איסור בדיוק</span>.</p>
+      <p>39 הפעולות שנעשו במשכן נקראות <b>אבות מלאכות</b>, כי הן היסוד והמקור. כל פעולה אחרת שעושה את אותו הדבר בכלים אחרים נקראת <b>תולדה</b> - ואפילו שלא הייתה במשכן מעולם.</p>
+      <div class="rule rule--no"><span class="rule__mark">≡</span><p><strong>מבחינת חומרת האיסור אין ביניהם שום הבדל.</strong> שניהם אסורים מן התורה, ובזמן שבית המקדש היה קיים היה חיוב שווה על שניהם.</p></div>
+      <p>וזה בדיוק מה שהופך את הרשימה מרשימה עתיקה למערכת חיה: השאלה בשבת אינה ״האם היה להם כזה במדבר״, אלא <span class="hl">״מה אני עושה כאן בעצם״</span>.</p>
+
+      <details class="more">
+        <summary>🔎 רוצה להעמיק?</summary>
+        <div class="more__in">
+          <h4>שלוש דוגמאות מהיומיום</h4>
+          <p>• <b>מגרדת ירקות</b> ← טוחן (כמו שחיקת הסממנים באבן).<br>
+             • <b>סינון גרעינים מכוס מיץ במסננת</b> ← בורר בכלי, שהוא ״דרך מלאכה״.<br>
+             • <b>הדבקת שני חלקים בדבק</b> ← תופר, שהרי מהות התפירה היא חיבור שני דברים באמצעות גורם שלישי.</p>
+          <h4>שימו לב - לא כל סחיטה שווה</h4>
+          <p>המלאכה חלה על פרי <b>שדרכו להיסחט</b> - כמו ענבים או תפוזים. פרי שאין דרך העולם לסחוט אותו כלל אינו באותו דין, וכן סחיטה לתוך מאכל שסופג את הנוזל. אלו פרטים שנרחיב בהם בשבוע ייעודי - כאן חשוב רק העיקרון.</p>
+        </div>
+      </details>
+
+    </div>
+  </div>
+
+  <div class="map rise">
+    <p class="map__eyebrow">🗺 המפה המלאה</p>
+    <h3 class="map__t">ל״ט המלאכות, לפי סדר העבודה במשכן</h3>
+    <p class="map__sub">אלו הן. לחצו על כל מלאכה כדי לראות את ההגדרה שלה ואת מה שעשו איתה בפועל במשכן - ואל תרגישו חייבים לסיים הכל היום.</p>
+    <div id="groups"></div>
+    <p class="map__hint">גילית <b id="seen">0</b> מתוך 39</p>
+  </div>
+  </div>
+</div>
+
+<!-- ============ FINISH ============ -->
+<div class="tear tear--navy tear--flip" style="margin-top:2.4rem"><svg viewBox="0 0 1200 30" preserveAspectRatio="none" aria-hidden="true"><path d="M0,30 L0,14 L41,8 L90,18 L120,4 L176,12 L237,11 L275,18 L335,18 L386,8 L426,8 L485,16 L511,6 L547,5 L592,4 L635,18 L685,17 L736,3 L770,15 L802,5 L836,18 L875,12 L928,13 L980,16 L1042,15 L1102,17 L1142,14 L1169,12 L1200,14 L1200,30 Z"/></svg></div>
+<section class="finish" id="end" data-chapter="סיכום השבוע">
+  <div class="finish__glow"></div>
+  <div class="wrap">
+    <p class="hero__eyebrow" style="margin-bottom:.4rem">סיכום · שבוע א׳</p>
+    <h2 class="finish__t">שלוש שורות שכדאי לקחת לשבת</h2>
+    <div class="take"><span class="take__n">1</span><p><b>מלאכה איננה מאמץ.</b> אפשר לגרור ספסל כבד ולא לעבור על כלום, ואפשר לתלוש עלה אחד ולעבור על איסור תורה.</p></div>
+    <div class="take"><span class="take__n">2</span><p><b>המשכן הוא הרשימה.</b> 39 המלאכות הן הפעולות שנדרשו להקמתו - ולכן המספר אינו שרירותי.</p></div>
+    <div class="take"><span class="take__n">3</span><p><b>אב ותולדה שווים.</b> השאלה אינה איזה מכשיר אני מחזיק ביד, אלא איזו יצירה אני עושה איתו.</p></div>
+
+    <button class="done" id="done">סיימתי את שבוע א׳</button>
+    <div class="acts">
+      <a class="act act--gold act--wide" href="quiz.html">🏆 לשעשועון השבועי ולהגרלת הפרסים</a>
+      <a class="act" id="share" href="#">↗ שיתוף</a>
+      <a class="act" href="index.html">◂ כל השבועות</a>
+    </div>
+
+    <div class="next">
+      <small>בשבוע הבא</small>
+      <p>שער ב׳ · בורר - למה דווקא בשולחן שבת הכי קל להיכשל</p>
+    </div>
+  </div>
+</section>
+<p class="foot"><b>סקיצה לדוגמה.</b> התכנים ההלכתיים מובאים כאן לצורך הדגמת מבנה היחידה, וטעונים עריכה ואישור רבני לפני פרסום.<br>אור ישראלי · תנועת נוער בערכי היהדות</p>
+
+</div>
+
+<div class="scrim" id="scrim"></div>
+<aside class="sheet" id="sheet" role="dialog" aria-modal="true" aria-labelledby="sheetT">
+  <div class="sheet__grab"></div>
+  <p class="sheet__n" id="sheetN"></p>
+  <h3 class="sheet__t" id="sheetT"></h3>
+  <span class="sheet__g" id="sheetG"></span>
+  <div class="sheet__sec"><h5>הגדרת המלאכה</h5><p id="sheetD"></p></div>
+  <div class="sheet__sec sheet__sec--mish"><h5>המלאכה במשכן</h5><p id="sheetM"></p></div>
+  <button class="sheet__close" id="sheetX">סגירה</button>
+</aside>
+<div class="toast" id="toast"><span></span></div>
+<script>
+(function(){
+"use strict";
+const MEL=[{"n": 1, "t": "זורע", "g": "a", "d": "להצמיח: זריעה, נטיעה, שתילה, השקיה, גיזום לצורך צמיחה.", "m": "זרעו סממנים כדי לצבוע בהם את היריעות."}, {"n": 2, "t": "חורש", "g": "a", "d": "הכשרת קרקע לזריעה - תיחוח האדמה כדי שתהיה ראויה לזרע.", "m": "חרשו את הקרקע לקראת זריעת הסממנים."}, {"n": 3, "t": "קוצר", "g": "a", "d": "עקירת דבר ממקום גידולו: קטיפת פרי, תלישת עלה, חיתוך ענף.", "m": "קצרו את הסממנים ששימשו לצביעת היריעות."}, {"n": 4, "t": "מעמר", "g": "a", "d": "איסוף גידולי קרקע במקום גידולם וכינוסם לערימה.", "m": "אספו את הסממנים במקום גידולם."}, {"n": 5, "t": "דש", "g": "a", "d": "הפרדת גידול מהפסולת המחוברת אליו. בכלל זה סחיטת פירות שדרכם להיסחט.", "m": "דשו את הסממנים לפני השימוש בהם."}, {"n": 6, "t": "זורה", "g": "a", "d": "הפרדת פסולת מאוכל בעזרת הרוח.", "m": "זרו את הסממנים ברוח."}, {"n": 7, "t": "בורר", "g": "a", "d": "הפרדת פסולת מאוכל ״דרך מלאכה״ - פסולת מתוך אוכל, בכלי מיוחד, או לא לשימוש מיידי.", "m": "הפרידו את הפסולת מן הסממנים."}, {"n": 8, "t": "טוחן", "g": "a", "d": "פירור מוצק לחלקים דקים: כתישה, חיתוך דק, גירוד במגרדת.", "m": "שחקו את הסממנים כדי להפיק מהם צבע."}, {"n": 9, "t": "מרקד", "g": "a", "d": "הפרדת אוכל מפסולת בנפה - הרקדה וסינון.", "m": "ניפו את הסממנים מן הפסולת המעורבת בהם."}, {"n": 10, "t": "לש", "g": "a", "d": "חיבור דברי מאכל לעיסה אחת. בכלל זה גיבול עפר במים.", "m": "לשו את הסממנים להכנת צבעי תכלת וארגמן."}, {"n": 11, "t": "אופה (מבשל)", "g": "a", "d": "הכשרת דבר לשימוש בכוח החום - בישול, אפייה, התכת מתכת, הנחה במקום חם.", "m": "בישלו את הסממנים לצורך הכנת הצבע."}, {"n": 12, "t": "גוזז", "g": "b", "d": "ניתוק דבר ממקום גידולו על גוף אדם או בהמה: צמר, שיער, ציפורניים.", "m": "גזזו צמר מן הבהמה לצורך היריעות."}, {"n": 13, "t": "מלבן", "g": "b", "d": "כל פעולת ניקוי של בד וחוט: כיבוס, שרייה במים, סחיטה, הסרת כתם.", "m": "ליבנו צמר ופשתן ליריעות, לפרוכות ולבגדי הכהונה."}, {"n": 14, "t": "מנפץ", "g": "b", "d": "סריקת הצמר אחרי הליבון, כדי להפריד בין השערות ולהכשירן לטווייה.", "m": "ניפצו את הצמר לקראת הטווייה."}, {"n": 15, "t": "צובע", "g": "b", "d": "צביעת חוט, בגד, קיר, רהיט או ציור - או חיזוק צבע קיים.", "m": "צבעו את חוטי הצמר בתכלת, ארגמן ותולעת שני."}, {"n": 16, "t": "טווה", "g": "b", "d": "עשיית חוטים מחומר גלמי - צמר, פשתן או כותנה.", "m": "טוו את סיבי הצמר לחוטים לאריגת היריעות."}, {"n": 17, "t": "מיסך", "g": "b", "d": "מתיחת חוטי השתי (חוטי האורך) לקראת האריגה.", "m": "מתחו את חוטי השתי לאריגת היריעות."}, {"n": 18, "t": "עושה שני בתי נירין", "g": "b", "d": "הכנה לאריגה: עשיית טבעות הנירין, או השחלת חוטי השתי לתוכן.", "m": "עשו בתי נירין לאריגת היריעות."}, {"n": 19, "t": "אורג", "g": "b", "d": "יצירת אריג בהכנסת חוטי הערב (הרוחב) בין חוטי השתי.", "m": "ארגו את היריעות, הפרוכות ובגדי הכהונה."}, {"n": 20, "t": "פוצע", "g": "b", "d": "סתירת האריג - נטילת חוטים ממקום אחד כדי לתקן במקום אחר.", "m": "פצעו חוטים לצורך תיקון היריעות."}, {"n": 21, "t": "קושר", "g": "b", "d": "חיבור שני דברים בקשר של קיימא - קשר קבוע וחזק.", "m": "קשרו את חוטי היריעות שנקרעו בשעת האריגה."}, {"n": 22, "t": "מתיר", "g": "b", "d": "התרת קשר של קיימא.", "m": "ציידי החילזון התירו חוטים ברשתות כדי לתקנן."}, {"n": 23, "t": "תופר", "g": "b", "d": "חיבור שני דברים בתפר המתקיים. בכלל זה הדבקה - חיבור בגורם שלישי.", "m": "תפרו את היריעות זו לזו."}, {"n": 24, "t": "קורע", "g": "b", "d": "קריעה או הפרדה של דברים המחוברים חיבור של קיימא - בד, נייר או תפר.", "m": "קרעו סביב נקב ביריעה כדי לתופרו מחדש בתפר ישר."}, {"n": 25, "t": "צד", "g": "c", "d": "כל פעולה השוללת את חירותו של בעל חיים: ביד, ברשת, במלכודת או במצודה.", "m": "צדו אילים ותחשים לצורך עורות המשכן."}, {"n": 26, "t": "שוחט", "g": "c", "d": "נטילת נשמה של בעל חיים בכל צורה. בכלל זה הוצאת דם מן החי.", "m": "שחטו אילים ותחשים לצורך העורות."}, {"n": 27, "t": "מפשיט", "g": "c", "d": "הפשטת העור מבעל חיים לאחר מותו.", "m": "הפשיטו את עורות האילים והתחשים."}, {"n": 28, "t": "מעבד (מולח)", "g": "c", "d": "עיבוד העור להכשירו לשימוש: מליחה, שרייה בסיד או בחומרים אחרים.", "m": "עיבדו את העורות לכיסויי המשכן."}, {"n": 29, "t": "ממחק", "g": "c", "d": "החלקת עור בעל חיים כדי להכינו לשימוש.", "m": "החליקו את העורות בהסרת השערות והצמר."}, {"n": 30, "t": "משרטט", "g": "c", "d": "סימון קווים על קלף או נייר, כדי לכתוב עליהם ישר או לחתוך לפיהם.", "m": "שרטטו את העורות לפני החיתוך."}, {"n": 31, "t": "מחתך", "g": "c", "d": "חיתוך דבר לפי מידה או לפי צורה מסוימת.", "m": "חתכו את העורות במידה מדויקת לאוהל המשכן."}, {"n": 32, "t": "כותב", "g": "d", "d": "כתיבת אותיות - גם באדים על זכוכית או באצבע רטובה על השולחן.", "m": "כתבו אותיות על הקרשים כדי לדעת את מקומו של כל קרש."}, {"n": 33, "t": "מוחק", "g": "d", "d": "מחיקת כתב כדי לכתוב במקום שנמחק.", "m": "מחקו אותיות שנכתבו בטעות על הקרשים."}, {"n": 34, "t": "בונה", "g": "d", "d": "כל פעולה המקימה בניין או חלק ממנו - עד כדי נעיצת מסמר בקיר.", "m": "הקימו את המשכן."}, {"n": 35, "t": "סותר", "g": "d", "d": "הריסת בניין או חלק ממנו. אסור גם כשסותר לשם קלקול.", "m": "פירקו את המשכן בכל מסע כדי להקימו במקום החדש."}, {"n": 36, "t": "מכבה", "g": "d", "d": "הפסקת בעירה או הקטנת להבה.", "m": "כיבו את האש לצורך עשיית פחמים לצירוף הזהב והכסף."}, {"n": 37, "t": "מבעיר", "g": "d", "d": "הדלקת אש או הגדלתה.", "m": "הבעירו אש ליציקת הכלים והאדנים ולבישול הסממנים."}, {"n": 38, "t": "מכה בפטיש", "g": "d", "d": "כל פעולה המשלימה חפץ ומכשירה אותו לשימושו - ולו הכאה אחת אחרונה.", "m": "היכו בפטיש על הכלים לסיום עיצובם."}, {"n": 39, "t": "מוציא מרשות לרשות", "g": "d", "d": "הוצאת חפץ מרשות היחיד לרשות הרבים או להפך - בנשיאה, זריקה, הושטה או דחיפה.", "m": "בני ישראל הביאו את תרומת המשכן מבתיהם אל מחנה לוויה."}];
+const GC={a:"#C9803A",b:"#3C7FA8",c:"#8A4A6E",d:"#4B8A2B"};
+const GN={a:"סדר הסממנים",b:"סדר היריעות",c:"סדר העורות",d:"סדר הבניין"};
+const $=(s,r)=>(r||document).querySelector(s);
+const $$=(s,r)=>Array.from((r||document).querySelectorAll(s));
+const reduce=window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+/* ---- storage (safe) ---- */
+const KEY="shabat.w1";
+function load(){try{return JSON.parse(localStorage.getItem(KEY))||{}}catch(e){return{}}}
+function save(s){try{localStorage.setItem(KEY,JSON.stringify(s))}catch(e){}}
+let state=load(); state.seen=state.seen||[];
+
+/* ---- toast ---- */
+let tt;
+function toast(msg){const t=$("#toast");$("span",t).textContent=msg;t.classList.add("on");clearTimeout(tt);tt=setTimeout(()=>t.classList.remove("on"),2200);}
+
+/* ---- progress ---- */
+const fill=$("#fill"),pct=$("#pct"),chapter=$("#chapter");
+function onScroll(){
+  const h=document.documentElement.scrollHeight-window.innerHeight;
+  const p=h>0?Math.min(100,Math.max(0,Math.round(window.scrollY/h*100))):0;
+  fill.style.width=p+"%"; pct.textContent=p+"%";
+}
+window.addEventListener("scroll",onScroll,{passive:true});
+window.addEventListener("resize",onScroll); onScroll();
+
+const marks=$$("[data-chapter]");
+if("IntersectionObserver" in window){
+  const co=new IntersectionObserver(es=>{
+    es.forEach(e=>{ if(e.isIntersecting){ chapter.textContent=e.target.dataset.chapter; e.target.classList.add("is-open"); } });
+  },{rootMargin:"-45% 0px -50% 0px"});
+  marks.forEach(m=>co.observe(m));
+
+  const ro=new IntersectionObserver(es=>{
+    es.forEach(e=>{ if(e.isIntersecting){ e.target.classList.add("in"); ro.unobserve(e.target);} });
+  },{rootMargin:"0px 0px -12% 0px",threshold:.08});
+  $$(".rise").forEach(el=>ro.observe(el));
+}else{ $$(".rise").forEach(el=>el.classList.add("in")); }
+
+/* ---- quizzes ---- */
+$$("[data-quiz]").forEach(q=>{
+  const id=q.dataset.quiz, right=+q.dataset.answer;
+  const opts=$$(".opt",q);
+  const target=$('[data-reveal="'+id+'"]');
+  opts.forEach(o=>o.addEventListener("click",()=>{
+    if(q.dataset.locked)return;
+    const i=+o.dataset.i, ok=i===right;
+    if(!ok){ o.classList.add("shake"); setTimeout(()=>o.classList.remove("shake"),340); }
+    q.dataset.locked="1";
+    opts.forEach(x=>{
+      x.disabled=true;
+      const xi=+x.dataset.i;
+      if(xi===right)x.classList.add("is-right");
+      else if(xi===i)x.classList.add("is-wrong");
+      else x.classList.add("is-dim");
+    });
+    $('[data-v="'+(ok?"yes":"no")+'"]',q).classList.add("show");
+    setTimeout(()=>{
+      target.classList.add("open");
+      if(!reduce)setTimeout(()=>{const r=target.getBoundingClientRect();if(r.top>window.innerHeight*0.85)target.scrollIntoView({behavior:"smooth",block:"start"});},420);
+    }, ok?420:700);
+    state["q"+id]=ok; save(state);
+  }));
+});
+
+/* ---- map ---- */
+const GORDER=["a","b","c","d"];
+const GT={a:"סדר הסממנים · הכנת הצבע ליריעות",b:"סדר היריעות · מצמר לאריג",c:"סדר העורות · כיסויי המשכן",d:"סדר הבניין · הקמת המשכן"};
+const groups=$("#groups"), seenEl=$("#seen");
+groups.innerHTML=GORDER.map(function(g){
+  const list=MEL.filter(function(m){return m.g===g;});
+  return '<section class="seder" style="--gc:'+GC[g]+'">'+
+    '<h4 class="seder__t"><i></i>'+GT[g]+'<em>'+list.length+' מלאכות</em></h4>'+
+    '<div class="pills">'+list.map(function(m){
+      return '<button class="pill'+(state.seen.indexOf(m.n)>-1?" seen":"")+'" data-n="'+m.n+'"><b>'+m.n+'</b>'+m.t+'</button>';
+    }).join("")+'</div></section>';
+}).join("");
+seenEl.textContent=state.seen.length;
+
+const sheet=$("#sheet"),scrim=$("#scrim");
+let lastFocus=null;
+function openSheet(n){
+  const m=MEL[n-1]; if(!m)return;
+  lastFocus=document.activeElement;
+  $("#sheetN").textContent="מלאכה "+m.n+" מתוך 39";
+  $("#sheetT").textContent=m.t;
+  const g=$("#sheetG");
+  g.textContent=GN[m.g]; g.style.background=GC[m.g]+"22"; g.style.color=GC[m.g];
+  $("#sheetD").textContent=m.d; $("#sheetM").textContent=m.m;
+  sheet.classList.add("on"); scrim.classList.add("on");
+  $("#sheetX").focus();
+  if(state.seen.indexOf(n)===-1){ state.seen.push(n); save(state); seenEl.textContent=state.seen.length;
+    groups.querySelectorAll('[data-n="'+n+'"]').forEach(function(b){b.classList.add("seen");});
+    if(state.seen.length===39)setTimeout(()=>toast("כל ל״ט המלאכות - כל הכבוד! 🏔"),400);
+  }
+}
+function closeSheet(){ sheet.classList.remove("on"); scrim.classList.remove("on"); if(lastFocus)lastFocus.focus(); }
+groups.addEventListener("click",function(e){const b=e.target.closest(".pill"); if(b)openSheet(+b.dataset.n);});
+scrim.addEventListener("click",closeSheet);
+$("#sheetX").addEventListener("click",closeSheet);
+document.addEventListener("keydown",e=>{ if(e.key==="Escape"&&sheet.classList.contains("on"))closeSheet(); });
+
+/* ---- done + share ---- */
+const done=$("#done");
+function paintDone(){ if(state.done){ done.classList.add("is-done"); done.textContent="✓ שבוע א׳ הושלם"; } }
+paintDone();
+done.addEventListener("click",()=>{
+  state.done=!state.done; save(state);
+  if(state.done){ paintDone(); toast("נרשם! נתראה בשבוע הבא 🏔"); }
+  else{ done.classList.remove("is-done"); done.textContent="סיימתי את שבוע א׳"; }
+});
+
+const shareText="למדתי את שבוע א׳ במיזם השבת של אור ישראלי - ״מלאכת מחשבת״. מתכוננים לשבת האחרונה של השנה 🏔";
+$("#share").addEventListener("click",e=>{
+  e.preventDefault();
+  const url=location.href;
+  if(navigator.share){ navigator.share({title:"מיזם השבת · אור ישראלי",text:shareText,url:url}).catch(()=>{}); }
+  else{ window.open("https://wa.me/?text="+encodeURIComponent(shareText+"\n"+url),"_blank","noopener"); }
+});
+
+/* ---- hero trail canvas ---- */
+const cv=$("#trail");
+if(cv&&cv.getContext){
+  const ctx=cv.getContext("2d");
+  let W=0,H=0,dots=[],raf;
+  function ridge(y,amp,seed){ const pts=[]; for(let i=0;i<=12;i++){ const x=W*i/12; pts.push([x, y + Math.sin(i*1.7+seed)*amp + Math.cos(i*0.9+seed*2)*amp*0.6]); } return pts; }
+  function drawRidge(pts,col){ ctx.beginPath(); ctx.moveTo(0,H); ctx.lineTo(pts[0][0],pts[0][1]);
+    for(let i=1;i<pts.length;i++){ const p=pts[i-1],c=pts[i]; ctx.quadraticCurveTo(p[0],p[1],(p[0]+c[0])/2,(p[1]+c[1])/2); }
+    ctx.lineTo(W,H); ctx.closePath(); ctx.fillStyle=col; ctx.fill(); }
+  function setup(){
+    const r=cv.getBoundingClientRect(); const dpr=Math.min(2,window.devicePixelRatio||1);
+    W=r.width; H=r.height; cv.width=W*dpr; cv.height=H*dpr; ctx.setTransform(dpr,0,0,dpr,0,0);
+    dots=[]; for(let i=0;i<26;i++)dots.push({x:Math.random()*W,y:Math.random()*H*0.6,r:Math.random()*1.3+0.4,p:Math.random()*6.28,s:Math.random()*0.9+0.3});
+    draw(0);
+  }
+  function draw(t){
+    ctx.clearRect(0,0,W,H);
+    for(const d of dots){ const a=0.28+0.28*Math.sin(t*0.0012*d.s+d.p);
+      ctx.beginPath(); ctx.arc(d.x,d.y,d.r,0,6.284); ctx.fillStyle="rgba(228,182,94,"+a.toFixed(3)+")"; ctx.fill(); }
+    drawRidge(ridge(H*0.72,18,1.2),"rgba(255,255,255,0.045)");
+    drawRidge(ridge(H*0.84,13,3.4),"rgba(255,255,255,0.06)");
+    ctx.save(); ctx.setLineDash([5,9]); ctx.lineWidth=2; ctx.lineCap="round";
+    ctx.strokeStyle="rgba(125,199,80,0.5)"; ctx.beginPath();
+    ctx.moveTo(W*0.06,H*0.99); ctx.bezierCurveTo(W*0.32,H*0.92,W*0.30,H*0.78,W*0.55,H*0.74);
+    ctx.bezierCurveTo(W*0.78,H*0.70,W*0.72,H*0.60,W*0.90,H*0.56); ctx.stroke(); ctx.restore();
+    const gx=W*0.90,gy=H*0.56, g=ctx.createRadialGradient(gx,gy,0,gx,gy,16);
+    g.addColorStop(0,"rgba(228,182,94,0.95)"); g.addColorStop(1,"rgba(228,182,94,0)");
+    ctx.fillStyle=g; ctx.beginPath(); ctx.arc(gx,gy,16,0,6.284); ctx.fill();
+    if(!reduce)raf=requestAnimationFrame(draw);
+  }
+  setup(); window.addEventListener("resize",()=>{cancelAnimationFrame(raf);setup();});
+}
+
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,822 @@
+/**
+ * ערכת מראה למחזור "מידות טובות" - נטען אחרי style.css.
+ * מבוסס על סגנון המודעות: גווני תכלת, ורוד-פנינה זוהר, כחול מלכותי וזהב.
+ */
+
+body {
+    font-family: var(--site-font-body);
+    color: var(--site-ink);
+    background: linear-gradient(165deg,
+            #fce4ec 0%,
+            #e0f7fa 20%,
+            var(--site-blue) 45%,
+            var(--site-blue-dark) 85%) !important;
+    background-attachment: fixed;
+}
+
+@media (prefers-color-scheme: dark) {
+    body {
+        background: linear-gradient(165deg,
+                #1a0928 0%,
+                #092040 35%,
+                #004d40 100%) !important;
+        color: #ffffff !important;
+    }
+}
+
+.modern-main {
+    background: rgba(255, 255, 255, 0.97) !important;
+    border-radius: var(--site-radius-xl);
+    box-shadow: var(--site-shadow);
+    max-width: var(--site-max);
+}
+
+.modern-header {
+    background: linear-gradient(120deg,
+            var(--site-blue-dark) 0%,
+            var(--site-blue) 55%,
+            #00acc1 100%) !important;
+    box-shadow: 0 8px 28px rgba(2, 136, 209, 0.35);
+}
+
+.main-logo img {
+    height: clamp(48px, 10vw, 64px);
+}
+
+.back-button {
+    color: var(--site-ink) !important;
+    background: rgba(255, 255, 255, 0.92) !important;
+    border-color: rgba(255, 255, 255, 0.55) !important;
+}
+
+/* --- דף הבית: גיבור חדש --- */
+.hero-section.hero-program {
+    background: transparent !important;
+    box-shadow: none;
+    border-radius: 0;
+    margin-bottom: 2rem;
+    overflow: visible;
+}
+
+.hero-section.hero-program::before {
+    display: none;
+}
+
+.hero-program__shell {
+    position: relative;
+    border-radius: var(--site-radius-xl);
+    overflow: hidden;
+    background: var(--site-white);
+    box-shadow: 0 20px 50px rgba(2, 136, 209, 0.22);
+    clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%);
+    border: 1px solid rgba(255, 64, 129, 0.15);
+}
+
+.hero-program__ribbon {
+    position: absolute;
+    top: 1.25rem;
+    left: -2.5rem;
+    z-index: 4;
+    background: linear-gradient(135deg, #ff4081 0%, #e53935 100%);
+    color: #fff;
+    font-weight: 800;
+    font-size: 0.82rem;
+    padding: 0.4rem 2.75rem;
+    transform: rotate(-12deg);
+    box-shadow: 0 4px 16px rgba(255, 64, 129, 0.4);
+    letter-spacing: 0.03em;
+}
+
+@media (max-width: 520px) {
+    .hero-program__ribbon {
+        font-size: 0.72rem;
+        left: -2rem;
+        padding: 0.3rem 2.25rem;
+    }
+}
+
+.hero-program__bg {
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(circle at 15% 20%, rgba(255, 64, 129, 0.45) 0%, transparent 45%),
+        radial-gradient(circle at 85% 75%, rgba(0, 188, 212, 0.4) 0%, transparent 50%),
+        linear-gradient(135deg, #092040 0%, #0288d1 60%, #00b0ff 100%);
+    opacity: 1;
+}
+
+.hero-program__inner {
+    position: relative;
+    z-index: 2;
+    display: grid;
+    grid-template-columns: 1fr 1.05fr;
+    gap: clamp(1rem, 3vw, 2rem);
+    align-items: center;
+    padding: clamp(1.25rem, 4vw, 2.25rem);
+}
+
+@media (max-width: 820px) {
+    .hero-program__inner {
+        grid-template-columns: 1fr;
+        text-align: center;
+    }
+}
+
+.hero-program__visual {
+    position: relative;
+    border-radius: var(--site-radius-lg);
+    overflow: hidden;
+    box-shadow: 0 16px 40px rgba(0, 0, 0, 0.3), 0 0 20px rgba(255, 64, 129, 0.3);
+    transform: rotate(-2deg);
+    max-width: min(100%, 340px);
+    margin-inline: auto;
+    border: 3px solid rgba(255, 255, 255, 0.85);
+}
+
+@media (max-width: 820px) {
+    .hero-program__visual {
+        transform: none;
+        max-width: 280px;
+    }
+}
+
+.hero-program__visual img {
+    display: block;
+    width: 100%;
+    height: auto;
+    vertical-align: middle;
+}
+
+.hero-program__copy {
+    color: #fff;
+    text-shadow: 0 2px 12px rgba(0, 0, 0, 0.3);
+}
+
+@media (max-width: 820px) {
+    .hero-program__copy {
+        text-shadow: 0 2px 16px rgba(0, 0, 0, 0.45);
+    }
+}
+
+.hero-program__eyebrow {
+    font-size: 0.85rem;
+    font-weight: 700;
+    margin-bottom: 0.6rem;
+    letter-spacing: 0.07em;
+    text-transform: uppercase;
+    color: #80d8ff;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(6px);
+    padding: 0.3rem 0.85rem;
+    border-radius: 999px;
+    border: 1px solid rgba(128, 216, 255, 0.4);
+}
+
+.hero-program__title {
+    font-family: var(--site-font-display);
+    font-size: clamp(2.4rem, 7vw, 3.8rem);
+    font-weight: 900;
+    line-height: 1.05;
+    margin: 0 0 0.5rem;
+    color: #ffffff;
+    /* gradient shimmer on the title */
+    background: linear-gradient(135deg, #ffffff 30%, #80d8ff 65%, #ff80ab 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    filter: drop-shadow(0 2px 8px rgba(0, 0, 0, 0.35));
+    letter-spacing: -0.02em;
+}
+
+.hero-program__cycle {
+    font-size: clamp(1rem, 3vw, 1.2rem);
+    font-weight: 600;
+    margin-bottom: 0.9rem;
+    color: rgba(255, 255, 255, 0.92);
+    /* subtle underline accent */
+    position: relative;
+    display: inline-block;
+}
+
+.hero-program__cycle::after {
+    content: '';
+    position: absolute;
+    bottom: -3px;
+    right: 0;
+    left: 0;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, #ff80ab, #80d8ff, transparent);
+    border-radius: 2px;
+    opacity: 0.7;
+}
+
+@media (max-width: 820px) {
+    .hero-program__cycle {
+        display: block;
+    }
+}
+
+.hero-program__lead {
+    font-size: clamp(0.97rem, 2.4vw, 1.1rem);
+    line-height: 1.6;
+    max-width: 36ch;
+    opacity: 0.95;
+    margin-bottom: 1.5rem;
+    color: rgba(255, 255, 255, 0.93);
+}
+
+@media (max-width: 820px) {
+    .hero-program__lead {
+        max-width: none;
+        margin-inline: auto;
+    }
+}
+
+/* ── Hero Chips: redesigned for clarity & mobile ─────── */
+.hero-program__chips {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.55rem;
+    max-width: 320px;
+}
+
+.hero-program__chips> :last-child:nth-child(odd) {
+    grid-column: 1 / -1;
+}
+
+@media (max-width: 820px) {
+    .hero-program__chips {
+        max-width: 340px;
+        margin-inline: auto;
+    }
+}
+
+@media (max-width: 400px) {
+    .hero-program__chips {
+        grid-template-columns: 1fr;
+        max-width: 260px;
+    }
+
+    .hero-program__chips> :last-child:nth-child(odd) {
+        grid-column: auto;
+    }
+}
+
+.hero-chip {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.4rem;
+    padding: 0.65rem 0.85rem;
+    border-radius: 14px;
+    font-weight: 700;
+    font-size: 0.9rem;
+    text-decoration: none;
+    text-align: center;
+    background: rgba(255, 255, 255, 0.15);
+    color: #fff;
+    border: 1.5px solid rgba(255, 255, 255, 0.35);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.15), inset 0 1px 0 rgba(255, 255, 255, 0.2);
+    transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.2s ease, background 0.2s ease;
+    letter-spacing: 0.01em;
+}
+
+.hero-chip:hover {
+    transform: translateY(-3px) scale(1.03);
+    background: rgba(255, 255, 255, 0.25);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.3);
+}
+
+/* primary chip - המשימה השבועית */
+.hero-program__chips>a:first-child {
+    background: linear-gradient(135deg, var(--site-yellow-strong) 0%, #ff8f00 100%);
+    color: var(--site-blue-dark);
+    border-color: transparent;
+    box-shadow: 0 6px 18px rgba(255, 193, 7, 0.45);
+}
+
+.hero-program__chips>a:first-child:hover {
+    background: linear-gradient(135deg, #ffd740 0%, var(--site-yellow-strong) 100%);
+    box-shadow: 0 10px 28px rgba(255, 193, 7, 0.55);
+}
+
+/* ghost chip overrides kept for BC */
+.hero-chip--ghost {
+    background: rgba(255, 255, 255, 0.15);
+    color: #fff;
+    border-color: rgba(255, 255, 255, 0.35);
+}
+
+/* register chip - distinct dark */
+#register-chip {
+    background: linear-gradient(135deg, #0d47a1 0%, var(--site-blue-dark) 100%);
+    color: #fff;
+    border-color: rgba(255, 255, 255, 0.3);
+    box-shadow: 0 6px 18px rgba(9, 32, 64, 0.5);
+}
+
+/* ── כרטיסי ניווט - עיצוב חדש ─────────────────────────── */
+.modern-nav {
+    gap: clamp(0.55rem, 1.8vw, 0.9rem);
+    /* מצמצמים קצת את הכרטיסים במובייל */
+}
+
+@media (max-width: 600px) {
+    .modern-nav {
+        grid-template-columns: repeat(2, 1fr) !important;
+        gap: 0.55rem;
+        margin-bottom: 1.5rem;
+    }
+
+    /* כרטיס אחרון לבדו - מרחיבים על כל הרוחב */
+    .modern-nav>a:last-child:nth-child(odd) {
+        grid-column: 1 / -1;
+    }
+}
+
+.nav-card {
+    /* בסיס זכוכית + הדרגה עדינה */
+    background: linear-gradient(155deg,
+            rgba(2, 136, 209, 0.92) 0%,
+            rgba(9, 32, 64, 0.96) 100%) !important;
+    border: 1.5px solid rgba(255, 255, 255, 0.18);
+    box-shadow:
+        0 8px 24px rgba(2, 136, 209, 0.25),
+        inset 0 1px 0 rgba(255, 255, 255, 0.15);
+    border-radius: 18px !important;
+    transition:
+        transform 0.28s cubic-bezier(0.34, 1.56, 0.64, 1),
+        box-shadow 0.25s ease,
+        border-color 0.25s ease !important;
+    position: relative;
+    overflow: hidden;
+    /* compact padding */
+    padding: 1.35rem 1rem !important;
+}
+
+/* shimmer sweep on hover */
+.nav-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -120%;
+    width: 80%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.14), transparent);
+    transform: skewX(-15deg);
+    transition: left 0.55s ease;
+    pointer-events: none;
+}
+
+.nav-card:hover::before {
+    left: 160%;
+}
+
+/* top-edge color accent per card index */
+.nav-card::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    right: 0;
+    left: 0;
+    height: 3px;
+    background: linear-gradient(90deg, #00b0ff, #ff4081);
+    border-radius: 18px 18px 0 0;
+    opacity: 0.7;
+    transition: opacity 0.25s;
+}
+
+.nav-card:hover::after {
+    opacity: 1;
+}
+
+.nav-card:hover {
+    transform: translateY(-5px) scale(1.02) !important;
+    box-shadow:
+        0 18px 44px rgba(2, 136, 209, 0.38),
+        0 0 24px rgba(0, 176, 255, 0.22),
+        inset 0 1px 0 rgba(255, 255, 255, 0.2) !important;
+    border-color: rgba(255, 255, 255, 0.35) !important;
+}
+
+.nav-card:focus-visible {
+    outline: 3px solid var(--site-yellow-strong, #ffd400);
+    outline-offset: 3px;
+}
+
+.hero-chip:focus-visible {
+    outline: 2px solid var(--site-blue-dark, #003d82);
+    outline-offset: 2px;
+}
+
+.nav-card h3,
+.nav-card p {
+    color: #fff !important;
+}
+
+.nav-card h3 {
+    font-size: 1.05rem !important;
+    font-weight: 800 !important;
+    margin-bottom: 0.3rem !important;
+    letter-spacing: -0.01em;
+}
+
+.nav-card p {
+    font-size: 0.8rem !important;
+    opacity: 0.82;
+    line-height: 1.4;
+}
+
+.nav-card .nav-icon {
+    font-size: 2.2rem;
+    margin-bottom: 0.7rem;
+    display: block;
+    filter: drop-shadow(0 3px 6px rgba(0, 0, 0, 0.25));
+    transition: transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1), filter 0.3s ease;
+}
+
+.nav-card:hover .nav-icon {
+    transform: scale(1.3) rotate(-6deg);
+    filter: drop-shadow(0 5px 12px rgba(0, 0, 0, 0.35));
+}
+
+/* individual card accents */
+.modern-nav>a:nth-child(1)::after {
+    background: linear-gradient(90deg, #ff4081, #ff8f00);
+}
+
+.modern-nav>a:nth-child(2)::after {
+    background: linear-gradient(90deg, #ffc107, #ff4081);
+}
+
+.modern-nav>a:nth-child(3)::after {
+    background: linear-gradient(90deg, #00e5ff, #0288d1);
+}
+
+.modern-nav>a:nth-child(4)::after {
+    background: linear-gradient(90deg, #69f0ae, #00bcd4);
+}
+
+.modern-nav>a:nth-child(5)::after {
+    background: linear-gradient(90deg, #ce93d8, #7c4dff);
+}
+
+
+/* גיבורי דפים פנימיים */
+.hero-section:not(.hero-program),
+.page-hero {
+    background: linear-gradient(135deg,
+            var(--site-blue) 0%,
+            var(--site-blue-dark) 100%) !important;
+    box-shadow: 0 16px 36px rgba(0, 56, 120, 0.25);
+}
+
+.hero-question,
+.page-title {
+    font-family: var(--site-font-display) !important;
+}
+
+.main-title {
+    font-family: var(--site-font-display);
+}
+
+.highlight-text {
+    color: var(--site-yellow-strong) !important;
+}
+
+.quiz-announcement {
+    background: linear-gradient(135deg,
+            var(--site-blue) 0%,
+            var(--site-blue-dark) 100%) !important;
+}
+
+.submit-button,
+.start-quiz-btn {
+    background: linear-gradient(135deg,
+            var(--site-blue) 0%,
+            var(--site-blue-dark) 100%) !important;
+    box-shadow: 0 8px 24px rgba(0, 86, 179, 0.35);
+}
+
+.form-group input:focus,
+.form-group select:focus,
+.form-group textarea:focus {
+    border-color: var(--site-blue) !important;
+    box-shadow: 0 0 0 3px rgba(0, 86, 179, 0.12) !important;
+}
+
+.section-title {
+    color: var(--site-blue-dark);
+}
+
+.download-card:hover {
+    border-color: var(--site-blue);
+}
+
+.share-button {
+    background: linear-gradient(135deg,
+            var(--site-yellow-strong) 0%,
+            #ffc400 100%);
+    color: var(--site-blue-dark);
+    font-weight: 800;
+}
+
+#announcement-text {
+    white-space: pre-line;
+}
+
+.support-fineprint {
+    margin-top: 1rem;
+    font-size: 0.82rem;
+    color: var(--site-muted);
+    line-height: 1.45;
+    max-width: 36rem;
+    margin-inline: auto;
+    text-align: center;
+}
+
+.topic-category {
+    background: linear-gradient(135deg,
+            var(--site-blue) 0%,
+            var(--site-blue-dark) 100%) !important;
+}
+
+.topic-button {
+    background: linear-gradient(135deg,
+            var(--site-yellow-strong) 0%,
+            #ffc400 100%) !important;
+    color: var(--site-blue-dark) !important;
+    font-weight: 700;
+}
+
+.topic-button:hover {
+    box-shadow: 0 10px 24px rgba(0, 56, 120, 0.2);
+}
+
+@media (max-width: 600px) {
+    .modern-main {
+        padding: 1rem !important;
+        border-radius: var(--site-radius-lg);
+        margin-top: -12px;
+    }
+}
+
+/* דפים פנימיים: הדר צפוף במובייל; ביטול עמודה מ-discussion.css; ללא כותרת "תנועת הנוער…" */
+@media (max-width: 768px) {
+    .modern-header:has(> .header-content) {
+        padding-top: 0.45rem !important;
+        padding-bottom: 0.45rem !important;
+        min-height: unset !important;
+    }
+
+    .modern-header>.header-content {
+        flex-direction: row !important;
+        flex-wrap: nowrap !important;
+        align-items: center !important;
+        justify-content: space-between !important;
+        text-align: start !important;
+        gap: 0.5rem;
+        padding-inline: 0.65rem !important;
+        padding-block: 0.35rem !important;
+    }
+
+    .modern-header>.header-content .logo-container {
+        flex-direction: row;
+        align-items: center;
+        gap: 0.45rem;
+        min-width: 0;
+        flex: 1;
+    }
+
+    .modern-header>.header-content .logo-text h2 {
+        display: none !important;
+    }
+
+    .modern-header>.header-content .logo-text {
+        min-width: 0;
+        margin: 0;
+    }
+
+    .modern-header>.header-content .logo-text p {
+        margin: 0;
+        font-size: 0.8rem;
+        line-height: 1.25;
+        font-weight: 600;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+
+    .modern-header>.header-content .main-logo img {
+        height: 40px;
+        width: auto;
+    }
+
+    .modern-header>.header-content .back-button {
+        flex-shrink: 0;
+        padding: 0.4rem 0.55rem !important;
+        font-size: 0.72rem !important;
+        border-radius: 10px;
+        gap: 0.2rem;
+        line-height: 1.15;
+        white-space: nowrap;
+    }
+
+    .modern-header>.header-content .back-button .material-icons {
+        font-size: 1.1rem;
+    }
+}
+
+/* --- תצוגת מידות טובות, משימות שבועיות ופרסים --- */
+.virtues-showcase-section {
+    margin: 2rem 0;
+    padding: 2rem 1.5rem;
+    border-radius: var(--site-radius-xl);
+    background:
+        radial-gradient(ellipse at 0% 0%, rgba(255, 64, 129, 0.07) 0%, transparent 50%),
+        radial-gradient(ellipse at 100% 100%, rgba(2, 136, 209, 0.09) 0%, transparent 50%),
+        radial-gradient(circle at 50% 0%, rgba(224, 247, 254, 0.8) 0%, rgba(252, 228, 236, 0.3) 100%),
+        #ffffff;
+    border: 1px solid rgba(2, 136, 209, 0.18);
+    box-shadow: 0 12px 36px rgba(2, 136, 209, 0.1), inset 0 1px 0 rgba(255, 255, 255, 0.9);
+}
+
+.virtues-showcase-title {
+    text-align: center;
+    font-size: 1.5rem;
+    font-weight: 900;
+    color: var(--site-blue-dark);
+    margin-bottom: 1.25rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    background: linear-gradient(135deg, var(--site-blue-dark) 30%, #ff4081 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.virtues-cloud {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 0.5rem;
+    max-width: 950px;
+    margin: 0 auto 1.75rem;
+}
+
+.virtue-tag {
+    display: inline-block;
+    padding: 0.4rem 0.9rem;
+    border-radius: 999px;
+    font-size: 0.9rem;
+    font-weight: 700;
+    color: #0277bd;
+    background: rgba(225, 245, 254, 0.9);
+    border: 1px solid rgba(2, 136, 209, 0.25);
+    box-shadow: 0 2px 8px rgba(2, 136, 209, 0.1);
+    transition: transform 0.22s cubic-bezier(0.34, 1.56, 0.64, 1), background 0.2s ease, box-shadow 0.2s ease;
+    user-select: none;
+    cursor: pointer;
+}
+
+.virtue-tag:nth-child(3n) {
+    color: #c2185b;
+    background: rgba(252, 228, 236, 0.9);
+    border-color: rgba(233, 30, 99, 0.25);
+}
+
+.virtue-tag:nth-child(5n) {
+    color: #00695c;
+    background: rgba(224, 242, 241, 0.9);
+    border-color: rgba(0, 150, 136, 0.25);
+}
+
+.virtue-tag:nth-child(7n) {
+    color: #f57f17;
+    background: rgba(255, 248, 225, 0.9);
+    border-color: rgba(255, 193, 7, 0.3);
+}
+
+.virtue-tag--highlight {
+    font-size: 1rem;
+    font-weight: 800;
+    background: linear-gradient(135deg, #0288d1 0%, #ff4081 100%) !important;
+    color: #ffffff !important;
+    border: none !important;
+    box-shadow: 0 4px 14px rgba(2, 136, 209, 0.4) !important;
+    text-shadow: 0 1px 4px rgba(0, 0, 0, 0.2);
+}
+
+.virtue-tag:hover {
+    transform: translateY(-3px) scale(1.07);
+    box-shadow: 0 8px 20px rgba(2, 136, 209, 0.25);
+    z-index: 2;
+    position: relative;
+}
+
+.virtue-tag--highlight:hover {
+    box-shadow: 0 8px 24px rgba(255, 64, 129, 0.45) !important;
+}
+
+/* משימות שבועיות & הגרלת פרסים */
+.weekly-highlights-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 1.25rem;
+    margin-top: 1.5rem;
+}
+
+.weekly-card {
+    background: linear-gradient(135deg, #ffffff 0%, #f4faff 100%);
+    border-radius: var(--site-radius-lg);
+    padding: 1.25rem;
+    border: 2px solid rgba(2, 136, 209, 0.15);
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.05);
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    transition: transform 0.25 ease, box-shadow 0.25s ease;
+}
+
+.weekly-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 12px 28px rgba(2, 136, 209, 0.15);
+    border-color: var(--site-blue);
+}
+
+.weekly-card__header {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.weekly-card__icon {
+    width: 46px;
+    height: 46px;
+    border-radius: 12px;
+    background: linear-gradient(135deg, #0288d1 0%, #00bcd4 100%);
+    color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    flex-shrink: 0;
+    box-shadow: 0 4px 10px rgba(2, 136, 209, 0.3);
+}
+
+.weekly-card__icon--gift {
+    background: linear-gradient(135deg, #ff4081 0%, #ff1744 100%);
+    box-shadow: 0 4px 10px rgba(255, 64, 129, 0.3);
+}
+
+.weekly-card__title {
+    font-size: 1.15rem;
+    font-weight: 800;
+    color: var(--site-blue-dark);
+    margin: 0;
+}
+
+.weekly-task-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.45rem;
+    margin: 0.25rem 0;
+}
+
+.task-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+    background: #e1f5fe;
+    color: #0277bd;
+    font-weight: 700;
+    font-size: 0.85rem;
+    padding: 0.35rem 0.75rem;
+    border-radius: 8px;
+    border: 1px solid rgba(2, 136, 209, 0.2);
+}
+
+.prize-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+}
+
+.prize-item {
+    background: linear-gradient(135deg, #fff8e1 0%, #ffe082 100%);
+    color: #5d4037;
+    font-weight: 800;
+    font-size: 0.85rem;
+    padding: 0.4rem 0.8rem;
+    border-radius: 8px;
+    border: 1px solid #ffe082;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+}

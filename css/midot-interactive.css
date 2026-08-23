@@ -1,0 +1,695 @@
+/**
+ * עיצוב מתקדם, חוויית משתמש ואנימציות - "מידות טובות"
+ */
+
+/* 1. Ambient Canvas */
+.ambient-canvas {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    pointer-events: none;
+    z-index: 0;
+    opacity: 0.85;
+}
+
+/* 2. סינון קטגוריות מידות */
+.virtues-filter-bar {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 0.5rem;
+    margin: 0.5rem auto 1.25rem;
+    max-width: 600px;
+}
+
+.virtue-filter-btn {
+    background: rgba(255, 255, 255, 0.7);
+    border: 1px solid rgba(2, 136, 209, 0.2);
+    border-radius: 999px;
+    padding: 0.4rem 1rem;
+    font-size: 0.88rem;
+    font-weight: 700;
+    color: var(--site-blue-dark);
+    cursor: pointer;
+    backdrop-filter: blur(8px);
+    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+}
+
+.virtue-filter-btn:hover {
+    background: #ffffff;
+    border-color: var(--site-blue);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(2, 136, 209, 0.15);
+}
+
+.virtue-filter-btn.active {
+    background: linear-gradient(135deg, var(--site-blue) 0%, #00acc1 100%);
+    color: #ffffff;
+    border-color: transparent;
+    box-shadow: 0 4px 14px rgba(2, 136, 209, 0.35);
+}
+
+/* כפתור הגרלת מידה יומית */
+.random-virtue-container {
+    text-align: center;
+    margin: 1.25rem 0 0.5rem;
+}
+
+.random-virtue-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.65rem 1.4rem;
+    background: linear-gradient(135deg, #ff4081 0%, #7c4dff 100%);
+    color: #ffffff;
+    font-weight: 800;
+    font-size: 0.95rem;
+    border: none;
+    border-radius: 999px;
+    cursor: pointer;
+    box-shadow: 0 6px 20px rgba(255, 64, 129, 0.35);
+    transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.random-virtue-btn:hover {
+    transform: translateY(-3px) scale(1.03);
+    box-shadow: 0 10px 28px rgba(255, 64, 129, 0.45);
+}
+
+.random-virtue-btn.spinning .material-icons {
+    animation: spinDice 0.4s ease-in-out;
+}
+
+@keyframes spinDice {
+    0% { transform: rotate(0deg) scale(1); }
+    50% { transform: rotate(180deg) scale(1.3); }
+    100% { transform: rotate(360deg) scale(1); }
+}
+
+/* 3. מודאל מידה מפורטת */
+.virtue-modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(9, 32, 64, 0.65);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    z-index: 10000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 1.25rem;
+    opacity: 1;
+    transition: opacity 0.3s ease, visibility 0.3s ease;
+}
+
+.virtue-modal-overlay.hidden {
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+}
+
+.virtue-modal-card {
+    position: relative;
+    background: linear-gradient(145deg, rgba(255, 255, 255, 0.96) 0%, rgba(240, 248, 255, 0.94) 100%);
+    border-radius: 1.75rem;
+    max-width: 480px;
+    width: 100%;
+    padding: 2rem 1.75rem;
+    box-shadow: 0 25px 60px rgba(9, 32, 64, 0.35), 0 0 30px rgba(2, 136, 209, 0.2);
+    border: 2px solid rgba(255, 255, 255, 0.9);
+    animation: modalPop 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+    text-align: center;
+}
+
+@keyframes modalPop {
+    from {
+        opacity: 0;
+        transform: scale(0.85) translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1) translateY(0);
+    }
+}
+
+.virtue-modal-close {
+    position: absolute;
+    top: 1rem;
+    left: 1rem;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    border: 1px solid rgba(0, 0, 0, 0.08);
+    background: rgba(255, 255, 255, 0.8);
+    font-size: 1.4rem;
+    line-height: 1;
+    cursor: pointer;
+    color: var(--site-muted);
+    transition: all 0.2s ease;
+}
+
+.virtue-modal-close:hover {
+    background: #ff1744;
+    color: #fff;
+    border-color: #ff1744;
+    transform: rotate(90deg);
+}
+
+.virtue-modal-icon-badge {
+    width: 68px;
+    height: 68px;
+    border-radius: 20px;
+    margin: 0 auto 0.75rem;
+    background: linear-gradient(135deg, #0288d1 0%, #ff4081 100%);
+    color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 8px 24px rgba(2, 136, 209, 0.35);
+}
+
+.virtue-modal-icon-badge .material-icons {
+    font-size: 2.2rem;
+}
+
+.virtue-modal-badge {
+    display: inline-block;
+    padding: 0.3rem 0.85rem;
+    border-radius: 999px;
+    font-size: 0.8rem;
+    font-weight: 800;
+    color: #0288d1;
+    background: #e1f5fe;
+    margin-bottom: 0.5rem;
+}
+
+.virtue-modal-title {
+    font-size: 2rem;
+    font-weight: 900;
+    color: var(--site-blue-dark);
+    margin: 0 0 1rem;
+    font-family: var(--site-font-display);
+}
+
+.virtue-quote {
+    font-size: 1.05rem;
+    font-style: italic;
+    color: #c2185b;
+    margin: 0 0 1.25rem;
+    padding: 0.75rem 1rem;
+    background: rgba(252, 228, 236, 0.6);
+    border-radius: 1rem;
+    border-right: 4px solid #ff4081;
+}
+
+.virtue-practical-tip {
+    background: #ffffff;
+    border-radius: 1.25rem;
+    padding: 1.1rem;
+    text-align: right;
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.05);
+    border: 1px solid rgba(2, 136, 209, 0.15);
+    margin-bottom: 1.5rem;
+}
+
+.virtue-practical-tip .tip-header {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    color: #0277bd;
+    font-size: 0.92rem;
+    margin-bottom: 0.4rem;
+}
+
+.virtue-practical-tip p {
+    margin: 0;
+    font-size: 0.95rem;
+    line-height: 1.5;
+    color: var(--site-ink);
+}
+
+.virtue-commit-btn {
+    width: 100%;
+    padding: 0.85rem 1.25rem;
+    border-radius: 1rem;
+    background: linear-gradient(135deg, #0288d1 0%, #00b0ff 100%);
+    color: #fff;
+    font-size: 1.05rem;
+    font-weight: 800;
+    border: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    box-shadow: 0 6px 20px rgba(2, 136, 209, 0.35);
+    transition: all 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.virtue-commit-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 28px rgba(2, 136, 209, 0.45);
+}
+
+/* 4. מנהל המשימות השבועי (Gamified Weekly Tracker) */
+.weekly-tracker-container {
+    background: #ffffff;
+    border-radius: var(--site-radius-xl);
+    padding: 1.5rem;
+    border: 2px solid rgba(2, 136, 209, 0.18);
+    box-shadow: 0 10px 30px rgba(2, 136, 209, 0.1);
+    margin-top: 1.5rem;
+}
+
+.tracker-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    flex-wrap: wrap;
+    gap: 1rem;
+    margin-bottom: 1.25rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+}
+
+.tracker-badge {
+    display: inline-block;
+    padding: 0.25rem 0.75rem;
+    background: linear-gradient(135deg, #ff4081 0%, #f50057 100%);
+    color: #ffffff;
+    font-size: 0.78rem;
+    font-weight: 800;
+    border-radius: 999px;
+    margin-bottom: 0.3rem;
+}
+
+.tracker-title {
+    font-size: 1.35rem;
+    font-weight: 900;
+    color: var(--site-blue-dark);
+    margin: 0;
+}
+
+.tracker-progress-wrapper {
+    min-width: 200px;
+    flex: 1;
+    max-width: 320px;
+}
+
+.tracker-progress-text {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: var(--site-muted);
+    margin-bottom: 0.35rem;
+}
+
+.tracker-progress-track {
+    height: 10px;
+    background: #e0f2fe;
+    border-radius: 999px;
+    overflow: hidden;
+    position: relative;
+}
+
+.tracker-progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #ff4081 0%, #00e676 100%);
+    border-radius: 999px;
+    transition: width 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.tracker-tasks-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 0.85rem;
+}
+
+.tracker-task-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.75rem;
+    padding: 0.9rem;
+    border-radius: var(--site-radius-lg);
+    background: #f8fafc;
+    border: 2px solid transparent;
+    cursor: pointer;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    user-select: none;
+}
+
+.tracker-task-item:hover {
+    background: #ffffff;
+    border-color: var(--site-blue);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(2, 136, 209, 0.12);
+}
+
+.tracker-task-item.is-done {
+    background: #ecfdf5;
+    border-color: #10b981;
+}
+
+.tracker-task-item.is-done .task-checkbox {
+    background: #10b981;
+    border-color: #10b981;
+    color: #ffffff;
+}
+
+.tracker-task-item.is-done .task-header-line strong {
+    color: #065f46;
+    text-decoration: line-through;
+}
+
+.task-checkbox {
+    width: 24px;
+    height: 24px;
+    border-radius: 8px;
+    border: 2px solid #cbd5e1;
+    background: #ffffff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    margin-top: 2px;
+    transition: all 0.2s ease;
+}
+
+.task-checkbox .material-icons {
+    font-size: 16px;
+    font-weight: 900;
+}
+
+.task-content {
+    flex: 1;
+}
+
+.task-header-line {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    font-size: 0.95rem;
+    color: var(--site-blue-dark);
+    margin-bottom: 0.2rem;
+}
+
+.task-subtext {
+    margin: 0;
+    font-size: 0.8rem;
+    color: var(--site-muted);
+    line-height: 1.35;
+}
+
+.tracker-completion-celebration {
+    margin-top: 1rem;
+    padding: 0.75rem 1rem;
+    border-radius: var(--site-radius-lg);
+    background: linear-gradient(135deg, #ecfdf5 0%, #d1fae5 100%);
+    color: #065f46;
+    font-weight: 800;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    border: 1px solid #6ee7b7;
+    animation: bannerPop 0.4s ease-out;
+}
+
+@keyframes bannerPop {
+    from { transform: scale(0.95); opacity: 0; }
+    to { transform: scale(1); opacity: 1; }
+}
+
+/* 5. כרטיסי פרסים יוקרתיים (Luxurious Prize Showcase) */
+.prizes-showcase-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+    gap: 0.75rem;
+    margin-top: 0.75rem;
+}
+
+.prize-showcase-card {
+    background: linear-gradient(145deg, #ffffff 0%, #fffbf0 100%);
+    border-radius: var(--site-radius-lg);
+    padding: 0.9rem 0.65rem;
+    text-align: center;
+    border: 2px solid #fde68a;
+    box-shadow: 0 6px 16px rgba(245, 158, 11, 0.1);
+    position: relative;
+    overflow: hidden;
+    transition: all 0.25s ease;
+}
+
+.prize-showcase-card::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: linear-gradient(
+        45deg,
+        transparent 35%,
+        rgba(255, 255, 255, 0.7) 50%,
+        transparent 65%
+    );
+    transform: rotate(30deg);
+    transition: transform 0.6s ease;
+    pointer-events: none;
+}
+
+.prize-showcase-card:hover::before {
+    transform: rotate(30deg) translate(50%, 50%);
+}
+
+.prize-showcase-card:hover {
+    transform: translateY(-4px);
+    border-color: #f59e0b;
+    box-shadow: 0 12px 24px rgba(245, 158, 11, 0.25);
+}
+
+.prize-showcase-emoji {
+    font-size: 2.2rem;
+    display: block;
+    margin-bottom: 0.35rem;
+    filter: drop-shadow(0 4px 6px rgba(0, 0, 0, 0.12));
+}
+
+.prize-showcase-name {
+    font-size: 0.88rem;
+    font-weight: 800;
+    color: #78350f;
+    margin: 0;
+    line-height: 1.25;
+}
+
+/* 6. Confetti Particle */
+.confetti-container {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    pointer-events: none;
+    z-index: 100000;
+    overflow: hidden;
+}
+
+.confetti-piece {
+    position: absolute;
+    width: 9px;
+    height: 14px;
+    border-radius: 3px;
+    opacity: 1;
+    animation: confettiFall 1.5s cubic-bezier(0.25, 1, 0.5, 1) forwards;
+}
+
+@keyframes confettiFall {
+    0% {
+        transform: translate(0, 0) rotate(0deg) scale(1);
+        opacity: 1;
+    }
+    100% {
+        transform: translate(var(--tx), var(--ty)) rotate(var(--rot)) scale(0.6);
+        opacity: 0;
+    }
+}
+
+/* ── 7. Hero Text Reveal ──────────────────────────────────── */
+.hero-reveal {
+    opacity: 0;
+    transform: translateY(24px);
+    animation: heroSlideUp 0.65s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+.hero-reveal--delay-1 { animation-delay: 0.1s; }
+.hero-reveal--delay-2 { animation-delay: 0.25s; }
+.hero-reveal--delay-3 { animation-delay: 0.4s; }
+.hero-reveal--delay-4 { animation-delay: 0.55s; }
+
+@keyframes heroSlideUp {
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* Shimmer title glow pulse */
+@keyframes titleGlowPulse {
+    0%, 100% { text-shadow: 0 0 20px rgba(255, 64, 129, 0.5), 0 4px 10px rgba(0, 0, 0, 0.4); }
+    50%       { text-shadow: 0 0 40px rgba(255, 64, 129, 0.8), 0 0 60px rgba(0, 176, 255, 0.4), 0 4px 10px rgba(0, 0, 0, 0.4); }
+}
+
+.hero-program__title {
+    animation: titleGlowPulse 3.5s ease-in-out infinite;
+}
+
+/* ── 8. Staggered Entrance for Nav Cards ─────────────────── */
+.nav-card {
+    opacity: 0;
+    transform: translateY(30px) scale(0.96);
+    animation: cardEntrance 0.55s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+}
+
+.nav-card:nth-child(1) { animation-delay: 0.15s; }
+.nav-card:nth-child(2) { animation-delay: 0.27s; }
+.nav-card:nth-child(3) { animation-delay: 0.39s; }
+.nav-card:nth-child(4) { animation-delay: 0.51s; }
+.nav-card:nth-child(5) { animation-delay: 0.63s; }
+
+@keyframes cardEntrance {
+    to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+/* ── 9. Prize Cards Glow Pulse ───────────────────────────── */
+@keyframes prizeGlow {
+    0%, 100% { box-shadow: 0 6px 16px rgba(245, 158, 11, 0.15); }
+    50%       { box-shadow: 0 8px 28px rgba(245, 158, 11, 0.45), 0 0 20px rgba(255, 193, 7, 0.3); }
+}
+
+.prize-showcase-card {
+    animation: prizeGlow 2.5s ease-in-out infinite;
+}
+
+.prize-showcase-card:nth-child(2) { animation-delay: 0.6s; }
+.prize-showcase-card:nth-child(3) { animation-delay: 1.2s; }
+.prize-showcase-card:nth-child(4) { animation-delay: 1.8s; }
+
+/* ── 10. Floating Virtue Tags ────────────────────────────── */
+@keyframes virtueFloat {
+    0%, 100% { transform: translateY(0px); }
+    50%       { transform: translateY(-5px); }
+}
+
+.virtue-tag--highlight {
+    animation: virtueFloat 3s ease-in-out infinite;
+}
+
+.virtue-tag--highlight:nth-child(4)  { animation-delay: 0.5s; }
+.virtue-tag--highlight:nth-child(8)  { animation-delay: 1.0s; }
+.virtue-tag--highlight:nth-child(12) { animation-delay: 1.5s; }
+.virtue-tag--highlight:nth-child(16) { animation-delay: 2.0s; }
+
+/* ── 11. Header Scroll-Shrink ────────────────────────────── */
+.modern-header {
+    transition: padding 0.35s ease, box-shadow 0.35s ease;
+}
+
+.modern-header.header--compact {
+    box-shadow: 0 4px 20px rgba(2, 136, 209, 0.5) !important;
+}
+
+.modern-header.header--compact .main-logo img {
+    height: 42px;
+    transition: height 0.35s ease;
+}
+
+/* ── 12. Section entrance fade-slide ─────────────────────── */
+.animate-on-scroll {
+    opacity: 0;
+    transform: translateY(40px);
+    transition: opacity 0.7s ease, transform 0.7s ease;
+}
+
+.animate-on-scroll.is-visible {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+/* ── Ripple Click Effect ──────────────────────────────────── */
+@keyframes rippleExpand {
+    to {
+        transform: scale(1);
+        opacity: 0;
+    }
+}
+
+/* ── Typewriter Cursor ────────────────────────────────────── */
+@keyframes cursorBlink {
+    0%, 100% { opacity: 1; }
+    50%       { opacity: 0; }
+}
+
+/* ── 13. Floating Mobile Quick Dock */
+.mobile-floating-dock {
+    display: none;
+}
+
+@media (max-width: 768px) {
+    .mobile-floating-dock {
+        display: flex;
+        position: fixed;
+        bottom: 12px;
+        left: 12px;
+        right: 12px;
+        background: rgba(9, 32, 64, 0.88);
+        backdrop-filter: blur(16px);
+        -webkit-backdrop-filter: blur(16px);
+        border-radius: 999px;
+        padding: 0.4rem 0.6rem;
+        z-index: 9999;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35), 0 0 15px rgba(2, 136, 209, 0.3);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        justify-content: space-around;
+        align-items: center;
+        animation: slideUpDock 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+
+    @keyframes slideUpDock {
+        from { transform: translateY(100px); opacity: 0; }
+        to { transform: translateY(0); opacity: 1; }
+    }
+
+    .dock-item {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 0.15rem;
+        color: #ffffff;
+        text-decoration: none;
+        font-size: 0.68rem;
+        font-weight: 700;
+        padding: 0.35rem 0.6rem;
+        border-radius: 999px;
+        transition: all 0.2s ease;
+        flex: 1;
+        text-align: center;
+    }
+
+    .dock-item:active, .dock-item:hover {
+        background: rgba(255, 255, 255, 0.18);
+        color: var(--site-yellow-strong);
+        transform: translateY(-2px);
+    }
+
+    .dock-item--highlight {
+        background: linear-gradient(135deg, #ff4081 0%, #0288d1 100%);
+        box-shadow: 0 4px 12px rgba(255, 64, 129, 0.4);
+    }
+
+    .dock-icon {
+        font-size: 1.15rem;
+    }
+}
+

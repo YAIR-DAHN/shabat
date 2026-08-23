@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html dir="rtl" lang="he">
+<head>
+    <!-- Google Analytics 4 -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-HJV6EQFRPY"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', 'G-HJV6EQFRPY');
+    </script>
+    <!-- End Google Analytics -->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>זוכי השעשועון - אור ישראלי · מיזם השבת</title>
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Heebo:wght@300;400;500;600;700;800;900&family=Rubik:wght@500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/tokens.css">
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/program-skin.css">
+    <link rel="stylesheet" href="css/dark-mode.css">
+    <meta name="theme-color" content="#0288d1">
+    <script src="js/config.js"></script>
+    <script src="js/site-config.js"></script>
+    <script src="js/common.js"></script>
+    <script src="js/winners.js"></script>
+</head>
+<body>
+    <div id="loading" class="loading hidden">
+        <div class="spinner"></div>
+        <p>טוען...</p>
+    </div>
+
+    <header class="modern-header">
+        <div class="header-content">
+            <div class="logo-container">
+                <div class="main-logo">
+                    <img src="assets/logos/or-israeli-logo.png" alt="אור ישראלי">
+                </div>
+                <div class="logo-text">
+                    <h2>תנועת הנוער אור ישראלי</h2>
+                    <p>זוכי השעשועון השבועי</p>
+                </div>
+            </div>
+            <a href="index.html" class="back-button">
+                <span class="material-icons">arrow_back</span>
+                חזרה לדף הבית
+            </a>
+        </div>
+    </header>
+
+    <main class="modern-main">
+        <section class="hero-section">
+            <div class="hero-content">
+                <div class="hero-title">
+                    <h1 class="main-title">זוכי השעשועון</h1>
+                    <span class="material-icons shofar-icon">emoji_events</span>
+                </div>
+                <p class="hero-question">ברכות לזוכים בשעשועון השבועי!</p>
+                <div class="hero-description">
+                    <p class="highlight-text">🏆 מצטיינים שבועיים</p>
+                    <p>הכירו את הזוכים בשעשועון השבועי - מיזם השבת.</p>
+                </div>
+            </div>
+        </section>
+
+        <div class="winners-container">
+            <div class="winners-header">
+                <span class="material-icons winners-icon">emoji_events</span>
+                <h2>זוכי השעשועון השבועי</h2>
+                <p>ברכות לזוכים שהשקיעו והשתתפו בחוויה</p>
+            </div>
+
+            <div class="winners-list" id="winnersList">
+                <!-- Winners will be loaded here -->
+            </div>
+
+            <div class="no-winners" id="noWinners" style="display: none;">
+                <span class="material-icons">info</span>
+                <p>עדיין אין זוכים בשעשועון השבועי </p>
+                
+                <p>  -היה הראשון לזכות!</p>
+            </div>
+        </div>
+    </main>
+
+    <footer class="modern-footer">
+        <p class="footer-credit" onclick="showContactInfo()">נבנה ע"י Y.D. Systems</p>
+    </footer>
+</body>
+</html> 

@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html dir="rtl" lang="he">
+<head>
+    <!-- Google Analytics 4 -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-HJV6EQFRPY"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', 'G-HJV6EQFRPY');
+    </script>
+    <!-- End Google Analytics -->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="פודקאסט שבועי - חזרה ושינון בנושא מידות טובות · אור ישראלי">
+    <meta name="theme-color" content="#0288d1">
+    <link rel="icon" type="image/png" href="./assets/logos/or-israeli-logo.png">
+
+    <title>פודקאסט · מידות טובות | אור ישראלי</title>
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Heebo:wght@300;400;500;600;700;800&family=Rubik:wght@500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/tokens.css">
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/program-skin.css">
+    <link rel="stylesheet" href="css/dark-mode.css">
+    <link rel="stylesheet" href="css/podcast.css">
+    <script src="js/config.js"></script>
+    <script src="js/common.js"></script>
+    <script src="js/podcast.js" defer></script>
+</head>
+<body>
+    <div id="loading" class="loading hidden">
+        <div class="spinner"></div>
+        <p>טוען...</p>
+    </div>
+
+    <header class="modern-header">
+        <div class="header-content">
+            <div class="logo-container">
+                <div class="main-logo">
+                    <img src="assets/logos/or-israeli-logo.png" alt="אור ישראלי">
+                </div>
+                <div class="logo-text">
+                    <h2>תנועת הנוער אור ישראלי</h2>
+                    <p>מידות טובות · פודקאסט שבועי</p>
+                </div>
+            </div>
+            <a href="index.html" class="back-button">
+                <span class="material-icons">arrow_back</span>
+                חזרה לדף הבית
+            </a>
+        </div>
+    </header>
+
+    <main class="modern-main podcast-page">
+        <section class="podcast-hero">
+            <div class="podcast-hero__inner">
+                <p class="podcast-hero__eyebrow">האזנה, חזרה ושינון</p>
+                <h1 class="podcast-hero__title">פודקאסט שבועי</h1>
+                <p class="podcast-hero__lead">האזינו לתוכן בהקשר <strong>מידות טובות</strong> ולחומר שנלמד בפעילות - בכל מקום ובקצב שלכם.</p>
+            </div>
+        </section>
+
+        <div class="podcast-shell">
+            <audio id="podcastAudio" preload="metadata" playsinline></audio>
+
+            <section class="now-playing-card" aria-label="נגן פודקאסט">
+                <div class="now-playing-card__glow" aria-hidden="true"></div>
+                <div class="now-playing-card__top">
+                    <div class="now-playing-artwork">
+                        <img src="assets/podcast/Podcast Cover.png" alt="עטיפת הפודקאסט" width="120" height="120" loading="eager" decoding="async">
+                        <div class="playing-indicator hidden" title="מנגן">
+                            <span class="playing-indicator__bar"></span>
+                            <span class="playing-indicator__bar"></span>
+                            <span class="playing-indicator__bar"></span>
+                        </div>
+                    </div>
+                    <div class="now-playing-copy">
+                        <h2 class="now-playing-title" id="episodeTitle">בחרו פרק מהרשימה</h2>
+                        <p class="now-playing-desc" id="episodeDescription">לחצו על כרטיס פרק כדי לטעון ולהאזין. אפשר לשנות קצב האזנה ולעצור בכל עת - המיקום נשמר בדפדפן.</p>
+                    </div>
+                </div>
+
+                <div class="progress-bar-container" dir="ltr" role="slider" aria-label="התקדמות ההאזנה" tabindex="0" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
+                    <div class="progress-track">
+                        <div class="buffered-bar" id="bufferedBar"></div>
+                        <div class="progress-fill" id="progressFill"></div>
+                        <div class="progress-handle" id="progressHandle"></div>
+                    </div>
+                    <div class="time-row" dir="ltr">
+                        <span id="currentTime">0:00</span>
+                        <span id="totalTime">0:00</span>
+                    </div>
+                </div>
+
+                <div class="transport-row" dir="ltr" aria-label="בקרת ניגון">
+                    <button type="button" class="control-btn" id="skipBackward" title="10 שניות אחורה" aria-label="10 שניות אחורה">
+                        <span class="material-icons">replay_10</span>
+                    </button>
+                    <button type="button" class="control-btn control-btn--main" id="playPauseBtn" disabled title="נגן או עצור" aria-label="נגן או עצור">
+                        <span class="material-icons play-icon">play_arrow</span>
+                        <span class="material-icons pause-icon hidden">pause</span>
+                    </button>
+                    <button type="button" class="control-btn" id="skipForward" title="10 שניות קדימה" aria-label="10 שניות קדימה">
+                        <span class="material-icons">forward_10</span>
+                    </button>
+                </div>
+
+                <div class="secondary-controls">
+                    <div class="speed-control">
+                        <button type="button" class="speed-pill" id="speedBtn" title="קצב ניגון" aria-haspopup="true" aria-expanded="false">
+                            <span class="js-speed-label">1×</span>
+                            <span class="material-icons speed-pill__chev" aria-hidden="true">expand_more</span>
+                        </button>
+                        <div class="speed-menu hidden" id="speedMenu" role="menu">
+                            <button type="button" class="speed-option" data-speed="0.75" role="menuitem">0.75×</button>
+                            <button type="button" class="speed-option active" data-speed="1" role="menuitem">1×</button>
+                            <button type="button" class="speed-option" data-speed="1.25" role="menuitem">1.25×</button>
+                            <button type="button" class="speed-option" data-speed="1.5" role="menuitem">1.5×</button>
+                            <button type="button" class="speed-option" data-speed="2" role="menuitem">2×</button>
+                        </div>
+                    </div>
+                    <div class="volume-block">
+                        <button type="button" class="control-btn" id="volumeBtn" title="עוצמה" aria-label="עוצמת שמע">
+                            <span class="material-icons">volume_up</span>
+                        </button>
+                        <div class="volume-slider hidden" id="volumeSlider" data-volume="100">
+                            <input type="range" id="volumeRange" class="volume-range" min="0" max="100" value="100" aria-label="עוצמת שמע" />
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <div class="episodes-block">
+                <div class="episodes-block__head">
+                    <h2 class="episodes-block__title">פרקים</h2>
+                    <p class="episodes-block__sub">לחצו על פרק כדי לפתוח אותו בנגן</p>
+                </div>
+                <div class="episodes-grid" id="episodesList" role="list"></div>
+            </div>
+        </div>
+    </main>
+
+    <footer class="modern-footer">
+        <p class="footer-credit" onclick="showContactInfo()">נבנה ע"י Y.D. Systems</p>
+    </footer>
+</body>
+</html>

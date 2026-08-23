@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html dir="rtl" lang="he">
+
+<head>
+    <script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/12.17.1/firebase-app.js";
+  import { getAnalytics } from "https://www.gstatic.com/firebasejs/12.17.1/firebase-analytics.js";
+  const firebaseConfig = {
+    apiKey: "AIzaSyAL4QkE6xgM84q_NEhT3-uT_sTL2YFRt3E",
+    authDomain: "modot-tovot.firebaseapp.com",
+    projectId: "modot-tovot",
+    storageBucket: "modot-tovot.firebasestorage.app",
+    messagingSenderId: "615026945265",
+    appId: "1:615026945265:web:4ed0f9cf46b7be80ce0d50",
+    measurementId: "G-4YSFPFCQD4"
+  };
+  const app = initializeApp(firebaseConfig);
+  const analytics = getAnalytics(app);
+</script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="מיזם הכנה לשבת האחרונה של השנה - אור ישראלי. פעילות שבועית בדיני שבת, שעשועון והגרלות על פרסים.">
+    <meta property="og:title" content="אור ישראלי · מתכוננים לשבת">
+    <meta property="og:description" content="השנה כולנו משתתפים במיזם השבת ומגיעים מוכנים לשבת האחרונה של השנה!">
+    <meta property="og:image" content="./assets/images/shabbat-hero.png">
+    <meta name="theme-color" content="#12294A">
+
+    <link rel="icon" type="image/png" href="./assets/logos/or-israeli-logo.png">
+    <link rel="apple-touch-icon" href="./assets/logos/or-israeli-logo.png">
+
+    <title>אור ישראלי · מתכוננים לשבת</title>
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Heebo:wght@300;400;500;600;700;800;900&family=Rubik:wght@500;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/tokens.css">
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/program-skin.css">
+    <link rel="stylesheet" href="css/shabbat-skin.css">
+    <link rel="stylesheet" href="css/dark-mode.css">
+    <link rel="stylesheet" href="css/carousel.css">
+    <script src="js/config.js"></script>
+    <script src="js/site-config.js"></script>
+    <script src="js/weeks-config.js"></script>
+    <script src="js/common.js"></script>
+    <script src="js/updates.js"></script>
+    <script src="js/animations.js"></script>
+    <script src="js/main.js"></script>
+    <script src="js/shabbat-home.js" defer></script>
+</head>
+
+<body>
+    <div id="loading" class="loading hidden">
+        <div class="spinner"></div>
+        <p>טוען...</p>
+    </div>
+
+    <header class="modern-header">
+        <div class="header-content-home-page">
+            <div class="logo-container">
+                <div class="main-logo">
+                    <img src="assets/logos/or-israeli-logo.png" alt="אור ישראלי">
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <main class="modern-main">
+        <section class="hero-section hero-program animate-on-scroll">
+            <div class="hero-program__shell">
+                <div class="hero-program__ribbon">בס״ד</div>
+                <div class="hero-program__bg" aria-hidden="true"></div>
+                <div class="hero-program__inner">
+                    <div class="hero-program__copy">
+                        <p class="hero-program__eyebrow">מיזם שבועי · אור ישראלי</p>
+                        <h1 class="hero-program__title">מתכוננים לקראת<br>השבת האחרונה</h1>
+                        <p class="hero-program__cycle">דיני שבת · פעילות שבועית באתר</p>
+                        <p class="hero-program__lead">השנה כולנו משתתפים במיזם השבת ומגיעים <strong>מוכנים</strong> לשבת האחרונה של השנה! חוויה שבועית בדיני שבת, שעשועון והגרלות.</p>
+                        <div class="hero-program__chips">
+                            <a href="#weeks-section" class="hero-chip">🕯️ הפעילות השבועית</a>
+                            <a href="#" class="hero-chip hero-chip--ghost" onclick="handleQuizNavigation(event); return false;">🧩 שעשועון והגרלות</a>
+                            <a href="register.html" class="hero-chip hero-chip--ghost">📝 הרשמה לפעילות</a>
+                        </div>
+                    </div>
+                    <div class="hero-program__visual">
+                        <img src="assets/images/shabbat-hero.png" alt="מתכוננים לקראת השבת האחרונה - אור ישראלי" width="600" height="800" loading="eager">
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <nav class="modern-nav animate-on-scroll">
+            <a href="week1.html" class="nav-card">
+                <div class="nav-icon">🕯️</div>
+                <h3>הפעילות השבועית</h3>
+                <p>חומרי הפעילות בדיני שבת - ישירות באתר</p>
+            </a>
+            <a href="#" class="nav-card" onclick="handleQuizNavigation(event)">
+                <div class="nav-icon">🧩</div>
+                <h3>שעשועון שבועי</h3>
+                <p>חידון באתר והגרלת פרסים</p>
+            </a>
+            <a href="register.html" class="nav-card">
+                <div class="nav-icon">📝</div>
+                <h3>הרשמה לפעילות</h3>
+                <p>הרשמה למיזם השבת</p>
+            </a>
+            <a href="https://chat.whatsapp.com/Lh3rqZNMhJQ6SKPm4VFMC4" class="nav-card" target="_blank" rel="noopener noreferrer">
+                <div class="nav-icon">👥</div>
+                <h3>קבוצת העדכונים</h3>
+                <p>וואטסאפ שקט - עדכונים והגרלות</p>
+            </a>
+            <a href="winners.html" class="nav-card">
+                <div class="nav-icon">🏆</div>
+                <h3>זוכי השעשועון</h3>
+                <p>מחמאות לשותפים והזוכים</p>
+            </a>
+        </nav>
+
+        <!-- שבועות המיזם -->
+        <section id="weeks-section" class="weeks-section animate-on-scroll">
+            <h2 class="section-title">
+                <span class="title-icon">📅</span>
+                השבועות של המיזם
+            </h2>
+            <p class="weeks-section__lead">
+                כל שבוע יתווסף חומר חדש. אפשר לחזור גם לשבועות קודמים.
+            </p>
+            <div id="weeks-grid" class="weeks-grid"></div>
+            <div class="learning-cta">
+                <a href="week1.html" class="learning-cta__btn">🕯️ מתחילים את שבוע א׳</a>
+            </div>
+        </section>
+
+        <!-- פרסים -->
+        <section class="virtues-showcase-section animate-on-scroll" style="padding-top:0">
+            <div class="weekly-card">
+                <div class="weekly-card__header">
+                    <div class="weekly-card__icon weekly-card__icon--gift">🎁</div>
+                    <div>
+                        <h3 class="weekly-card__title">הגרלות ופרסים יקרי ערך!</h3>
+                        <p style="margin:0;font-size:0.82rem;color:var(--site-muted);">בין משתתפי הפעילות השבועית</p>
+                    </div>
+                </div>
+                <div class="prizes-showcase-grid">
+                    <div class="prize-showcase-card">
+                        <span class="prize-showcase-emoji">🎧</span>
+                        <h4 class="prize-showcase-name">איירפודס</h4>
+                    </div>
+                    <div class="prize-showcase-card">
+                        <span class="prize-showcase-emoji">⌚</span>
+                        <h4 class="prize-showcase-name">שעון Apple Watch</h4>
+                    </div>
+                    <div class="prize-showcase-card">
+                        <span class="prize-showcase-emoji">🎁</span>
+                        <h4 class="prize-showcase-name">שובר מתנה</h4>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="updates-section animate-on-scroll">
+            <h2 class="section-title">
+                <span class="title-icon">📢</span>
+                עדכונים אחרונים
+            </h2>
+            <div id="updates-container" class="updates-container">
+                <div class="loading-updates">
+                    <div class="spinner"></div>
+                    <p>טוען עדכונים...</p>
+                </div>
+            </div>
+        </section>
+
+        <section class="support-section animate-on-scroll">
+            <p class="support-text">לשאלות בנושא המיזם:</p>
+            <div class="support-contacts">
+                <a href="https://wa.me/972583730000" class="support-contact" target="_blank" rel="noopener noreferrer">
+                    <span class="contact-icon">💬</span>
+                    <span dir="ltr">058-373-0000</span>
+                </a>
+                <a href="tel:0548473336" class="support-contact">
+                    <span class="contact-icon">📞</span>
+                    <span dir="ltr">054-847-3336</span>
+                </a>
+            </div>
+            <p class="support-fineprint">הפעילות מתקיימת במסגרת חינוך בלתי־פורמלי; לפרטים נוספים פנו לרכז הסניף.</p>
+        </section>
+
+        <section class="share-section animate-on-scroll">
+            <p class="share-text">אתם במיזם? שיתוף קטן יביא עוד חברים לחוויה.</p>
+            <button type="button" class="share-button ripple" onclick="shareWebsite()">
+                <span class="share-icon">📤</span>
+                <span>שיתוף לחברים</span>
+            </button>
+        </section>
+    </main>
+
+    <aside class="mobile-floating-dock" aria-label="ניווט מהיר">
+        <a href="week1.html" class="dock-item dock-item--highlight">
+            <span class="dock-icon">🕯️</span>
+            <span>השבוע</span>
+        </a>
+        <a href="#" class="dock-item" onclick="handleQuizNavigation(event)">
+            <span class="dock-icon">🧩</span>
+            <span>שעשועון</span>
+        </a>
+        <a href="register.html" class="dock-item">
+            <span class="dock-icon">📝</span>
+            <span>הרשמה</span>
+        </a>
+        <a href="https://chat.whatsapp.com/Lh3rqZNMhJQ6SKPm4VFMC4" class="dock-item" target="_blank" rel="noopener noreferrer">
+            <span class="dock-icon">👥</span>
+            <span>וואטסאפ</span>
+        </a>
+        <a href="winners.html" class="dock-item">
+            <span class="dock-icon">🏆</span>
+            <span>זוכים</span>
+        </a>
+    </aside>
+
+    <footer class="modern-footer">
+        <p class="footer-credit" onclick="showContactInfo()">נבנה ע"י Y.D. Systems</p>
+    </footer>
+</body>
+
+</html>

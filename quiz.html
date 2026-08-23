@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html dir="rtl" lang="he">
+<head>
+    <!-- Google Analytics 4 -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-HJV6EQFRPY"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', 'G-HJV6EQFRPY');
+    </script>
+    <!-- End Google Analytics -->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>שעשועון שבועי - אור ישראלי · מיזם השבת</title>
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Heebo:wght@300;400;500;600;700;800;900&family=Rubik:wght@500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/tokens.css">
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/program-skin.css">
+    <link rel="stylesheet" href="css/shabbat-skin.css">
+    <link rel="stylesheet" href="css/quiz-experience.css">
+    <meta name="theme-color" content="#0288d1">
+    <script src="js/config.js"></script>
+    <script src="js/site-config.js"></script>
+    <script src="js/common.js"></script>
+    <script src="js/quiz.js"></script>
+</head>
+<body>
+    <div id="loading" class="loading hidden">
+        <div class="spinner"></div>
+        <p>טוען...</p>
+    </div>
+
+    <header class="modern-header">
+        <div class="header-content">
+            <div class="logo-container">
+                <div class="main-logo">
+                    <img src="assets/logos/or-israeli-logo.png" alt="אור ישראלי">
+                </div>
+            </div>
+            <a href="index.html" class="back-button">
+                <span class="material-icons">arrow_back</span>
+                חזרה לדף הבית
+            </a>
+        </div>
+    </header>
+
+    <main class="modern-main">
+        <section class="hero-section">
+            <div class="hero-content">
+                <div class="hero-title">
+                    <h1 class="main-title">שעשועון שבועי</h1>
+                    <span class="material-icons shofar-icon">school</span>
+                </div>
+                <p class="hero-question">שעשועון שבועי - בנושא דיני שבת</p>
+                <div class="hero-description">
+                    <p class="highlight-text">שאלות קצרות וברורות</p>
+                    <p>השעשועון מתעדכן מדי שבוע לפי חומרי הפעילות בסניף.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- הודעת פתיחה לשעשועון -->
+        <div id="quiz-announcement" class="quiz-announcement">
+            <div class="announcement-content">
+                <button class="close-announcement">
+                    <span class="material-icons">close</span>
+                </button>
+                <h2>ברוכים הבאים לשעשועון השבועי!</h2>
+                <p id="announcement-text">מדי שבוע מתעדכן השעשועון, ובין המשתתפים מתקיימות הגרלות על פרסים. בהצלחה!</p>
+                <button class="start-quiz-btn">התחל שעשועון</button>
+            </div>
+        </div>
+
+        <!-- טופס הרשמה -->
+        <div id="registration-form" class="registration-form">
+            <h3>פרטי משתתף</h3>
+            <form id="userDetailsForm">
+                <div class="form-group">
+                    <label for="userName">שם מלא *</label>
+                    <input type="text" id="userName" name="userName" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="branch">סניף *</label>
+                    <div class="branch-search-container">
+                        <input type="text" id="branch" name="branch" placeholder="הקלד לחיפוש סניף..." required>
+                        <div class="branch-results"></div>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="phone">מספר טלפון *</label>
+                    <input type="tel" id="phone" name="phone" placeholder="05X-XXXXXXX" required>
+                </div>
+                
+                <div class="form-group checkbox-group">
+                    <label class="checkbox-label">
+                        <input type="checkbox" id="rememberMe" name="rememberMe">
+                        <span class="checkmark"></span>
+                        זכור פרטיי לשעשועון הבא
+                    </label>
+                </div>
+                
+                <button type="submit" class="submit-button">
+                    התחל שעשועון
+                </button>
+            </form>
+        </div>
+
+        <!-- אזור השעשועון -->
+        <div id="quiz-section" class="quiz-section hidden">
+            <!-- <div class="quiz-introduction">
+                <h3>הוראות השעשועון</h3>
+                <p>ברוכים הבאים למבחן השבועי!<br>
+             </p>
+            </div> -->
+
+            <div class="progress-container quiz-progress-immersive">
+                <button type="button" class="quiz-sound-toggle" id="quizSoundToggle" aria-pressed="false" title="השתקת קול" aria-label="השתקה או הפעלת קול">
+                    <span class="material-icons quiz-sound-ico-on" aria-hidden="true">volume_up</span>
+                    <span class="material-icons quiz-sound-ico-off" aria-hidden="true">volume_off</span>
+                    <span class="quiz-sound-text">קול</span>
+                </button>
+                <div class="progress-bar" id="progressBar"></div>
+                <p class="progress-text progress-text-padded">
+                    שאלה <span id="currentQuestion">1</span> מתוך <span id="totalQuestions">10</span>
+                </p>
+            </div>
+
+            <div class="quiz-question-scene" id="quizQuestionScene" aria-live="polite">
+                <div class="time-warp-veil" id="timeWarpVeil" aria-hidden="true"></div>
+                <div class="time-warp-burst" id="timeWarpBurst" aria-hidden="true"></div>
+                <div id="question-container" class="question-surface">
+                    <!-- השאלות יטענו כאן -->
+                </div>
+            </div>
+
+            <div class="quiz-controls">
+                <button class="nav-button" id="prevQuestion">
+                    <span class="material-icons">arrow_back</span>
+                    הקודמת
+                </button>
+                <button class="nav-button submit-button" id="submitQuiz">
+                    <span class="material-icons">send</span> 
+                    סיים שעשועון
+                </button>
+                <button class="nav-button" id="nextQuestion">
+                    הבאה
+                    <span class="material-icons">arrow_forward</span>
+                </button>
+            </div>
+        </div>
+    </main>
+
+    <footer class="modern-footer">
+        <p class="footer-credit" onclick="showContactInfo()">נבנה ע"י Y.D. Systems</p>
+    </footer>
+</body>
+</html>

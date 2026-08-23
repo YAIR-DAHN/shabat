@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html dir="rtl" lang="he">
+<head>
+    <!-- Google Analytics 4 -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-HJV6EQFRPY"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', 'G-HJV6EQFRPY');
+    </script>
+    <!-- End Google Analytics -->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>הרשמה לפעילות - אור ישראלי · מיזם השבת</title>
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Heebo:wght@300;400;500;600;700;800;900&family=Rubik:wght@500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/tokens.css">
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/program-skin.css">
+    <link rel="stylesheet" href="css/register-page.css">
+    <link rel="stylesheet" href="css/shabbat-skin.css">
+    <meta name="theme-color" content="#0288d1">
+    <script src="js/config.js"></script>
+    <script src="js/site-config.js"></script>
+    <script src="js/common.js"></script>
+    <script src="js/register.js" defer></script>
+</head>
+<body>
+    <div id="loading" class="loading hidden">
+        <div class="spinner"></div>
+        <p>טוען...</p>
+    </div>
+
+    <header class="modern-header">
+        <div class="header-content">
+            <div class="logo-container">
+                <div class="main-logo">
+                    <img src="assets/logos/or-israeli-logo.png" alt="אור ישראלי">
+                </div>
+                <div class="logo-text">
+                    <h2>תנועת הנוער אור ישראלי</h2>
+                    <p>הרשמה לפעילות</p>
+                </div>
+            </div>
+            <a href="index.html" class="back-button">
+                <span class="material-icons">arrow_back</span>
+                חזרה לדף הבית
+            </a>
+        </div>
+    </header>
+
+    <main class="modern-main register-page">
+        <section class="hero-section register-hero">
+            <div class="register-hero__inner">
+                <span class="register-hero__badge">מיזם השבת · אור ישראלי</span>
+                <h1>נרשמים לפעילות בקליק</h1>
+                <p class="register-hero__lead">אחרי ההרשמה תוכלו להיכנס לשעשועון כשהוא פתוח - ולקבל עדכונים בקבוצת וואטסאפ שקטה לחברי התוכנית.</p>
+            </div>
+        </section>
+
+        <div class="registration-container">
+            <div class="register-layout">
+                <aside class="register-aside" aria-labelledby="register-benefits-title">
+                    <h2 id="register-benefits-title">למה נרשמים מראש?</h2>
+                    <ul class="register-benefits">
+                        <li>
+                            <span class="material-icons" aria-hidden="true">bolt</span>
+                            <span>כניסה מהירה לשעשועון כשהוא נפתח - בלי למלא שוב פרטים בכל שבוע.</span>
+                        </li>
+                        <li>
+                            <span class="material-icons" aria-hidden="true">groups</span>
+                            <span>חיבור לסניף ולרכז - הכל מאורגן במקום אחד.</span>
+                        </li>
+                        <li>
+                            <span class="material-icons" aria-hidden="true">emoji_events</span>
+                            <span>הגרלות וחוויית הפעילות ממשיכות גם מחוץ לאתר.</span>
+                        </li>
+                    </ul>
+                    <div class="register-wa-hint">
+                        <span class="material-icons" aria-hidden="true">tips_and_updates</span>
+                        <div>
+                            <strong class="register-wa-hint__title">אחרי השליחה</strong>
+                            נמליץ להצטרף לקבוצת וואטסאפ שקטה - שם מתעדכנים על חידונים, זוכים והגרלות מיוחדות לחברי הקבוצה.
+                        </div>
+                    </div>
+                </aside>
+
+                <div class="register-form-panel">
+                    <form id="registration-form" class="registration-form" novalidate>
+                        <div class="form-header">
+                            <h2>פרטי הרשמה</h2>
+                            <p>מלאו את השדות - השמירה מתבצעת בצורה מאובטחת לפי תקנון התוכנית.</p>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="fullName">שם מלא</label>
+                            <input type="text" id="fullName" name="fullName" autocomplete="name" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="phone">מספר טלפון</label>
+                            <input type="tel" id="phone" name="phone" placeholder="050-123-4567" dir="ltr" inputmode="tel" autocomplete="tel" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="branch">סניף</label>
+                            <div class="branch-search-container">
+                                <input type="text" id="branch" name="branch" placeholder="הקלד לחיפוש סניף..." autocomplete="off" required>
+                                <div class="branch-results" id="branchResults"></div>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="age">גיל</label>
+                            <select id="age" name="age" required>
+                                <option value="">בחרו גיל</option>
+                                <option value="12">12</option>
+                                <option value="13">13</option>
+                                <option value="14">14</option>
+                                <option value="15">15</option>
+                                <option value="16">16</option>
+                                <option value="17">17</option>
+                                <option value="18">18</option>
+                                <option value="19">19</option>
+                                <option value="20">20</option>
+                            </select>
+                        </div>
+
+                        <div class="checkbox-wrapper">
+                            <input type="checkbox" id="acceptTerms" name="acceptTerms" required aria-labelledby="acceptTermsLabel">
+                            <label for="acceptTerms" class="checkbox-custom"></label>
+                            <span id="acceptTermsLabel">אני מאשר את <a href="#" class="terms-link" onclick="event.preventDefault(); showTermsModal();">התקנון ותנאי השימוש</a></span>
+                        </div>
+
+                        <button type="submit" class="primary-button" id="submitBtn">
+                            <span class="btn-text">שליחת הרשמה</span>
+                            <span class="loading-spinner hidden">
+                                <span class="spinner" aria-hidden="true"></span>
+                                <span>שולחים…</span>
+                            </span>
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <div id="termsModal" class="register-terms-modal" role="dialog" aria-modal="true" aria-labelledby="termsModalTitle">
+        <div class="modal">
+            <div class="modal-header">
+                <span class="material-icons modal-icon" aria-hidden="true">description</span>
+                <h3 class="modal-title" id="termsModalTitle">תקנון ותנאי שימוש</h3>
+                <button type="button" class="modal-close" onclick="closeTermsModal()" aria-label="סגירה">&times;</button>
+            </div>
+            <div class="modal-content">
+                <div class="terms-content">
+                    <h3>תקנון השעשועון השבועי</h3>
+                    <p>ברוכים הבאים לשעשועון השבועי של תנועת הנוער אור ישראלי!</p>
+                    <h3>כללי השעשועון</h3>
+                    <ul>
+                        <li>השעשועון מתעדכן מדי שבוע לפי נושאי הפעילות.</li>
+                        <li>כל משתתף רשאי להשתתף לפי כללי הסניף והרכז.</li>
+                        <li>זוכי השעשועון יפורסמו באתר בשבוע שלאחר מכן.</li>
+                        <li>ההגרלות והזכיות יהיו בהתאם לשיקול דעת הרבנים</li>
+                    </ul>
+                    <h3>פרטיות</h3>
+                    <p>הפרטים משמשים לניהול ההשתתפות ולא יועברו לשיווק חיצוני.</p>
+                    <p>בהרשמתכם, הנכם מסכימים לקבל הודעות ומסרים בנושאי החידון והגרלות.</p>
+                    <h3>שינויים</h3>
+                    <p>התנועה רשאית לעדכן תקנון או מבנה פעילות מעת לעת.</p>
+                </div>
+            </div>
+            <div class="modal-actions">
+                <button type="button" class="modal-button secondary" onclick="closeTermsModal()">סגור</button>
+            </div>
+        </div>
+    </div>
+
+    <footer class="modern-footer">
+        <p class="footer-credit" onclick="showContactInfo()">נבנה ע"י Y.D. Systems</p>
+    </footer>
+</body>
+</html>

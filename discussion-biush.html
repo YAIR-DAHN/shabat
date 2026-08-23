@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html dir="rtl" lang="he">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>יוזמה בבית - אור ישראלי</title>
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Heebo:wght@300;400;500;600;700;800;900&family=Rubik:wght@500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/tokens.css">
+    <link rel="stylesheet" href="css/discussion.css">
+    <link rel="stylesheet" href="css/program-skin.css">
+    <link rel="stylesheet" href="css/dark-mode.css">
+    <script src="js/config.js"></script>
+    <script src="js/site-config.js"></script>
+    <script src="js/common.js"></script>
+    <script src="js/discussion.js"></script>
+    <script>
+        window.DISCUSSION_ID = typeof SITE !== 'undefined' && SITE.discussions
+            ? SITE.discussions.helpingHome
+            : 'kibud-ozer-bayit';
+    </script>
+</head>
+<body>
+    <div id="loading" class="loading hidden">
+        <div class="spinner"></div>
+        <p>טוען...</p>
+    </div>
+
+    <header class="modern-header">
+        <div class="header-content">
+            <div class="logo-container">
+                <div class="main-logo">
+                    <img src="assets/logos/or-israeli-logo.png" alt="אור ישראלי">
+                </div>
+            </div>
+            <a href="index.html" class="back-button">
+                <span class="material-icons">arrow_back</span>
+                חזרה לדף הבית
+            </a>
+        </div>
+    </header>
+
+    <main class="modern-main">
+        <div class="back-button-container">
+            <a href="discussion-topics.html" class="back-button">
+                <span class="material-icons">arrow_back</span>
+                חזרה לנושאי השיח
+            </a>
+        </div>
+
+        <section class="discussion-area">
+            <h2 class="discussion-title">יוזמה בבית: שיתוף, סדר ומחווה</h2>
+
+            <div class="discussion-question">
+                <h3>שאלות לפתיחת השיח</h3>
+                <ul>
+                    <li>מה המטלה הביתית שהכי קל לכם לעזור בה - ומה הרגילה להישאר "על אמא ואבא"?</li>
+                    <li>איך מרגישים כשמבקשים עזרה בזמן שאתם בעצמכם עסוקים?</li>
+                    <li>מה הייתם רוצים שישתנה בחלוקת העבודה בבית - בלי להאשים?</li>
+                    <li>איזו מחווה קטנה (אפילו דקה) הייתם רוצים להוסיף השבוע?</li>
+                </ul>
+            </div>
+
+            <div class="source-block">
+                <strong>שיתוף ציפיות</strong><br>
+                <span>לפעמים ההורים מצפים לדבר אחד ואנחנו לדבר אחר. כשמדברים על זה בקול רגוע, קל יותר למצוא אמצע משותף.</span>
+                <div class="example-block">
+                    <span class="example-label">דוגמה מהשטח:</span>
+                    <span>"אני באמת רוצה לעזור עם הארוחה - אם נקבע שעה שמתאימה לי אחרי האימון, זה יעבוד לי הכי טוב."</span>
+                </div>
+            </div>
+
+            <div class="source-block">
+                <strong>כבוד גם כשלא באותו רגע</strong><br>
+                <span>אפשר להיות לא מסכימים עם בקשה - ועדיין לדבר בצורה שמכבדת. זה לא תמיד קל, במיוחד כשעייפים, ולכן זה נושא מצוין לתרגל יחד בקבוצה.</span>
+                <div class="example-block">
+                    <span class="example-label">דוגמה מהשטח:</span>
+                    <span>במקום "תפסיקו לנג'ס אותי", אפשר לנסות: "אני מרגיש שזה הרבה עליי השבוע, אפשר לחלק אחרת?"</span>
+                </div>
+            </div>
+
+            <div class="source-block">
+                <strong>מחווה שמחממת את הבית</strong><br>
+                <span>זה לא רק "לעזור" - לפעמים זה סידור שולחן, הדלקת תאורה נעימה או שאלה "איך היה היום שלך?". קטן לכם, גדול למי שמקבל.</span>
+            </div>
+
+            <div class="discussion-intro">
+                <h3>המשך השיח בקבוצה</h3>
+                <ul>
+                    <li>מה עוזר לכם להרגיש שותפים אמיתיים בבית?</li>
+                    <li>איך אפשר לבקש הפסקה בלי "לשרוף את השיחה"?</li>
+                    <li>איזה רגע אחרון גרם לכם להרגיש גאים בעצמכם בבית?</li>
+                </ul>
+            </div>
+        </section>
+
+        <div class="comments-section">
+            <h4 class="comments-title">תגובות המשתתפים:</h4>
+            <div class="comments-sort-bar" id="commentsSortBar">
+                <label for="sortCommentsSelect" class="sort-label">סדר תגובות:</label>
+                <select id="sortCommentsSelect" class="sort-select">
+                    <option value="newest" selected>מהחדש לישן</option>
+                    <option value="oldest">מהישן לחדש</option>
+                    <option value="mostLiked">הכי הרבה לייקים</option>
+                </select>
+            </div>
+            <div class="comments-container" id="commentsContainer">
+            </div>
+
+            <div class="reply-form hidden" id="replyForm">
+                <h4 class="reply-title">השבת על תגובה:</h4>
+                <form id="replyCommentForm">
+                    <div class="form-group">
+                        <label for="replyName">שם:</label>
+                        <input type="text" id="replyName" name="replyName" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="replyPhone">טלפון:</label>
+                        <input type="tel" id="replyPhone" name="replyPhone" required>
+                        <small class="form-hint">לא יוצג בפומבי</small>
+                    </div>
+                    <div class="form-group">
+                        <label for="replyText">תגובה:</label>
+                        <div class="text-editor-container">
+                            <div class="formatting-toolbar">
+                                <button type="button" onclick="formatReplyText('bold')" title="מודגש">ב</button>
+                                <button type="button" onclick="formatReplyText('italic')" title="נטוי">נ</button>
+                                <button type="button" onclick="formatReplyText('underline')" title="קו תחתון">ק</button>
+                                <button type="button" onclick="formatReplyText('strikethrough')" title="קו חוצה">ח</button>
+                            </div>
+                            <div id="replyText" class="text-editor" contenteditable="true" data-placeholder="כתוב את תגובתך..."></div>
+                        </div>
+                    </div>
+                    <div class="reply-actions">
+                        <button type="button" class="cancel-btn" onclick="cancelReply()">ביטול</button>
+                        <button type="submit" class="reply-btn" id="submitReplyBtn">
+                            שלח תגובה
+                            <span class="loading-spinner hidden"></span>
+                        </button>
+                    </div>
+                </form>
+            </div>
+
+            <div class="comment-form">
+                <h4>הוסף תגובה:</h4>
+                <form id="commentForm">
+                    <div class="form-group">
+                        <label for="commentText">מה דעתך בנושא?</label>
+                        <div class="text-editor-container">
+                            <div class="formatting-toolbar">
+                                <button type="button" onclick="formatNewText('bold')" title="מודגש">ב</button>
+                                <button type="button" onclick="formatNewText('italic')" title="נטוי">נ</button>
+                                <button type="button" onclick="formatNewText('underline')" title="קו תחתון">ק</button>
+                                <button type="button" onclick="formatNewText('strikethrough')" title="קו חוצה">ח</button>
+                            </div>
+                            <div id="commentText" class="text-editor" contenteditable="true" data-placeholder="שתף את דעתך על הדיון..."></div>
+                        </div>
+                    </div>
+
+                    <div class="user-details-fields" id="userDetailsFields">
+                        <div class="form-group">
+                            <label for="commenterName">שם:</label>
+                            <input type="text" id="commenterName" name="commenterName" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="commenterPhone">טלפון:</label>
+                            <input type="tel" id="commenterPhone" name="commenterPhone" required>
+                            <small class="form-hint">לא יוצג בפומבי</small>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="submit-btn" id="submitCommentBtn">
+                        שלח תגובה
+                        <span class="loading-spinner hidden"></span>
+                    </button>
+                </form>
+            </div>
+        </div>
+    </main>
+
+    <footer class="modern-footer">
+        <p class="footer-credit" onclick="showContactInfo()">נבנה ע"י Y.D. Systems</p>
+    </footer>
+</body>
+</html>

@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html dir="rtl" lang="he">
+
+<head>
+    <!-- Google Analytics 4 -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-HJV6EQFRPY"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', 'G-HJV6EQFRPY');
+    </script>
+    <!-- End Google Analytics -->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="נושאי שיח - תנועת הנוער אור ישראלי, מידות טובות">
+    <meta property="og:title" content="נושאי שיח - אור ישראלי">
+    <meta property="og:description" content="בחרו נושא לשיח קבוצתי בנושא מידות טובות">
+    <meta property="og:image" content="./assets/logos/or-israeli-logo.png">
+    <meta name="theme-color" content="#0288d1" media="(prefers-color-scheme: light)">
+    <meta name="theme-color" content="#0288d1" media="(prefers-color-scheme: dark)">
+    <meta name="msapplication-navbutton-color" content="#0288d1">
+    <meta name="apple-mobile-web-app-status-bar-style" content="#0288d1">
+
+    <link rel="icon" type="image/png" href="./assets/logos/or-israeli-logo.png">
+    <link rel="apple-touch-icon" href="./assets/logos/or-israeli-logo.png">
+
+    <title>נושאי שיח - אור ישראלי</title>
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Heebo:wght@300;400;500;600;700;800;900&family=Rubik:wght@500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/tokens.css">
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/program-skin.css">
+    <link rel="stylesheet" href="css/dark-mode.css">
+    <script src="js/config.js"></script>
+    <script src="js/site-config.js"></script>
+    <script src="js/common.js"></script>
+    <script src="js/animations.js"></script>
+</head>
+
+<body>
+    <div id="loading" class="loading hidden">
+        <div class="spinner"></div>
+        <p>טוען...</p>
+    </div>
+
+    <header class="modern-header">
+        <div class="header-content">
+            <div class="logo-container">
+                <div class="main-logo">
+                    <img src="assets/logos/or-israeli-logo.png" alt="אור ישראלי">
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <main class="modern-main">
+        <div class="back-button-container">
+            <a href="index.html" class="back-button">
+                <span class="material-icons">arrow_back</span>
+                חזרה לדף הבית
+            </a>
+        </div>
+
+        <section class="page-hero animate-on-scroll">
+            <div class="page-hero-content">
+                <h1 class="page-title">
+                    <span class="title-icon">💬</span>
+                    נושאי שיח
+                </h1>
+                <p class="page-subtitle">פעילות קבוצתית בנושא מידות טובות - בחרו נושא והצטרפו לשיח בסניף</p>
+            </div>
+        </section>
+
+        <section class="topics-section animate-on-scroll">
+            <div class="topics-grid">
+                <article class="topic-card animate-on-scroll">
+                    <a href="discussion-biush.html" class="topic-card-link">
+                        <div class="topic-image">
+                            <img src="assets/png/buy-happy.png" alt="" class="topic-img" width="400" height="300" loading="lazy">
+                        </div>
+                        <div class="topic-content">
+                            <h2 class="topic-title">יוזמה ועשיית טוב</h2>
+                            <p class="topic-description">
+                                נדיבות, עזרה לזולת וכבוד הדדי - בלי האשמות, עם הרבה פרקטיקה.
+                            </p>
+                            <div class="topic-meta">
+                                <span class="topic-category">מידות טובות</span>
+                                <span class="topic-participants">👥 שיח קבוצתי</span>
+                            </div>
+                            <span class="topic-button">
+                                <span class="material-icons">forum</span>
+                                הצטרפו לשיח
+                            </span>
+                        </div>
+                    </a>
+                </article>
+
+                <article class="topic-card animate-on-scroll">
+                    <a href="discussion.html" class="topic-card-link">
+                        <div class="topic-image">
+                            <img src="assets/png/boy-salutes.png" alt="" class="topic-img" width="400" height="300" loading="lazy">
+                        </div>
+                        <div class="topic-content">
+                            <h2 class="topic-title">לדון לכף זכות</h2>
+                            <p class="topic-description">
+                                הסתכלות חיובית, הקשבה וסבלנות - איך לשמור על שיח נעים ועין טובה.
+                            </p>
+                            <div class="topic-meta">
+                                <span class="topic-category">מידות טובות</span>
+                                <span class="topic-participants">👥 שיח קבוצתי</span>
+                            </div>
+                            <span class="topic-button">
+                                <span class="material-icons">forum</span>
+                                הצטרפו לשיח
+                            </span>
+                        </div>
+                    </a>
+                </article>
+            </div>
+        </section>
+    </main>
+
+    <footer class="modern-footer">
+        <p class="footer-credit" onclick="showContactInfo()">נבנה ע"י Y.D. Systems</p>
+    </footer>
+
+</body>
+
+</html>

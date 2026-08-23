@@ -1,0 +1,262 @@
+/* שכבת חוויית שעשועון: מעבר "מסע בזמן" וממשק שמע */
+
+.quiz-section {
+    position: relative;
+    overflow: hidden;
+}
+
+/* --- כפתור שמע - פינה, פינה מעוגלת, אנרגיה */
+.quiz-progress-immersive {
+    position: relative;
+    padding-top: 0.25rem;
+}
+
+.quiz-sound-toggle {
+    position: absolute;
+    top: 0.65rem;
+    inset-inline-end: 0.65rem;
+    z-index: 2;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    padding: 0.45rem 0.75rem 0.45rem 0.65rem;
+    border: none;
+    border-radius: 999px;
+    background: linear-gradient(145deg, #ffffff 0%, #f0f3ff 100%);
+    color: #3d4a9c;
+    font-family: inherit;
+    font-size: 0.85rem;
+    font-weight: 600;
+    cursor: pointer;
+    box-shadow: 0 4px 14px rgba(102, 126, 234, 0.22), 0 0 0 1px rgba(102, 126, 234, 0.12);
+    transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
+}
+
+.quiz-sound-toggle:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 8px 22px rgba(102, 126, 234, 0.3), 0 0 0 1px rgba(102, 126, 234, 0.2);
+}
+
+.quiz-sound-toggle:focus-visible {
+    outline: 2px solid #667eea;
+    outline-offset: 2px;
+}
+
+.quiz-sound-toggle .material-icons {
+    font-size: 1.25rem;
+}
+
+.quiz-sound-ico-off {
+    display: none;
+}
+
+.quiz-sound-toggle.is-muted {
+    background: linear-gradient(145deg, #f1f1f1 0%, #e8e8e8 100%);
+    color: #6c6c6c;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+.quiz-sound-toggle.is-muted .quiz-sound-ico-on {
+    display: none;
+}
+
+.quiz-sound-toggle.is-muted .quiz-sound-ico-off {
+    display: inline-block;
+}
+
+.progress-text-padded {
+    position: relative;
+    z-index: 1;
+    margin: 0;
+    padding-inline-end: 4.5rem;
+}
+
+/* --- שלב שאלה: תאורה ורקע עומק */
+.quiz-question-scene {
+    position: relative;
+    border-radius: 20px;
+    min-height: 8rem;
+    perspective: 1200px;
+    transform-style: preserve-3d;
+}
+
+.question-surface {
+    position: relative;
+    z-index: 1;
+    will-change: transform, filter, opacity;
+    transform-style: preserve-3d;
+    transform-origin: 50% 40%;
+}
+
+/* יציאה: "צניחה" לחור תולעת + טשטוש */
+.question-surface--exit {
+    animation: quizWormOut 0.42s cubic-bezier(0.55, 0.05, 0.67, 0.19) forwards;
+}
+
+/* כניסה: חלחלה החוצה */
+.question-surface--enter {
+    animation: quizWormIn 0.5s cubic-bezier(0.22, 0.8, 0.32, 1) forwards;
+}
+
+@keyframes quizWormOut {
+    0% {
+        transform: scale(1) translateZ(0) rotateX(0deg);
+        filter: blur(0) hue-rotate(0deg) brightness(1);
+        opacity: 1;
+    }
+    100% {
+        transform: scale(0.88) translateZ(-120px) rotateX(12deg) rotateY(-4deg);
+        filter: blur(6px) hue-rotate(25deg) brightness(1.1);
+        opacity: 0.2;
+    }
+}
+
+@keyframes quizWormIn {
+    0% {
+        transform: scale(0.9) translateZ(80px) rotateX(-10deg) rotateY(3deg);
+        filter: blur(4px) hue-rotate(-15deg) brightness(1.15);
+        opacity: 0.25;
+    }
+    100% {
+        transform: scale(1) translateZ(0) rotateX(0deg) rotateY(0deg);
+        filter: blur(0) hue-rotate(0deg) brightness(1);
+        opacity: 1;
+    }
+}
+
+/* הילה כחול-סגול: ערפילית זמן */
+.time-warp-veil {
+    pointer-events: none;
+    position: absolute;
+    inset: -2px;
+    z-index: 0;
+    border-radius: 22px;
+    opacity: 0;
+    background:
+        conic-gradient(from 180deg at 50% 50%, rgba(118, 75, 162, 0) 0deg, rgba(102, 126, 234, 0.4) 90deg, rgba(56, 189, 248, 0.25) 180deg, rgba(118, 75, 162, 0) 360deg);
+    background-size: 200% 200%;
+    transition: opacity 0.2s ease;
+    mix-blend-mode: screen;
+    filter: blur(0);
+}
+
+.time-warp-veil--on {
+    opacity: 0.85;
+    animation: timeVeilSpin 0.5s linear infinite;
+    filter: blur(1px);
+}
+
+@keyframes timeVeilSpin {
+    0% {
+        background-position: 0% 50%;
+    }
+    100% {
+        background-position: 100% 50%;
+    }
+}
+
+/* "כוכבים" / קווי אור במעבר */
+.time-warp-burst {
+    pointer-events: none;
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    border-radius: 20px;
+    opacity: 0;
+    overflow: hidden;
+    background:
+        repeating-linear-gradient(
+            -25deg,
+            transparent,
+            transparent 2px,
+            rgba(255, 255, 255, 0.15) 2px,
+            rgba(255, 255, 255, 0.15) 4px
+        ),
+        radial-gradient(ellipse 80% 50% at 50% 100%, rgba(56, 189, 248, 0.35) 0%, transparent 60%);
+    mix-blend-mode: overlay;
+}
+
+.time-warp-burst--on {
+    opacity: 1;
+    animation: timeBurstMove 0.4s ease-out;
+}
+
+@keyframes timeBurstMove {
+    0% {
+        transform: scale(1.2) translateY(10px);
+        opacity: 0;
+    }
+    30% {
+        opacity: 1;
+    }
+    100% {
+        transform: scale(1) translateY(0);
+        opacity: 0.7;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .time-warp-veil--on,
+    .time-warp-veil,
+    .time-warp-burst--on,
+    .time-warp-burst {
+        animation: none !important;
+    }
+
+    .question-surface--exit {
+        animation: quizFadeOut 0.15s ease forwards;
+    }
+
+    .question-surface--enter {
+        animation: quizFadeIn 0.15s ease forwards;
+    }
+}
+
+@keyframes quizFadeOut {
+    to {
+        opacity: 0.15;
+    }
+}
+
+@keyframes quizFadeIn {
+    from {
+        opacity: 0.2;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
+/* Dark */
+[data-theme="dark"] .quiz-sound-toggle {
+    background: linear-gradient(145deg, #2a2f3d 0%, #1e2230 100%);
+    color: #b4c0ff;
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.4), 0 0 0 1px rgba(102, 126, 234, 0.25);
+}
+
+[data-theme="dark"] .quiz-sound-toggle.is-muted {
+    background: #2c2c2c;
+    color: #9a9a9a;
+}
+
+[data-theme="dark"] .time-warp-veil {
+    mix-blend-mode: lighten;
+}
+
+/* מובייל: כפתור מתחת לשורת התקדמות */
+@media (max-width: 600px) {
+    .quiz-sound-toggle {
+        position: static;
+        margin: 0 auto 0.75rem;
+        display: flex;
+    }
+
+    .progress-text-padded {
+        padding-inline-end: 0;
+    }
+
+    .quiz-progress-immersive {
+        display: flex;
+        flex-direction: column;
+    }
+}
