@@ -1,14 +1,14 @@
 const CONFIG = {
     api: {
-        url: 'https://script.google.com/macros/s/AKfycbxsgQqFHkRvNXM9sM6usg3XDylAkc96uQH1qwYtve6aMvS6d7_UZj0F1_s-rRxE0oDQ/exec'
+        url: 'https://script.google.com/macros/s/AKfycbxy3phMJMb84pyjEu6HnWG_HW1FuqS-Iixwz3luIsr7XbeGhRkeb9Rms_S589qpvX7lkw/exec'
     },
 
     quiz: {
-        isAvailable: true,
+        isAvailable: false,
         nextQuizDate: '2025-05-19',
         hebrewDate: 'יום שני',
         displayDate: '19.5',
-        showAnnouncement: true,
+        showAnnouncement: false,
         announcementText:
             'ברוכים הבאים לשעשועון השבועי בנושא דיני שבת!\nבתחילת השעשועון יוצגו לכם שאלות לרענן את הידע - השאלות אינן משפיעות על הציון.\nבהצלחה!',
         introductionText: 'ארבע השאלות הבאות נועדו לרענן את הידע ולא משפיעות על הציון',
