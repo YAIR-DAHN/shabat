@@ -4,7 +4,7 @@ function getWhatsappUpdatesUrl() {
     if (typeof SITE !== 'undefined' && SITE.links && SITE.links.whatsappUpdates) {
         return SITE.links.whatsappUpdates;
     }
-    return 'https://chat.whatsapp.com/Lh3rqZNMhJQ6SKPm4VFMC4';
+    return 'https://chat.whatsapp.com/FT2N0k77sA25HrTvTR4PEb';
 }
 
 /** אותו מפתח ומבנה כמו ב-quiz.js - השעשועון קורא userName, branch, phone */

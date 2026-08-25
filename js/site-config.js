@@ -35,6 +35,6 @@ window.SITE = {
     },
 
     links: {
-        whatsappUpdates: 'https://chat.whatsapp.com/Lh3rqZNMhJQ6SKPm4VFMC4'
+        whatsappUpdates: 'https://chat.whatsapp.com/FT2N0k77sA25HrTvTR4PEb'
     }
 };
