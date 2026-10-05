@@ -70,8 +70,13 @@ body {
 
 @media (max-width: 820px) {
     .hero-program__inner {
+        padding-top: 2.75rem;
         padding-bottom: 1.75rem;
         gap: 1.25rem;
+    }
+
+    .hero-program__ribbon {
+        top: 0.65rem !important;
     }
 
     /* מובייל: כותרת וכפתורים לפני המודעה (סדר DOM) */
@@ -184,15 +189,15 @@ body {
 }
 
 .hero-program__chips > a:first-child {
-    background: linear-gradient(135deg, #4B8A2B 0%, #3C7021 100%) !important;
-    color: #fff !important;
+    background: linear-gradient(135deg, #F7E8A8 0%, #E4B65E 48%, #AD7F22 100%) !important;
+    color: #12294A !important;
     border-color: transparent !important;
-    box-shadow: 0 6px 18px rgba(75, 138, 43, 0.4) !important;
+    box-shadow: 0 8px 22px rgba(173, 127, 34, 0.45) !important;
 }
 
 .hero-program__chips > a:first-child:hover {
-    background: linear-gradient(135deg, #5A9A35 0%, #4B8A2B 100%) !important;
-    box-shadow: 0 8px 22px rgba(75, 138, 43, 0.5) !important;
+    background: linear-gradient(135deg, #FFF6D4 0%, #F7E8A8 100%) !important;
+    box-shadow: 0 10px 26px rgba(173, 127, 34, 0.5) !important;
 }
 
 .hero-chip--ghost {
@@ -407,8 +412,9 @@ body {
 
 @media (min-width: 640px) {
     .enrichment-grid {
-        grid-template-columns: repeat(3, 1fr);
+        grid-template-columns: repeat(2, minmax(0, 1fr));
         gap: 1.15rem;
+        max-width: 760px;
     }
 }
 
@@ -690,15 +696,15 @@ body {
     }
 
     .dock-item--highlight {
-        background: linear-gradient(135deg, #4B8A2B 0%, #3C7021 100%) !important;
-        color: #fff !important;
-        box-shadow: 0 3px 10px rgba(75, 138, 43, 0.45);
+        background: linear-gradient(135deg, #F7E8A8 0%, #E4B65E 100%) !important;
+        color: #12294A !important;
+        box-shadow: 0 3px 12px rgba(173, 127, 34, 0.45);
     }
 
     .dock-item--highlight:active,
     .dock-item--highlight:hover {
-        background: linear-gradient(135deg, #5A9A35 0%, #4B8A2B 100%) !important;
-        color: #fff !important;
+        background: linear-gradient(135deg, #FFF6D4 0%, #F7E8A8 100%) !important;
+        color: #12294A !important;
     }
 
     .dock-icon {
@@ -871,7 +877,350 @@ body {
     .nav-card:hover,
     .hero-chip:hover,
     .week-card:hover,
-    .prize-showcase-card:hover {
+    .prize-showcase-card:hover,
+    .path-step:hover,
+    .prize-ticket:hover,
+    .raffle-card:hover {
         transform: none;
     }
+
+    .hero-program__word,
+    .hero-glow {
+        animation: none !important;
+    }
+}
+
+/* ── חורף תשפ״ז: מילה, מסלול, כרטיסי פרס ── */
+.hero-program__bg {
+    overflow: hidden;
+}
+
+.hero-glow {
+    position: absolute;
+    border-radius: 50%;
+    filter: blur(28px);
+    pointer-events: none;
+}
+
+.hero-glow--gold {
+    width: 180px;
+    height: 180px;
+    top: -50px;
+    inset-inline-start: 8%;
+    background: rgba(228, 182, 94, 0.55);
+    animation: glowPulse 7s ease-in-out infinite;
+}
+
+.hero-glow--blue {
+    width: 220px;
+    height: 220px;
+    bottom: -70px;
+    inset-inline-end: -20px;
+    background: rgba(92, 190, 224, 0.35);
+    animation: glowPulse 9s ease-in-out infinite reverse;
+}
+
+.hero-program__kicker {
+    margin: 0.15rem 0 0.45rem;
+    color: #F7E8A8;
+    font-weight: 700;
+    font-size: 0.95rem;
+    letter-spacing: 0.01em;
+}
+
+.hero-program__title {
+    margin-bottom: 0.65rem !important;
+}
+
+.hero-program__title-soft {
+    display: block;
+    font-size: clamp(0.95rem, 2.4vw, 1.15rem);
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    white-space: nowrap;
+    color: #C5DFF0 !important;
+    -webkit-text-fill-color: #C5DFF0 !important;
+    margin-bottom: 0.1rem;
+}
+
+.hero-program__word {
+    display: block;
+    font-size: clamp(4.4rem, 18vw, 7.4rem);
+    line-height: 0.86;
+    letter-spacing: -0.045em;
+    font-weight: 900;
+    background: linear-gradient(105deg, #FFF6D4 0%, #FFFFFF 28%, #E4B65E 52%, #FFF6D4 74%, #AD7F22 100%);
+    background-size: 220% auto;
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent !important;
+    -webkit-text-fill-color: transparent !important;
+    filter: drop-shadow(0 8px 18px rgba(0, 0, 0, 0.35));
+    animation: shimmerGold 8s linear infinite;
+}
+
+@media (max-width: 820px) {
+    .hero-program__word {
+        font-size: clamp(4.6rem, 22vw, 6.2rem) !important;
+    }
+}
+
+.path-section {
+    padding: 0.25rem 1.25rem 2.25rem;
+}
+
+.path-section__lead,
+.prizes-section__lead {
+    text-align: center;
+    color: var(--site-muted);
+    font-size: 0.95rem;
+    line-height: 1.55;
+    margin: -0.75rem auto 1.25rem;
+    max-width: 34rem;
+}
+
+.path-steps {
+    list-style: none;
+    margin: 0 auto;
+    padding: 0;
+    display: grid;
+    gap: 0.85rem;
+    max-width: 920px;
+}
+
+@media (min-width: 760px) {
+    .path-steps {
+        grid-template-columns: repeat(3, 1fr);
+        gap: 1rem;
+    }
+}
+
+.path-step {
+    position: relative;
+    background: #fff;
+    border: 1.5px solid rgba(173, 127, 34, 0.22);
+    border-radius: 18px;
+    padding: 1.15rem 1.05rem 1.2rem;
+    box-shadow: 0 10px 28px rgba(18, 41, 74, 0.08);
+    min-height: 100%;
+}
+
+.path-step__num {
+    display: grid;
+    place-items: center;
+    width: 36px;
+    height: 36px;
+    margin-bottom: 0.65rem;
+    border-radius: 50%;
+    background: linear-gradient(145deg, #12294A, #256F94);
+    color: #F7E8A8;
+    font-family: var(--site-font-display);
+    font-weight: 800;
+}
+
+.path-step h3 {
+    margin: 0 0 0.35rem;
+    font-family: var(--site-font-display);
+    font-size: 1.12rem;
+    color: #12294A;
+}
+
+.path-step p {
+    margin: 0;
+    color: var(--site-muted);
+    font-size: 0.92rem;
+    line-height: 1.5;
+}
+
+.prizes-section {
+    margin: 0 1rem 2rem;
+    padding: 1.5rem 1rem 1.35rem;
+    border-radius: 24px;
+    background:
+        radial-gradient(ellipse at 100% 0%, rgba(228, 182, 94, 0.22) 0%, transparent 55%),
+        linear-gradient(165deg, #12294A 0%, #0B1C33 100%);
+    box-shadow: 0 16px 40px rgba(7, 18, 35, 0.22);
+}
+
+.prizes-section .section-title {
+    color: #F7E8A8;
+}
+
+.prizes-section__lead {
+    color: rgba(255, 255, 255, 0.82);
+}
+
+.prize-tickets {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.7rem;
+    max-width: 720px;
+    margin: 0 auto 0.9rem;
+}
+
+@media (min-width: 760px) {
+    .prize-tickets {
+        grid-template-columns: repeat(4, 1fr);
+    }
+}
+
+.prize-ticket {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    min-height: 108px;
+    padding: 0.85rem 0.7rem 0.8rem;
+    text-align: center;
+    color: #3D3114;
+    background:
+        radial-gradient(circle at 0 50%, transparent 9px, #FFF8E8 10px),
+        radial-gradient(circle at 100% 50%, transparent 9px, #FFF8E8 10px);
+    background-color: #FFF8E8;
+    border-radius: 14px;
+    box-shadow: 0 8px 18px rgba(0, 0, 0, 0.18);
+}
+
+.prize-ticket--gold {
+    background-color: #F7E8A8;
+    background:
+        radial-gradient(circle at 0 50%, transparent 9px, #F7E8A8 10px),
+        radial-gradient(circle at 100% 50%, transparent 9px, #F7E8A8 10px);
+    box-shadow: 0 10px 24px rgba(228, 182, 94, 0.35);
+}
+
+.prize-ticket__place {
+    font-size: 0.78rem;
+    font-weight: 700;
+    letter-spacing: 0.02em;
+}
+
+.prize-ticket__sum {
+    display: block;
+    margin-top: 0.2rem;
+    font-family: var(--site-font-display);
+    font-size: clamp(1.45rem, 4vw, 1.85rem);
+    line-height: 1;
+    color: #12294A;
+}
+
+.prize-ticket__sum small {
+    font-size: 0.62em;
+    font-weight: 800;
+}
+
+.raffle-row {
+    display: grid;
+    gap: 0.65rem;
+    max-width: 720px;
+    margin: 0 auto;
+}
+
+@media (min-width: 700px) {
+    .raffle-row {
+        grid-template-columns: repeat(3, 1fr);
+    }
+}
+
+.raffle-card {
+    display: flex;
+    align-items: center;
+    gap: 0.7rem;
+    min-height: 72px;
+    padding: 0.75rem 0.85rem;
+    border-radius: 16px;
+    background: rgba(255, 255, 255, 0.08);
+    border: 1px solid rgba(247, 232, 168, 0.28);
+    color: #fff;
+}
+
+.raffle-card h3 {
+    margin: 0;
+    font-size: 0.98rem;
+    font-family: var(--site-font-display);
+}
+
+.raffle-card p {
+    margin: 0.1rem 0 0;
+    font-size: 0.8rem;
+    color: rgba(255, 255, 255, 0.75);
+}
+
+.raffle-card__icon {
+    flex: none;
+    width: 42px;
+    height: 42px;
+    display: grid;
+    place-items: center;
+    border-radius: 12px;
+    background: rgba(247, 232, 168, 0.16);
+    font-size: 1.25rem;
+}
+
+.raffle-card--soon {
+    border-style: dashed;
+}
+
+.blessing-band {
+    margin: 0 1.25rem 1.25rem;
+    padding: 1.15rem 1rem;
+    text-align: center;
+    border-radius: 18px;
+    background: linear-gradient(135deg, rgba(247, 232, 168, 0.35), rgba(255, 255, 255, 0.9));
+    border: 1px solid rgba(173, 127, 34, 0.25);
+}
+
+.blessing-band__wish {
+    margin: 0;
+    font-family: var(--site-font-display);
+    font-size: 1.35rem;
+    font-weight: 800;
+    color: #12294A;
+}
+
+.blessing-band__name {
+    margin: 0.25rem 0 0;
+    color: #5C4A1F;
+    font-weight: 600;
+}
+
+.memorial {
+    margin: 0.9rem auto 0;
+    max-width: 16rem;
+    padding: 0.45rem 0.8rem;
+    text-align: center;
+    font-size: 0.82rem;
+    color: #5C4A1F;
+    background: rgba(247, 232, 168, 0.45);
+    border: 1px solid rgba(173, 127, 34, 0.35);
+    border-radius: 10px;
+}
+
+@media (max-width: 768px) {
+    .dock-item {
+        min-height: 52px;
+        font-size: 0.72rem;
+        padding: 0.45rem 0.25rem;
+    }
+
+    .dock-icon {
+        font-size: 1.25rem;
+    }
+
+    .prizes-section {
+        margin-inline: 0.65rem;
+        padding-inline: 0.75rem;
+    }
+
+    .path-step,
+    .raffle-card,
+    .support-contact,
+    .share-button {
+        -webkit-tap-highlight-color: transparent;
+    }
+}
+
+@keyframes glowPulse {
+    0%, 100% { opacity: 0.65; transform: scale(1); }
+    50% { opacity: 1; transform: scale(1.08); }
 }

@@ -4,13 +4,14 @@ const CONFIG = {
     },
 
     quiz: {
-        isAvailable: true,
+        isAvailable: false,
+        // isAvailable: true,
         nextQuizDate: '2025-05-19',
         hebrewDate: 'יום שני',
         displayDate: '19.5',
         showAnnouncement: false,
         announcementText:
-            'ברוכים הבאים לשעשועון השבועי בנושא דיני שבת!\nבתחילת השעשועון יוצגו לכם שאלות לרענן את הידע - השאלות אינן משפיעות על הציון.\nבהצלחה!',
+            'ברוכים הבאים לחידון השבועי בנושא שבת!\nבתחילת השעשועון יוצגו שאלות לרענון - הן אינן משפיעות על הציון.\nבהצלחה!',
         // introductionText: 'ארבע השאלות הבאות נועדו לרענן את הידע ולא משפיעות על הציון',
         sounds: {
             good: 'assets/sound/good.mp3',
@@ -23,7 +24,7 @@ const CONFIG = {
     },
 
     general: {
-        projectName: 'מיזם השבת',
+        projectName: 'תוכנית שבת',
         organizationName: 'אור ישראלי'
     }
 };
