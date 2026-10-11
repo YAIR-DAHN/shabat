@@ -4,8 +4,8 @@ const CONFIG = {
     },
 
     quiz: {
-        isAvailable: false,
-        // isAvailable: true,
+        // isAvailable: false,
+        isAvailable: true,
         nextQuizDate: '2025-05-19',
         hebrewDate: 'יום שני',
         displayDate: '19.5',

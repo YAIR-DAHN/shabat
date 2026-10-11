@@ -40,8 +40,8 @@ const cache = {
 
 // הגדרת זמינות השעשועון
 const QUIZ_CONFIG = {
-    isAvailable: false, // האם השעשועון זמין כרגע
-    // isAvailable: true, // האם השעשועון זמין כרגע
+    // isAvailable: false, // האם השעשועון זמין כרגע
+    isAvailable: true, // האם השעשועון זמין כרגע
     nextQuizDate: '2024-05-26'  // תאריך השעשועון הבא
 };
 
