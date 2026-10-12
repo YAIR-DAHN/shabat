@@ -1,6 +1,6 @@
 const CONFIG = {
     api: {
-        url: 'https://script.google.com/macros/s/AKfycbzyOqOyD8Bd5RaZ5nPy1UbEbIIp1aRsFKFbfAaAvVcU7kNc8v4QF6e_nXqI4KIxZu4P/exec'
+        url: 'https://script.google.com/macros/s/AKfycbwSblgQrPBcFVPpFYuoN7EPg9fHnhJEJO7xZuBCBUrwh4haI4lpvbFWOrSja5pSyHIR/exec'
     },
 
     quiz: {

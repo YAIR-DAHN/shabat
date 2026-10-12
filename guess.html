@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html dir="rtl" lang="he">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>מה ההלכה בתמונה? · אור ישראלי</title>
+    <meta name="description" content="מנחשים איזו הלכה מסתתרת בתמונות שיצרו החברים. הניחוש נשמר רק לצוות.">
+    <meta name="theme-color" content="#12294A">
+    <link rel="icon" type="image/png" href="./assets/logos/or-israeli-logo.png">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Heebo:wght@400;600;700;800&family=Rubik:wght@600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/tokens.css">
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/program-skin.css">
+    <link rel="stylesheet" href="css/shabbat-skin.css">
+    <link rel="stylesheet" href="css/ai-gallery.css">
+    <script src="js/config.js"></script>
+    <script src="js/common.js"></script>
+    <script src="js/ai-gallery-config.js"></script>
+    <script src="js/ai-gallery.js" defer></script>
+</head>
+<body>
+    <div id="loading" class="loading hidden">
+        <div class="spinner"></div>
+        <p>טוען...</p>
+    </div>
+
+    <header class="modern-header">
+        <div class="header-content">
+            <div class="logo-container">
+                <div class="main-logo">
+                    <img src="assets/logos/or-israeli-logo.png" alt="אור ישראלי">
+                </div>
+            </div>
+            <a href="index.html" class="back-button">
+                <span class="material-icons">arrow_back</span>
+                חזרה לדף הבית
+            </a>
+        </div>
+    </header>
+
+    <main class="modern-main guess-page">
+        <section class="guess-hero">
+            <p>תמונות של החברים · AI</p>
+            <h1>מה ההלכה בתמונה?</h1>
+            <p>כל ציור מסתיר הלכה מתוך החוברת. יודעים את ההלכה? כיתבו לנו והיכנסו להגרלה!</p>
+            <p class="guess-hero__prize">בין המגיבים: גיפט קארד בשווי 200 ₪</p>
+            <div class="guess-hero__submit">
+                <p>רוצים שגם התמונה שלכם תופיע כאן? צרו תמונה בעזרת AI על הלכה מתוך החומר השבועי ושלחו לנו. התמונה שתזכה להכי הרבה לייקים תזכה את היוצר בגיפט קארד בשווי 200 ש״ח.</p>
+                <button type="button" class="guess-hero__wa" id="open-photo-guide">שליחת תמונה</button>
+            </div>
+        </section>
+        <div id="guess-board"></div>
+    </main>
+
+    <div id="photo-guide" class="photo-guide" hidden>
+        <div class="photo-guide__card" role="dialog" aria-modal="true" aria-labelledby="photo-guide-title">
+            <h2 id="photo-guide-title">רגע לפני השליחה</h2>
+            <ol class="photo-guide__steps">
+                <li>
+                    <strong>הלכה מהשבוע</strong>
+                    <span>התמונה מייצגת הלכה מההספק שנלמד השבוע בחוברת.</span>
+                </li>
+                <li>
+                    <strong>תמונה לרוחב</strong>
+                    <span>רחבה, לא עומדת. ככה היא נכנסת יפה לגלריה.</span>
+                </li>
+                <li>
+                    <strong>GPT או ג׳ימיני</strong>
+                    <span>אפשר ליצור ב-GPT, זה מה שמומלץ, או בג׳ימיני.</span>
+                </li>
+                <li>
+                    <strong>מה לכתוב בהודעה</strong>
+                    <span>השם שלכם, שם הסניף, וההלכה שהתמונה מייצגת. אחר כך מצרפים את התמונה.</span>
+                </li>
+                <li>
+                    <strong>לא כל תמונה עולה</strong>
+                    <span>התמונות הנבחרות יעלו לאתר. שליחה לא מבטיחה שהתמונה תופיע.</span>
+                </li>
+                <li>
+                    <strong>השם ליד התמונה</strong>
+                    <span>כתבו אם אתם רוצים שהשם יופיע ליד התמונה, או שלא.</span>
+                </li>
+            </ol>
+            <a class="photo-guide__go" id="photo-guide-go" href="https://wa.me/972583730000" target="_blank" rel="noopener noreferrer">המשך לשליחה בוואטסאפ</a>
+            <button type="button" class="photo-guide__close" id="close-photo-guide">עוד לא</button>
+        </div>
+    </div>
+
+    <footer class="modern-footer">
+        <p class="footer-credit" onclick="showContactInfo()">נבנה ע"י Y.D. Systems</p>
+    </footer>
+</body>
+</html>

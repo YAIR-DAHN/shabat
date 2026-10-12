@@ -39,12 +39,15 @@
     <link rel="stylesheet" href="css/shabbat-skin.css">
     <link rel="stylesheet" href="css/dark-mode.css">
     <link rel="stylesheet" href="css/carousel.css">
+    <link rel="stylesheet" href="css/ai-gallery.css">
     <script src="js/config.js"></script>
     <script src="js/site-config.js"></script>
     <script src="js/common.js"></script>
     <script src="js/updates.js"></script>
     <script src="js/animations.js"></script>
     <script src="js/main.js"></script>
+    <script src="js/ai-gallery-config.js"></script>
+    <script src="js/ai-gallery.js" defer></script>
 </head>
 
 <body>
@@ -82,7 +85,7 @@
                         <p class="hero-program__lead">חידון שבועי מדי שבוע, ובסוף הדרך <strong>חידון מסכם</strong> וביקור אצל גדולי ישראל. בין לבין, הגרלות על פרסים יקרי ערך.</p>
                         <div class="hero-program__chips">
                             <a href="#" class="hero-chip" onclick="handleQuizNavigation(event); return false;">🧩 לחידון השבועי</a>
-                            <a href="register.html" class="hero-chip hero-chip--ghost">📝 הרשמה</a>
+                            <a href="guess.html" class="hero-chip hero-chip--ghost">למשחק מה בתמונה🔎</a>
                             <a href="#prizes" class="hero-chip hero-chip--ghost">🎁 הפרסים</a>
                         </div>
                     </div>
@@ -139,6 +142,17 @@
                     <p>השיא: מפגש וביקור, אחרי החידון המסכם.</p>
                 </li>
             </ol>
+        </section>
+
+        <section class="ai-teaser animate-on-scroll">
+            <div>
+                <p class="ai-teaser__eyebrow">משחק קצר</p>
+                <h2>מה ההלכה בתמונה?</h2>
+                <p>תמונות שהחברים יצרו. מנחשים איזו הלכה מסתתרת ונכנסים להגלה!</p>
+                <p class="ai-teaser__prize">בין המגיבים: גיפט קארד בשווי 200 ₪</p>
+                <a class="ai-teaser__btn" href="guess.html">לחצו להתחלה</a>
+            </div>
+            <a class="ai-teaser__photos" id="ai-teaser-photos" href="guess.html" aria-label="לתמונות הניחוש"></a>
         </section>
 
         <!-- הרחבות בנושא השבת -->
@@ -269,6 +283,10 @@
         <a href="#" class="dock-item dock-item--highlight" onclick="handleQuizNavigation(event)">
             <span class="dock-icon" aria-hidden="true">🧩</span>
             <span>חידון</span>
+        </a>
+        <a href="guess.html" class="dock-item">
+            <span class="dock-icon" aria-hidden="true">🖼️</span>
+            <span>נחש</span>
         </a>
         <a href="register.html" class="dock-item">
             <span class="dock-icon" aria-hidden="true">📝</span>

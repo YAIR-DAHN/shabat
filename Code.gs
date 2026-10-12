@@ -10,6 +10,11 @@ const PODCAST_LOTTERY_SHEET_NAME = 'פודקאסט הגרלה';
 const PODCAST_LISTENS_SHEET_NAME = 'האזנות פודקאסט';
 const DISCUSSION_COMMENTS_SHEET_NAME = 'תגובות דיון';
 const GOOD_DEEDS_SHEET_NAME = 'מעשים טובים';
+const AI_GUESSES_SHEET_NAME = 'ניחושי תמונות';
+const AI_LIKES_SHEET_NAME = 'לייקים לתמונות';
+const AI_LIKE_FIX_SHEET_NAME = 'תיקון לייקים';
+// הקוד לדף הניהול ai-admin.html. כדאי להחליף לפני פרסום.
+const AI_ADMIN_PIN = 'shabbat200';
 
 function doGet(e) {
   const response = ContentService.createTextOutput()
@@ -154,6 +159,39 @@ function handleRequest(e) {
       
     case 'getGoodDeeds':
       return getGoodDeeds();
+
+    case 'submitAiGuess':
+      if (!data) {
+        return { error: 'No data provided' };
+      }
+      return submitAiGuess(data.guess || data);
+
+    case 'getAiGuesses':
+      if (!data || String(data.pin) !== String(AI_ADMIN_PIN)) {
+        return { error: 'unauthorized' };
+      }
+      return getAiGuesses();
+
+    case 'getAiLikes':
+      return getAiLikes();
+
+    case 'getAiLikeAudit':
+      if (!data || String(data.pin) !== String(AI_ADMIN_PIN)) {
+        return { error: 'unauthorized' };
+      }
+      return getAiLikeAudit();
+
+    case 'setAiLikeCount':
+      if (!data || String(data.pin) !== String(AI_ADMIN_PIN)) {
+        return { error: 'unauthorized' };
+      }
+      return setAiLikeCount(data);
+
+    case 'submitAiLike':
+      if (!data) {
+        return { error: 'No data provided' };
+      }
+      return submitAiLike(data.like || data);
       
     default:
       return {
@@ -1055,4 +1093,359 @@ function getGoodDeeds() {
       data: [] 
     };
   }
+}
+
+function submitAiGuess(guess) {
+  if (!guess || !guess.name || !guess.branch || !guess.phone || !guess.imageId || !guess.text) {
+    return { success: false, error: 'חסרים פרטים' };
+  }
+
+  var name = String(guess.name).trim();
+  var branch = String(guess.branch).trim();
+  var phone = String(guess.phone).replace(/[\s-]/g, '');
+  var text = String(guess.text).trim();
+  var imageId = String(guess.imageId).trim();
+  var week = String(guess.week || '');
+
+  if (name.length < 2 || branch.length < 2 || text.length < 2 || text.length > 400) {
+    return { success: false, error: 'הפרטים קצרים מדי' };
+  }
+  if (!/^0\d{8,9}$/.test(phone)) {
+    return { success: false, error: 'מספר טלפון לא תקין' };
+  }
+
+  try {
+    var ss = SpreadsheetApp.openById(SPREADSHEET_ID);
+    var sheet = ss.getSheetByName(AI_GUESSES_SHEET_NAME);
+    if (!sheet) {
+      sheet = ss.insertSheet(AI_GUESSES_SHEET_NAME);
+      sheet.getRange('A1:G1').setValues([['תאריך', 'שם', 'סניף', 'טלפון', 'שבוע', 'מזהה תמונה', 'ניחוש']]);
+      sheet.setFrozenRows(1);
+    }
+
+    sheet.appendRow([
+      new Date(),
+      safeCell(name),
+      safeCell(branch),
+      phone,
+      week,
+      safeCell(imageId),
+      safeCell(text)
+    ]);
+
+    return { success: true };
+  } catch (error) {
+    return { success: false, error: 'שגיאה בשמירת הניחוש: ' + error.toString() };
+  }
+}
+
+function getAiGuesses() {
+  try {
+    var ss = SpreadsheetApp.openById(SPREADSHEET_ID);
+    var sheet = ss.getSheetByName(AI_GUESSES_SHEET_NAME);
+    if (!sheet || sheet.getLastRow() < 2) {
+      return { success: true, data: [] };
+    }
+
+    var rows = sheet.getRange(2, 1, sheet.getLastRow() - 1, 7).getValues();
+    var guesses = rows.filter(function (row) {
+      return row[1] || row[6];
+    }).map(function (row) {
+      var when = row[0];
+      var formatted = '';
+      if (when instanceof Date) {
+        formatted = Utilities.formatDate(when, Session.getScriptTimeZone(), 'dd/MM/yyyy HH:mm');
+      } else {
+        formatted = String(when || '');
+      }
+      return {
+        time: formatted,
+        name: row[1],
+        branch: row[2],
+        phone: String(row[3] || ''),
+        week: String(row[4] || ''),
+        imageId: String(row[5] || ''),
+        text: String(row[6] || '')
+      };
+    }).reverse();
+
+    return { success: true, data: guesses };
+  } catch (error) {
+    return { success: false, error: 'שגיאה בקריאת הניחושים: ' + error.toString(), data: [] };
+  }
+}
+
+var AI_LIKE_HEADERS = [
+  'תאריך',
+  'מזהה תמונה',
+  'מזהה מכשיר',
+  'כתובת IP',
+  'שעה אצל המשתמש',
+  'אזור זמן',
+  'פרטי מכשיר',
+  'דפדפן',
+  'פעיל',
+  'שעת ביטול'
+];
+
+function ensureAiLikesSheet(ss) {
+  var sheet = ss.getSheetByName(AI_LIKES_SHEET_NAME);
+  if (!sheet) {
+    sheet = ss.insertSheet(AI_LIKES_SHEET_NAME);
+  }
+  var current = sheet.getRange(1, 1, 1, AI_LIKE_HEADERS.length).getValues()[0];
+  var same = true;
+  for (var i = 0; i < AI_LIKE_HEADERS.length; i++) {
+    if (String(current[i] || '') !== AI_LIKE_HEADERS[i]) same = false;
+  }
+  if (!same) {
+    sheet.getRange(1, 1, 1, AI_LIKE_HEADERS.length).setValues([AI_LIKE_HEADERS]);
+    sheet.setFrozenRows(1);
+    sheet.getRange('A:A').setNumberFormat('dd/mm/yyyy hh:mm:ss');
+    sheet.getRange('J:J').setNumberFormat('dd/mm/yyyy hh:mm:ss');
+  }
+  return sheet;
+}
+
+function ensureLikeFixSheet(ss) {
+  var sheet = ss.getSheetByName(AI_LIKE_FIX_SHEET_NAME);
+  if (!sheet) {
+    sheet = ss.insertSheet(AI_LIKE_FIX_SHEET_NAME);
+    sheet.getRange(1, 1, 1, 4).setValues([['מזהה תמונה', 'קיזוז', 'הערה', 'עודכן']]);
+    sheet.setFrozenRows(1);
+  }
+  return sheet;
+}
+
+function likeRowActive(row) {
+  return String(row[8] || '') !== 'לא';
+}
+
+function formatSheetTime(value) {
+  if (value instanceof Date) {
+    return Utilities.formatDate(value, Session.getScriptTimeZone(), 'dd/MM/yyyy HH:mm:ss');
+  }
+  return String(value || '');
+}
+
+function clipText(value, max) {
+  return safeCell(String(value || '').replace(/[\r\n\t]/g, ' ').slice(0, max));
+}
+
+function cleanIp(value) {
+  var ip = String(value || '').trim();
+  if (!ip || ip.length > 45 || !/^[0-9a-fA-F:.]+$/.test(ip)) return '';
+  return ip;
+}
+
+function readLikeRows(sheet) {
+  if (!sheet || sheet.getLastRow() < 2) return [];
+  return sheet.getRange(2, 1, sheet.getLastRow() - 1, AI_LIKE_HEADERS.length).getValues();
+}
+
+function readLikeFixes(ss) {
+  var map = {};
+  var sheet = ss.getSheetByName(AI_LIKE_FIX_SHEET_NAME);
+  if (!sheet || sheet.getLastRow() < 2) return map;
+  sheet.getRange(2, 1, sheet.getLastRow() - 1, 4).getValues().forEach(function (row) {
+    var imageId = String(row[0] || '').trim();
+    var offset = Number(row[1]);
+    if (!imageId || !isFinite(offset)) return;
+    map[imageId] = {
+      offset: offset,
+      note: String(row[2] || ''),
+      updated: formatSheetTime(row[3])
+    };
+  });
+  return map;
+}
+
+function summarizeLikes(ss) {
+  var raw = {};
+  readLikeRows(ss.getSheetByName(AI_LIKES_SHEET_NAME)).forEach(function (row) {
+    var imageId = String(row[1] || '').trim();
+    if (!imageId || !likeRowActive(row)) return;
+    raw[imageId] = (raw[imageId] || 0) + 1;
+  });
+  var fixes = readLikeFixes(ss);
+  var counts = {};
+  Object.keys(raw).forEach(function (imageId) {
+    counts[imageId] = raw[imageId];
+  });
+  Object.keys(fixes).forEach(function (imageId) {
+    counts[imageId] = Math.max(0, (raw[imageId] || 0) + fixes[imageId].offset);
+  });
+  return { raw: raw, fixes: fixes, counts: counts };
+}
+
+function getAiLikes() {
+  try {
+    var summary = summarizeLikes(SpreadsheetApp.openById(SPREADSHEET_ID));
+    return { success: true, counts: summary.counts };
+  } catch (error) {
+    return { success: false, error: 'שגיאה בקריאת לייקים: ' + error.toString(), counts: {} };
+  }
+}
+
+function getAiLikeAudit() {
+  try {
+    var ss = SpreadsheetApp.openById(SPREADSHEET_ID);
+    var summary = summarizeLikes(ss);
+    var rows = readLikeRows(ss.getSheetByName(AI_LIKES_SHEET_NAME));
+    if (rows.length > 400) rows = rows.slice(rows.length - 400);
+    var likes = rows.map(function (row) {
+      var when = row[0];
+      return {
+        time: formatSheetTime(when),
+        timeMs: when instanceof Date ? when.getTime() : 0,
+        imageId: String(row[1] || ''),
+        deviceId: String(row[2] || ''),
+        ip: String(row[3] || ''),
+        clientTime: String(row[4] || ''),
+        timeZone: String(row[5] || ''),
+        device: String(row[6] || ''),
+        browser: String(row[7] || ''),
+        active: likeRowActive(row),
+        removedAt: formatSheetTime(row[9])
+      };
+    }).reverse();
+    return {
+      success: true,
+      raw: summary.raw,
+      fixes: summary.fixes,
+      counts: summary.counts,
+      likes: likes
+    };
+  } catch (error) {
+    return { success: false, error: 'שגיאה בקריאת פירוט הלייקים: ' + error.toString() };
+  }
+}
+
+function setAiLikeCount(data) {
+  var imageId = String(data.imageId || '').trim();
+  if (imageId.length < 2 || imageId.length > 80) {
+    return { success: false, error: 'מזהה תמונה לא תקין' };
+  }
+  var clear = data.clear === true || data.clear === 'true';
+  var lock = LockService.getScriptLock();
+  var locked = false;
+  try {
+    lock.waitLock(10000);
+    locked = true;
+    var ss = SpreadsheetApp.openById(SPREADSHEET_ID);
+    var sheet = ensureLikeFixSheet(ss);
+    var last = sheet.getLastRow();
+    var rowIndex = -1;
+    if (last >= 2) {
+      var ids = sheet.getRange(2, 1, last - 1, 1).getValues();
+      for (var i = 0; i < ids.length; i++) {
+        if (String(ids[i][0]).trim() === imageId) {
+          rowIndex = i + 2;
+          break;
+        }
+      }
+    }
+    if (clear) {
+      if (rowIndex !== -1) sheet.deleteRow(rowIndex);
+    } else {
+      var desired = parseInt(data.count, 10);
+      if (isNaN(desired) || desired < 0 || desired > 100000) {
+        return { success: false, error: 'המספר צריך להיות בין 0 ל-100000' };
+      }
+      var raw = 0;
+      readLikeRows(ss.getSheetByName(AI_LIKES_SHEET_NAME)).forEach(function (row) {
+        if (String(row[1] || '').trim() === imageId && likeRowActive(row)) raw++;
+      });
+      var offset = desired - raw;
+      var note = clipText(data.note, 120);
+      var values = [[safeCell(imageId), offset, note, new Date()]];
+      if (rowIndex === -1) sheet.appendRow(values[0]);
+      else sheet.getRange(rowIndex, 1, 1, 4).setValues(values);
+    }
+    var summary = summarizeLikes(ss);
+    return {
+      success: true,
+      counts: summary.counts,
+      raw: summary.raw,
+      fixes: summary.fixes
+    };
+  } catch (error) {
+    return { success: false, error: 'שגיאה בעדכון הלייקים: ' + error.toString() };
+  } finally {
+    if (locked) lock.releaseLock();
+  }
+}
+
+function submitAiLike(like) {
+  if (!like || !like.imageId || !like.deviceId) {
+    return { success: false, error: 'חסרים פרטים' };
+  }
+
+  var imageId = String(like.imageId).trim();
+  var deviceId = String(like.deviceId).trim();
+  if (!/^[A-Za-z0-9_-]{8,80}$/.test(deviceId) || imageId.length < 2 || imageId.length > 80) {
+    return { success: false, error: 'פרטי לייק לא תקינים' };
+  }
+
+  var lock = LockService.getScriptLock();
+  var locked = false;
+  try {
+    lock.waitLock(10000);
+    locked = true;
+    var ss = SpreadsheetApp.openById(SPREADSHEET_ID);
+    var sheet = ensureAiLikesSheet(ss);
+    var remove = like.remove === true || like.remove === 'true';
+    var rows = readLikeRows(sheet);
+    var activeRow = -1;
+    for (var i = 0; i < rows.length; i++) {
+      if (String(rows[i][1]) === imageId && String(rows[i][2]) === deviceId && likeRowActive(rows[i])) {
+        activeRow = i + 2;
+      }
+    }
+
+    if (remove) {
+      if (activeRow !== -1) {
+        sheet.getRange(activeRow, 9, 1, 2).setValues([['לא', new Date()]]);
+      }
+    } else if (activeRow === -1) {
+      sheet.appendRow([
+        new Date(),
+        safeCell(imageId),
+        deviceId,
+        cleanIp(like.ip),
+        clipText(like.clientTime, 40),
+        clipText(like.timeZone, 60),
+        clipText(like.device, 160),
+        clipText(like.browser, 180),
+        'כן',
+        ''
+      ]);
+    }
+
+    var summary = summarizeLikes(ss);
+    var stillLiked = false;
+    readLikeRows(sheet).forEach(function (row) {
+      if (String(row[1]) === imageId && String(row[2]) === deviceId && likeRowActive(row)) {
+        stillLiked = true;
+      }
+    });
+
+    return {
+      success: true,
+      liked: stillLiked,
+      count: summary.counts[imageId] || 0
+    };
+  } catch (error) {
+    return { success: false, error: 'שגיאה בשמירת הלייק: ' + error.toString() };
+  } finally {
+    if (locked) lock.releaseLock();
+  }
+}
+
+function safeCell(value) {
+  var text = String(value || '');
+  if (text.charAt(0) === '=' || text.charAt(0) === '+' || text.charAt(0) === '@') {
+    return "'" + text;
+  }
+  return text;
 }
