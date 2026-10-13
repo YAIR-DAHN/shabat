@@ -23,6 +23,13 @@ window.AI_GALLERY = {
             src: 'assets/aiImages/2.jpeg',
             credit: '',
             open: true
+        },
+        {
+            id: 'week1-3',
+            week: 1,
+            src: 'assets/aiImages/3.jpeg',
+            credit: 'ראובן בן שמחון מסניף גבעת שמואל',
+            open: true
         }
     ]
 };

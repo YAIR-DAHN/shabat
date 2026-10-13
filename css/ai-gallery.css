@@ -81,7 +81,9 @@
 }
 
 .ai-teaser__photos img {
-    width: calc(50% - 0.35rem);
+    flex: 1 1 0;
+    width: auto;
+    min-width: 0;
     height: 150px;
     object-fit: cover;
     border-radius: 16px;
