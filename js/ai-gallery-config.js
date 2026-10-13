@@ -28,7 +28,14 @@ window.AI_GALLERY = {
             id: 'week1-3',
             week: 1,
             src: 'assets/aiImages/3.jpeg',
-            credit: 'ראובן בן שמחון מסניף גבעת שמואל',
+            credit: 'ראובן בן שמחון | גבעת שמואל',
+            open: true
+        },
+        {
+            id: 'week1-4',
+            week: 1,
+            src: 'assets/aiImages/4.jpeg',
+            credit: 'בן אהרוני | חדרה בית אליעזר',
             open: true
         },
     ]
