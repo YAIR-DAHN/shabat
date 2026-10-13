@@ -30,7 +30,7 @@ window.AI_GALLERY = {
             src: 'assets/aiImages/3.jpeg',
             credit: 'ראובן בן שמחון מסניף גבעת שמואל',
             open: true
-        }
+        },
     ]
 };
 

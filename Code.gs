@@ -1,5 +1,5 @@
 // עדכון הקבועים
-const SPREADSHEET_ID = '1QxV-KyUOkjyxs99Phx5aHg4e8Jh8SZZ50xDd-mdlOk4'; // צריך להחליף את זה ב-ID האמיתי
+const SPREADSHEET_ID = '1vzNdXWaZe1FKk4SFy0mWhbJ7s64zC-HAMOdMnXV52v4'; // צריך להחליף את זה ב-ID האמיתי
 const QUESTIONS_SHEET_NAME = 'שאלות';
 const ANSWERS_SHEET_NAME = 'תשובות';
 const BRANCHES_SHEET_NAME = 'סניפים';

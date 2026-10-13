@@ -76,8 +76,20 @@
             if (weeks.indexOf(image.week) === -1) weeks.push(image.week);
         });
         weeks.sort(function (a, b) {
-            return a - b;
+            return b - a;
         });
+
+        var indexed = images.map(function (image, index) {
+            return { image: image, index: index };
+        });
+
+        var sortBar =
+            '<div class="guess-sort" role="group" aria-label="סדר התמונות בתוך כל שבוע">' +
+            '<button type="button" class="guess-sort__btn is-on" data-sort="new" aria-pressed="true">מהחדש לישן</button>' +
+            '<button type="button" class="guess-sort__btn" data-sort="old" aria-pressed="false">מהישן לחדש</button>' +
+            '<button type="button" class="guess-sort__btn" data-sort="likes" aria-pressed="false">הכי הרבה לייקים</button>' +
+            '</div>' +
+            '<p class="guess-sort__note" hidden>מעדכנים את הסדר לפי הלייקים, בתוך כל שבוע...</p>';
 
         var filters =
             weeks.length > 1
@@ -100,11 +112,8 @@
         var user = storedUser();
         var sent = savedMap();
 
-        board.innerHTML =
-            filters +
-            '<div class="guess-grid">' +
-            images
-                .map(function (image, index) {
+        function cardMarkup(item, eager) {
+                    var image = item.image;
                     var credit = image.credit
                         ? '<p class="guess-card__credit">קרדיט: ' + escapeHtml(image.credit) + '</p>'
                         : '';
@@ -120,6 +129,8 @@
                     return (
                         '<article class="guess-card" data-week="' +
                         image.week +
+                        '" data-index="' +
+                        item.index +
                         '" data-id="' +
                         escapeHtml(image.id) +
                         '">' +
@@ -132,7 +143,7 @@
                         '" alt="תמונה לניחוש, ' +
                         escapeHtml(aiWeekLabel(image.week)) +
                         '" width="960" height="640" loading="' +
-                        (index === 0 ? 'eager' : 'lazy') +
+                        (eager ? 'eager' : 'lazy') +
                         '">' +
                         '</button></div>' +
                         '<div class="guess-card__body">' +
@@ -169,9 +180,37 @@
                         '</form>' +
                         '</div></article>'
                     );
-                })
-                .join('') +
-            '</div>';
+        }
+
+        var sections = weeks
+            .map(function (week) {
+                var items = indexed.filter(function (item) {
+                    return Number(item.image.week) === Number(week);
+                });
+                items.sort(function (a, b) {
+                    return b.index - a.index;
+                });
+                var heading =
+                    weeks.length > 1
+                        ? '<h2 class="guess-week__title">' + escapeHtml(aiWeekLabel(week)) + '</h2>'
+                        : '';
+                return (
+                    '<section class="guess-week" data-week="' +
+                    week +
+                    '">' +
+                    heading +
+                    '<div class="guess-week__grid">' +
+                    items
+                        .map(function (item, index) {
+                            return cardMarkup(item, week === weeks[0] && index === 0);
+                        })
+                        .join('') +
+                    '</div></section>'
+                );
+            })
+            .join('');
+
+        board.innerHTML = sortBar + filters + '<div class="guess-weeks">' + sections + '</div>';
 
         board.addEventListener('click', onBoardClick);
         loadBranches();
@@ -201,15 +240,63 @@
         );
     }
 
+    var sortMode = 'new';
+    var likesLoaded = false;
+    var likesFailed = false;
+
+    function updateSortNote() {
+        var note = document.querySelector('.guess-sort__note');
+        if (!note) return;
+        if (sortMode !== 'likes' || likesLoaded) {
+            note.hidden = true;
+            return;
+        }
+        note.hidden = false;
+        note.textContent = likesFailed
+            ? 'הלייקים עוד לא נטענו, בינתיים מהחדשה לישנה בתוך כל שבוע.'
+            : 'מעדכנים את הסדר לפי הלייקים, בתוך כל שבוע...';
+    }
+
+    function sortCards() {
+        document.querySelectorAll('.guess-week__grid').forEach(function (grid) {
+            var cards = Array.prototype.slice.call(grid.children);
+            cards.sort(function (a, b) {
+                var indexA = Number(a.getAttribute('data-index')) || 0;
+                var indexB = Number(b.getAttribute('data-index')) || 0;
+                var likesA = likeCounts[a.getAttribute('data-id')] || 0;
+                var likesB = likeCounts[b.getAttribute('data-id')] || 0;
+                if (sortMode === 'likes' && likesA !== likesB) return likesB - likesA;
+                if (sortMode === 'old') return indexA - indexB;
+                return indexB - indexA;
+            });
+            cards.forEach(function (card) {
+                grid.appendChild(card);
+            });
+        });
+    }
+
     function onBoardClick(event) {
+        var sortButton = event.target.closest('.guess-sort__btn');
+        if (sortButton) {
+            sortMode = sortButton.getAttribute('data-sort') || 'new';
+            document.querySelectorAll('.guess-sort__btn').forEach(function (button) {
+                var on = button === sortButton;
+                button.classList.toggle('is-on', on);
+                button.setAttribute('aria-pressed', on ? 'true' : 'false');
+            });
+            updateSortNote();
+            sortCards();
+            return;
+        }
+
         var filter = event.target.closest('.guess-filter');
         if (filter) {
             var week = filter.getAttribute('data-week');
             document.querySelectorAll('.guess-filter').forEach(function (button) {
                 button.classList.toggle('is-on', button === filter);
             });
-            document.querySelectorAll('.guess-card').forEach(function (card) {
-                card.hidden = week !== 'all' && card.getAttribute('data-week') !== week;
+            document.querySelectorAll('.guess-week').forEach(function (section) {
+                section.hidden = week !== 'all' && section.getAttribute('data-week') !== week;
             });
             return;
         }
@@ -453,6 +540,7 @@
                 badge.remove();
             }
         });
+        if (sortMode === 'likes') sortCards();
     }
 
     var likeCounts = {};
@@ -565,15 +653,32 @@
         applyLikeState(likeCounts);
         fetchFromAPI('getAiLikes')
             .then(function (result) {
-                if (likesSettled || !result || !result.counts) return;
-                likeCounts = result.counts;
+                if (!result || result.success === false || !result.counts) {
+                    likesFailed = true;
+                    updateSortNote();
+                    return;
+                }
+                likesLoaded = true;
+                likesFailed = false;
                 document.querySelectorAll('.guess-like').forEach(function (button) {
                     var id = button.getAttribute('data-like');
-                    button.dataset.serverCount = String(likeCounts[id] || 0);
+                    var server = result.counts[id] || 0;
+                    if (button.dataset.pending === '1') {
+                        if (!button.dataset.serverCount) button.dataset.serverCount = String(server);
+                        var delta = (button.dataset.want === '1' ? 1 : 0) - (button.dataset.saved === '1' ? 1 : 0);
+                        likeCounts[id] = Math.max(0, Number(button.dataset.serverCount || 0) + delta);
+                    } else if (!(likesSettled && button.dataset.serverCount)) {
+                        button.dataset.serverCount = String(server);
+                        likeCounts[id] = server;
+                    }
                 });
                 applyLikeState(likeCounts);
+                updateSortNote();
             })
-            .catch(function () {});
+            .catch(function () {
+                likesFailed = true;
+                updateSortNote();
+            });
     }
 
     function sendLike(button) {

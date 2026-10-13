@@ -255,6 +255,38 @@
     }
 }
 
+.guess-sort {
+    display: flex;
+    gap: 0.45rem;
+    overflow-x: auto;
+    margin-bottom: 0.7rem;
+}
+
+.guess-sort__btn {
+    flex: none;
+    min-height: 42px;
+    padding: 0.4rem 0.85rem;
+    border-radius: 999px;
+    border: 1.5px solid rgba(18, 41, 74, 0.15);
+    background: #fff;
+    color: #12294a;
+    font-weight: 700;
+    cursor: pointer;
+}
+
+.guess-sort__btn.is-on {
+    background: #12294a;
+    color: #f7e8a8;
+    border-color: #12294a;
+}
+
+.guess-sort__note {
+    margin: -0.25rem 0 0.75rem;
+    color: #546e7a;
+    font-size: 0.86rem;
+    font-weight: 700;
+}
+
 .guess-filters {
     display: flex;
     gap: 0.45rem;
@@ -280,13 +312,24 @@
     border-color: #12294a;
 }
 
-.guess-grid {
+.guess-weeks {
+    display: grid;
+    gap: 1.5rem;
+}
+
+.guess-week__title {
+    margin: 0 0 0.7rem;
+    color: #12294a;
+    font-size: 1.2rem;
+}
+
+.guess-week__grid {
     display: grid;
     gap: 1rem;
 }
 
 @media (min-width: 800px) {
-    .guess-grid {
+    .guess-week__grid {
         grid-template-columns: 1fr 1fr;
         align-items: start;
     }
