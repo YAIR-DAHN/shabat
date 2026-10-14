@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html dir="rtl" lang="he">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="robots" content="noindex">
+    <title>ניהול · תוכנית שבת</title>
+    <meta name="theme-color" content="#12294A">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Heebo:wght@400;500;600;700;800&family=Rubik:wght@600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/tokens.css">
+    <link rel="stylesheet" href="css/admin.css">
+    <script src="js/config.js"></script>
+    <script src="js/common.js"></script>
+    <script src="js/ai-gallery-config.js"></script>
+    <script src="js/admin.js" defer></script>
+</head>
+<body class="ap">
+    <section id="ap-gate" class="ap-gate">
+        <form id="ap-login" class="ap-login">
+            <img src="assets/logos/or-israeli-logo.png" alt="אור ישראלי">
+            <p class="ap-login__kicker">תוכנית שבת · חורף תשפ״ז</p>
+            <h1>פאנל ניהול</h1>
+            <p class="ap-login__lead">שאלות, תשובות, סניפים, נרשמים וזוכים. העריכה בגוגל שיטס נשארת פתוחה במקביל.</p>
+            <label for="ap-user">שם משתמש לרכז</label>
+            <input id="ap-user" autocomplete="username" maxlength="40" placeholder="מנהלים משאירים ריק">
+            <label for="ap-pin">קוד כניסה</label>
+            <input id="ap-pin" type="password" autocomplete="current-password" required>
+            <p id="ap-login-error" class="ap-error" hidden></p>
+            <button type="submit">כניסה</button>
+            <!-- <a class="ap-login__sheets" href="https://docs.google.com/spreadsheets/d/1vzNdXWaZe1FKk4SFy0mWhbJ7s64zC-HAMOdMnXV52v4/edit" target="_blank" rel="noopener">פתיחת הגיליון בגוגל שיטס</a>
+            <details class="ap-login__help">
+                <summary>לפני הכניסה הראשונה</summary>
+                <p>צריך להדביק את <strong>Code.gs</strong> ב-Apps Script ולפרסם גרסה חדשה על אותה פריסה קיימת, כדי שכתובת ה-API לא תשתנה. אם עוד אין רשימת מנהלים, הקוד הראשוני זהה לקוד של ניהול ניחושי התמונות. בכניסה הראשונה נוצרים גיליונות שבועות, ארכיון תשובות ומנהלים. גיליון התשובות הפתוח לא נמחק.</p>
+            </details> -->
+        </form>
+    </section>
+
+    <div id="ap-app" class="ap-shell" hidden>
+        <aside class="ap-nav">
+            <div class="ap-nav__brand">
+                <img src="assets/logos/or-israeli-logo.png" alt="">
+                <div>
+                    <strong>ניהול</strong>
+                    <span id="ap-role">צפייה</span>
+                </div>
+            </div>
+            <nav id="ap-nav" aria-label="תפריט ניהול"></nav>
+            <div class="ap-nav__foot">
+                <a id="ap-sheets" href="https://docs.google.com/spreadsheets/d/1vzNdXWaZe1FKk4SFy0mWhbJ7s64zC-HAMOdMnXV52v4/edit" target="_blank" rel="noopener">גוגל שיטס</a>
+                <button type="button" id="ap-pin-open">החלפת קוד</button>
+                <button type="button" id="ap-logout">יציאה</button>
+            </div>
+        </aside>
+        <div class="ap-main">
+            <header class="ap-top">
+                <div class="ap-top__start">
+                    <button type="button" class="ap-back" id="ap-back" disabled>חזרה</button>
+                    <div>
+                        <p class="ap-top__hello" id="ap-hello">שלום</p>
+                        <p class="ap-top__note">מה שנשמר כאן נכתב לאותו גיליון. רענון מציג גם עריכות שנעשו בשיטס.</p>
+                    </div>
+                </div>
+            </header>
+            <main id="ap-view"></main>
+        </div>
+    </div>
+
+    <div id="ap-toast" class="ap-toast" hidden></div>
+    <div id="ap-modal" class="ap-modal" hidden>
+        <div class="ap-modal__card" role="dialog" aria-modal="true">
+            <p id="ap-modal-text"></p>
+            <div class="ap-modal__actions">
+                <button type="button" id="ap-modal-cancel">ביטול</button>
+                <button type="button" id="ap-modal-ok">אישור</button>
+            </div>
+        </div>
+    </div>
+    <form id="ap-pin-modal" class="ap-modal" hidden>
+        <div class="ap-modal__card">
+            <h2>החלפת קוד</h2>
+            <label>קוד חדש<input name="next" type="password" minlength="6" maxlength="40" required autocomplete="new-password"></label>
+            <label>אימות<input name="again" type="password" minlength="6" maxlength="40" required autocomplete="new-password"></label>
+            <p class="ap-error" data-pin-error hidden></p>
+            <div class="ap-modal__actions">
+                <button type="button" id="ap-pin-cancel">ביטול</button>
+                <button type="submit">שמירה</button>
+            </div>
+        </div>
+    </form>
+</body>
+</html>

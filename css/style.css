@@ -1318,6 +1318,10 @@ body {
     opacity: 1;
 }
 
+.footer-credit a {
+    color: inherit;
+}
+
 /* Loading */
 .loading {
     position: fixed;

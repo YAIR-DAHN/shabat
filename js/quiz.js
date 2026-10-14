@@ -139,8 +139,7 @@ function goToQuestion(newIndex) {
 }
 
 async function startQuiz(userDetails) {
-    // בדיקה אם השעשועון זמין
-    if (!CONFIG.quiz.isAvailable) {
+    if (!(await quizIsOpen())) {
         window.location.href = 'quiz-unavailable.html';
         return;
     }

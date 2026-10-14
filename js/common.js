@@ -276,17 +276,40 @@ function showModal(options) {
     });
 }
 
+// פתיחת החידון: אם הוגדרה בגיליון ההגדרות היא קובעת, אחרת נשארת ההגדרה בקובץ.
+async function quizIsOpen() {
+    var fallback = false;
+    if (typeof CONFIG !== 'undefined' && CONFIG.quiz && typeof CONFIG.quiz.isAvailable === 'boolean') {
+        fallback = CONFIG.quiz.isAvailable;
+    } else if (typeof QUIZ_CONFIG !== 'undefined') {
+        fallback = !!QUIZ_CONFIG.isAvailable;
+    }
+    var cacheKey = 'shabbat-quiz-open';
+    try {
+        var cached = JSON.parse(sessionStorage.getItem(cacheKey) || 'null');
+        if (cached && Date.now() - cached.at < 30000) {
+            return typeof cached.open === 'boolean' ? cached.open : fallback;
+        }
+    } catch (error) {}
+    try {
+        var result = await Promise.race([
+            fetchFromAPI('getSiteSettings'),
+            new Promise(function (resolve) { setTimeout(function () { resolve(null); }, 4000); })
+        ]);
+        var open = result && typeof result.quizOpen === 'boolean' ? result.quizOpen : null;
+        try { sessionStorage.setItem(cacheKey, JSON.stringify({ at: Date.now(), open: open })); } catch (error) {}
+        if (typeof open === 'boolean') return open;
+    } catch (error) {}
+    return fallback;
+}
+
 // פונקציה לניתוב לדף המתאים
-function handleQuizNavigation(event) {
+async function handleQuizNavigation(event) {
     if (event) {
         event.preventDefault();
     }
-    
-    if (QUIZ_CONFIG.isAvailable) {
-        window.location.href = 'quiz.html';
-    } else {
-        window.location.href = 'quiz-unavailable.html';
-    }
+    var open = await quizIsOpen();
+    window.location.href = open ? 'quiz.html' : 'quiz-unavailable.html';
 }
 
 function showContactInfo() {
