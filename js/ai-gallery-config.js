@@ -38,6 +38,20 @@ window.AI_GALLERY = {
             credit: 'בן אהרוני | חדרה בית אליעזר',
             open: true
         },
+        {
+            id: 'week1-5',
+            week: 1,
+            src: 'assets/aiImages/5.jpeg',
+            credit: 'שמואל עירוב | רמת גן שקמה',
+            open: true
+        },
+        {
+            id: 'week1-6',
+            week: 1,
+            src: 'assets/aiImages/6.jpeg',
+            credit: 'בר שקיה | רמת גן שקמה',
+            open: true
+        },
     ]
 };
 
