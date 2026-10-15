@@ -1313,3 +1313,265 @@ body[data-role="coordinator"] #ap-open-gallery { display: none !important; }
         display: none;
     }
 }
+
+.ap-dir-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.ap-dir {
+    display: grid;
+    grid-template-columns: minmax(160px, 0.9fr) minmax(0, 1.4fr) minmax(120px, 0.7fr);
+    gap: 8px 12px;
+    align-items: center;
+    width: 100%;
+    text-align: right;
+    background: #fff;
+    border: 1px solid #e4ebf2;
+    border-radius: 14px;
+    padding: 10px 12px;
+    cursor: pointer;
+}
+
+.ap-dir__main,
+.ap-dir__who {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 2px;
+    min-width: 0;
+}
+
+.ap-dir__who b {
+    font-weight: 800;
+}
+
+.ap-dir.is-open {
+    border-color: var(--site-blue-dark);
+    background: #f7fafc;
+}
+
+.ap-dir-meta,
+.ap-dir-people,
+.ap-dir-person {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    align-items: center;
+}
+
+.ap-dir-body {
+    padding: 8px 2px 2px;
+}
+
+.ap-dir-card {
+    background: #fff;
+    border: 1px solid #e4ebf2;
+    border-radius: 14px;
+    padding: 12px;
+    margin-bottom: 10px;
+}
+
+.ap-dir-card__head,
+.ap-dir-note,
+.ap-branch-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    align-items: center;
+}
+
+.ap-branch-meta {
+    margin-top: 4px;
+}
+
+.ap-dir-person {
+    background: #f4f7fb;
+    border-radius: 12px;
+    padding: 6px 10px;
+}
+
+.ap-dir-person a {
+    font-weight: 800;
+}
+
+.ap-dir-notes {
+    margin: 8px 0 0;
+    white-space: pre-wrap;
+}
+
+.ap-dir-tools {
+    margin-bottom: 12px;
+}
+
+.ap-dir-label {
+    margin: 12px 0 6px;
+    font-weight: 800;
+}
+
+.ap-dir-more {
+    margin-top: 4px;
+}
+
+.ap-dir-more summary {
+    cursor: pointer;
+    font-weight: 800;
+    color: var(--site-blue-dark);
+}
+
+.ap-dir-day {
+    display: grid;
+    grid-template-columns: 148px 96px 96px auto;
+    gap: 8px;
+    align-items: center;
+    max-width: 540px;
+    margin-bottom: 8px;
+}
+
+.ap-dir-form input,
+.ap-dir-form select,
+.ap-dir-form textarea {
+    min-height: 44px;
+}
+
+.ap-dir-day input {
+    direction: ltr;
+    text-align: center;
+}
+
+.ap-today {
+    margin: 0 0 12px;
+}
+
+.ap-dir-note strong {
+    font-weight: 800;
+    color: var(--site-blue-dark);
+}
+
+.ap-today__stats {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px 16px;
+    margin-top: 6px;
+    font-weight: 700;
+}
+
+.ap-today__chips {
+    margin-top: 8px;
+}
+
+.ap-schedule {
+    list-style: none;
+    margin: 0 0 12px;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.ap-schedule li {
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+    background: #f4f7fb;
+    border-radius: 12px;
+    padding: 10px 12px;
+}
+
+.ap-schedule li.is-today {
+    background: #e7f6f3;
+    font-weight: 800;
+}
+
+.ap-contact-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-bottom: 12px;
+}
+
+.ap-contact {
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+    align-items: center;
+    background: #f4f7fb;
+    border-radius: 14px;
+    padding: 10px 12px;
+}
+
+.ap-contact > div:first-child {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+}
+
+.ap-contact__actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+}
+
+.ap-contact__actions a {
+    min-height: 40px;
+    display: inline-flex;
+    align-items: center;
+}
+
+.ap-profile-switch {
+    display: flex;
+    gap: 8px;
+    overflow-x: auto;
+    margin-bottom: 10px;
+}
+
+.ap-profile-switch button {
+    flex: 0 0 auto;
+    min-height: 44px;
+}
+
+.ap-profile h3 {
+    margin: 0 0 10px;
+}
+
+.ap-dir-block {
+    margin-bottom: 12px;
+}
+
+.ap-chip.is-interest { background: #e5f4e4; color: #24613a; }
+.ap-chip.is-cold { background: #e8eef4; color: #546e7a; }
+.ap-chip.is-nudge { background: #fff4d6; color: #6d5310; }
+.ap-chip.is-mute { background: #fde8ea; color: #8d3040; }
+.ap-chip.is-today { background: #e7f6f3; color: #0f6e62; }
+
+@media (max-width: 720px) {
+    .ap-dir {
+        grid-template-columns: 1fr;
+    }
+
+    .ap-dir-day {
+        grid-template-columns: 1fr 1fr;
+        max-width: none;
+    }
+
+    .ap-dir-day select,
+    .ap-dir-day button {
+        grid-column: 1 / -1;
+    }
+
+    .ap-contact {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .ap-contact__actions a {
+        flex: 1 1 30%;
+        justify-content: center;
+    }
+
+    .ap-today__stats {
+        flex-direction: column;
+        gap: 4px;
+    }
+}

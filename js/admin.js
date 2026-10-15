@@ -4,11 +4,14 @@
     var RANK = { viewer: 1, admin: 2, super: 3 };
     var ROLE_LABEL = { super: 'סופר אדמין', admin: 'אדמין', viewer: 'צפייה', coordinator: 'רכז סניף' };
     var UPDATE_TYPES = ['עדכון רגיל', 'עדכון חשוב', 'שעשועון חדש', 'זוכים'];
+    var DAY_OPTIONS = [['א', 'ראשון'], ['ב', 'שני'], ['ג', 'שלישי'], ['ד', 'רביעי'], ['ה', 'חמישי'], ['ו', 'שישי'], ['ש', 'שבת']];
+    var DIR_STATUSES = ['בעניין', 'לא בעניין', 'צריך דירבון', 'לא עונה'];
     var NAV = [
         { id: 'dashboard', icon: 'insights', label: 'דשבורד' },
         { id: 'questions', icon: 'quiz', label: 'שאלות' },
         { id: 'answers', icon: 'fact_check', label: 'תשובות' },
         { id: 'branches', icon: 'account_tree', label: 'סניפים' },
+        { id: 'directory', icon: 'contacts', label: 'אלפון' },
         { id: 'registrations', icon: 'how_to_reg', label: 'נרשמים' },
         { id: 'updates', icon: 'campaign', label: 'עדכונים' },
         { id: 'winners', icon: 'emoji_events', label: 'זוכים' },
@@ -57,7 +60,18 @@
         updates: [],
         winners: [],
         staff: [],
-        mine: null
+        mine: null,
+        directory: null,
+        dirQuery: '',
+        dirPart: 'all',
+        dirDay: 'all',
+        dirStatus: 'all',
+        dirArea: 'all',
+        dirMissingPhone: false,
+        dirOpen: '',
+        dirDraft: null,
+        dirFocus: '',
+        profileBranch: ''
     };
 
     function escapeHtml(value) {
@@ -171,7 +185,10 @@
 
     function paintNav() {
         var items = state.role === 'coordinator'
-            ? [{ id: 'mine', icon: 'account_tree', label: 'הסניף שלי' }]
+            ? [
+                { id: 'mine', icon: 'insights', label: 'הסניף שלי' },
+                { id: 'profile', icon: 'badge', label: 'פרטי הסניף' }
+            ]
             : NAV.filter(function (item) { return !item.super || state.role === 'super'; });
         document.getElementById('ap-nav').innerHTML = items.map(function (item) {
             return '<button type="button" class="ap-nav__btn' + (item.id === state.section ? ' is-on' : '') + '" data-section="' + item.id + '"><span class="material-icons">' + item.icon + '</span>' + item.label + '</button>';
@@ -206,7 +223,7 @@
     }
 
     function openSection(id, options) {
-        if (state.role === 'coordinator') id = 'mine';
+        if (state.role === 'coordinator' && id !== 'mine' && id !== 'profile') id = 'mine';
         options = options || {};
         if (!options.back) {
             var snap = navSnapshot(id);
@@ -232,6 +249,8 @@
             winners: loadWinners,
             gallery: loadGallery,
             staff: loadStaff,
+            directory: loadDirectory,
+            profile: loadProfile,
             mine: loadMine
         }[id];
         if (!job) return;
@@ -278,6 +297,7 @@
                 state.guessesLoaded = true;
             }));
         }
+        jobs.push(ensureDirectory());
         if (!jobs.length) return Promise.resolve();
         return Promise.all(jobs).then(function () {
             if (state.section === 'dashboard') renderDashboard();
@@ -350,12 +370,13 @@
             stat('סניפים', selected.branches.length, knownBranches ? 'מתוך ' + knownBranches + ' ברשימה' : 'השתתפו השבוע', 'is-rose') +
             '<article class="ap-stat"><span>חידת התמונה</span><strong>' + (guessStats.ready ? guessStats.guesses : '…') + '</strong><span>' + (guessStats.ready ? guessStats.images + ' תמונות פתוחות' : 'טוען ניחושים') + '</span><button type="button" class="ap-ghost ap-mini" data-open-gallery>לניחושים וללייקים</button></article>' +
             '</section>' +
+            directoryDashNote() +
             '<div class="ap-pair is-board">' +
             '<section class="ap-card"><div class="ap-actions"><strong>סניפים</strong><input id="ap-dash-branch" placeholder="חיפוש סניף" value="' + escapeHtml(state.dashQuery) + '"><button type="button" class="ap-ghost' + (state.branchSort === 'count' ? ' is-on' : '') + '" data-sort="count">לפי כמות</button><button type="button" class="ap-ghost' + (state.branchSort === 'avg' ? ' is-on' : '') + '" data-sort="avg">לפי ממוצע</button><button type="button" class="ap-ghost' + (state.dashMin >= 5 ? ' is-on' : '') + '" data-min="5">לפחות 5</button></div>' +
             '<p class="ap-muted">לחיצה על שורה פותחת את התשובות של הסניף.</p>' +
             (sorted.length ? '<div class="ap-table-wrap"><table class="ap-table"><thead><tr><th>סניף</th><th>נבחנים</th><th>ממוצע</th><th>100</th><th>מתחת ל-60</th></tr></thead><tbody>' +
             sorted.map(function (branch) {
-                return '<tr data-branch-jump="' + escapeHtml(branch.name) + '"><td>' + escapeHtml(branch.name) + '</td><td>' + branch.count + '</td><td><span class="ap-score ' + scoreClass(branch.avg) + '">' + fmtScore(branch.avg) + '</span> <span class="ap-meter"><span style="width:' + Math.max(0, Math.min(100, branch.avg)) + '%"></span></span></td><td>' + branch.perfect + '</td><td>' + branch.low + '</td></tr>';
+                return '<tr data-branch-jump="' + escapeHtml(branch.name) + '"><td>' + escapeHtml(branch.name) + branchDirectoryHint(branch.name) + '</td><td>' + branch.count + '</td><td><span class="ap-score ' + scoreClass(branch.avg) + '">' + fmtScore(branch.avg) + '</span> <span class="ap-meter"><span style="width:' + Math.max(0, Math.min(100, branch.avg)) + '%"></span></span></td><td>' + branch.perfect + '</td><td>' + branch.low + '</td></tr>';
             }).join('') + '</tbody></table></div>' : '<p>' + ((selected.branches || []).length ? 'אין סניפים שמתאימים לסינון.' : 'עדיין אין תשובות.') + '</p>') +
             '</section>' +
             '<section class="ap-card"><strong>שאלות</strong>' +
@@ -687,6 +708,9 @@
             state.answers = result;
             if (result.week) state.weekId = result.week.id;
             renderAnswers();
+            return ensureDirectory().then(function () {
+                if (state.section === 'answers') renderAnswers();
+            });
         });
     }
 
@@ -732,6 +756,7 @@
         view(
             head('תשובות', 'החדשות למעלה. תשובה ירוקה נכונה, ואדומה לא. מכאן אפשר להעביר נבחן לרשימת הזוכים.') +
             '<div class="ap-search"><select id="ap-answer-source"><option value="all">הכול</option><option value="live">גיליון פתוח</option><option value="archive">ארכיון</option></select><input id="ap-answer-query" placeholder="חיפוש שם, סניף או טלפון" value="' + escapeHtml(state.answerQuery) + '"><button type="button" class="ap-ghost" data-copy-names>העתקת הרשימה</button><button type="button" class="ap-ghost" data-export="answers">ייצוא</button><button type="button" class="ap-ghost" data-export-image>שמור כתמונה</button></div>' +
+            answersDirectoryHtml() +
             '<div class="ap-actions">' + filters.map(function (item) {
                 return '<button type="button" class="ap-ghost' + (state.answerScore === item[0] ? ' is-on' : '') + '" data-score="' + item[0] + '">' + item[1] + '</button>';
             }).join('') + (duplicatePlan(data.attempts || []).remove ? '<button type="button" class="ap-danger ap-edit" data-clear-dup>ניקוי כפילויות</button>' : '') + '</div>' +
@@ -901,7 +926,11 @@
     }
 
     function loadMine() {
-        return api('coordinatorOverview', { weekId: state.weekId }).then(function (result) {
+        return Promise.all([
+            api('coordinatorOverview', { weekId: state.weekId }),
+            ensureDirectory()
+        ]).then(function (results) {
+            var result = results[0];
             state.mine = result;
             if (result.selected) state.weekId = result.selected.id;
             state.answers = {
@@ -1317,7 +1346,30 @@
         document.getElementById('ap-view').addEventListener('click', function (event) {
             var target = event.target;
             if (target.closest('[data-refresh]')) {
+                state.directory = null;
                 openSection(state.section);
+                return;
+            }
+            if (target.closest('[data-add-day]') || target.closest('[data-remove-day]')) {
+                onDirectoryDay(target);
+                return;
+            }
+            var dirJump = target.closest('[data-dir-jump]');
+            if (dirJump) {
+                openDirectoryAt(dirJump.getAttribute('data-dir-jump'));
+                return;
+            }
+            if (target.closest('[data-open-directory]')) {
+                state.dirDay = 'today';
+                state.dirPart = 'all';
+                state.dirStatus = 'all';
+                state.dirArea = 'all';
+                state.dirMissingPhone = false;
+                state.dirQuery = '';
+                state.dirOpen = '';
+                state.dirDraft = null;
+                state.dirFocus = '';
+                openSection('directory');
                 return;
             }
             if (target.closest('[data-clear-dup]')) {
@@ -1335,6 +1387,8 @@
             if (state.section === 'mine') onMineClick(target);
             if (state.section === 'registrations') onExportClick(target);
             if (state.section === 'gallery') onGalleryClick(target);
+            if (state.section === 'directory') onDirectoryClick(target);
+            if (state.section === 'profile') onProfileClick(target);
         });
 
         document.getElementById('ap-view').addEventListener('input', function (event) {
@@ -1367,6 +1421,16 @@
                 state.galleryFilter = event.target.value;
                 renderGallery();
             }
+            if (event.target.id === 'ap-dir-part' || event.target.id === 'ap-dir-day' || event.target.id === 'ap-dir-status' || event.target.id === 'ap-dir-area' || event.target.id === 'ap-dir-phone') {
+                state.dirPart = document.getElementById('ap-dir-part').value;
+                state.dirDay = document.getElementById('ap-dir-day').value;
+                state.dirStatus = document.getElementById('ap-dir-status').value;
+                var area = document.getElementById('ap-dir-area');
+                state.dirArea = area ? area.value : 'all';
+                state.dirMissingPhone = document.getElementById('ap-dir-phone').checked;
+                captureDirForm();
+                renderDirectory();
+            }
             var card = event.target.closest('[data-key]');
             if (!card) return;
             if (event.target.name === 'type' || event.target.name === 'week') {
@@ -1392,6 +1456,16 @@
                 if (dashBox) {
                     dashBox.focus();
                     dashBox.setSelectionRange(dashBox.value.length, dashBox.value.length);
+                }
+            }
+            if (event.target.id === 'ap-dir-query') {
+                state.dirQuery = event.target.value;
+                captureDirForm();
+                renderDirectory();
+                var dirBox = document.getElementById('ap-dir-query');
+                if (dirBox) {
+                    dirBox.focus();
+                    dirBox.setSelectionRange(dirBox.value.length, dirBox.value.length);
                 }
             }
             if (event.target.id === 'ap-branch-query') {
@@ -1479,6 +1553,21 @@
                     status.hidden = false;
                     status.textContent = err.message || 'העדכון לא נשמר.';
                     button.disabled = false;
+                });
+            }
+            if (form.classList.contains('ap-dir-form')) {
+                event.preventDefault();
+                var saveDir = form.querySelector('[type="submit"]');
+                if (saveDir) saveDir.disabled = true;
+                api('adminSaveDirectory', { branch: directoryPayload(form) }).then(function () {
+                    toast('פרטי הסניף נשמרו');
+                    state.dirDraft = null;
+                    state.dirOpen = '';
+                    if (state.section === 'profile') return loadProfile();
+                    return loadDirectory();
+                }).catch(function (err) {
+                    if (saveDir) saveDir.disabled = false;
+                    showError(err);
                 });
             }
             if (form.id === 'ap-staff-form') {
@@ -1978,5 +2067,484 @@
             return [row.date, row.name, row.branch, prettyPhone(row.phone)];
         }));
         downloadCsv('registrations.csv', rows);
+    }
+
+    function normName(value) {
+        return String(value || '').replace(/\s+/g, ' ').trim();
+    }
+
+    function ensureDirectory() {
+        return api('adminListDirectory', { weekId: state.weekId }).then(function (result) {
+            result.weekId = state.weekId;
+            state.directory = result;
+            return result;
+        }).catch(function (error) {
+            var message = error && error.message || '';
+            state.directory = {
+                missing: true,
+                needsPublish: message.indexOf('Code.gs') !== -1 || message.indexOf('פאנל') !== -1,
+                branches: [],
+                error: message,
+                weekId: state.weekId,
+                today: '',
+                todayName: ''
+            };
+            return state.directory;
+        });
+    }
+
+    function directoryRecord(name) {
+        var key = normName(name);
+        var list = (state.directory && state.directory.branches) || [];
+        for (var i = 0; i < list.length; i++) {
+            if (normName(list[i].name) === key) return list[i];
+        }
+        return null;
+    }
+
+    function statusChip(status) {
+        if (!status) return '';
+        var kind = status === 'בעניין' ? 'is-interest' : status === 'לא בעניין' ? 'is-cold' : status === 'צריך דירבון' ? 'is-nudge' : 'is-mute';
+        return '<span class="ap-chip ' + kind + '">' + escapeHtml(status) + '</span>';
+    }
+
+    function ltr(value) {
+        return '<bdi dir="ltr">' + escapeHtml(value) + '</bdi>';
+    }
+
+    function dayChip(day, today) {
+        var time = (day.from || day.to) ? ' ' + ltr((day.from || '…') + '–' + (day.to || '…')) : '';
+        return '<span class="ap-chip' + (day.day && day.day === today ? ' is-today' : '') + '">' + escapeHtml(day.day || '') + time + '</span>';
+    }
+
+    function waHref(phone, name) {
+        var digits = String(phone || '').replace(/\D/g, '');
+        if (!digits) return '';
+        if (digits.charAt(0) === '0') digits = '972' + digits.slice(1);
+        if (digits.length < 11) return '';
+        return 'https://wa.me/' + digits + '?text=' + encodeURIComponent('שלום' + (name ? ' ' + name : '') + ', כאן מצוות תוכנית שבת.');
+    }
+
+    function peopleOf(rec) {
+        var people = [];
+        if (rec.lead || rec.phone || rec.email) people.push({ name: rec.lead, phone: rec.phone, email: rec.email });
+        if (rec.lead2 || rec.phone2 || rec.email2) people.push({ name: rec.lead2, phone: rec.phone2, email: rec.email2 });
+        return people;
+    }
+
+    function dayTitle(letter) {
+        var found = DAY_OPTIONS.filter(function (option) { return option[0] === letter; })[0];
+        return found ? found[1] : letter;
+    }
+
+    function contactActions(rec) {
+        var people = peopleOf(rec);
+        if (!people.length) return '';
+        return '<div class="ap-contact-list">' + people.map(function (person) {
+            var tel = String(person.phone || '').replace(/\D/g, '');
+            var wa = waHref(person.phone, person.name);
+            var phone = prettyPhone(person.phone);
+            return '<div class="ap-contact"><div><strong>' + escapeHtml(person.name || 'רכז') + '</strong>' +
+                (phone ? '<span>' + escapeHtml(phone) + '</span>' : '<span class="ap-muted">אין טלפון</span>') +
+                (person.email ? '<span class="ap-muted">' + escapeHtml(person.email) + '</span>' : '') +
+                '</div><div class="ap-contact__actions">' +
+                (tel ? '<a class="ap-ghost" href="tel:' + escapeHtml(tel) + '">חיוג</a>' : '') +
+                (wa ? '<a class="ap-ghost" href="' + wa + '" target="_blank" rel="noopener">וואטסאפ</a>' : '') +
+                (person.email ? '<a class="ap-ghost" href="mailto:' + escapeHtml(person.email) + '">מייל</a>' : '') +
+                '</div></div>';
+        }).join('') + '</div>';
+    }
+
+    function scheduleList(rec) {
+        var today = (state.directory && state.directory.today) || '';
+        var days = (rec.days || []).filter(function (day) { return day.day; });
+        if (!days.length) return '<p class="ap-muted">אין ימי פעילות רשומים.</p>';
+        return '<ul class="ap-schedule">' + days.map(function (day) {
+            var hours = (day.from || day.to) ? ltr((day.from || '…') + '–' + (day.to || '…')) : '';
+            return '<li' + (day.day === today ? ' class="is-today"' : '') + '><b>יום ' + escapeHtml(dayTitle(day.day)) + '</b><span>' + hours + (day.day === today ? ' · היום' : '') + '</span></li>';
+        }).join('') + '</ul>';
+    }
+
+    function directoryCard(rec) {
+        var today = (state.directory && state.directory.today) || '';
+        var days = (rec.days || []).filter(function (day) { return day.day; });
+        var people = peopleOf(rec);
+        var place = [rec.address, rec.city, rec.area].filter(Boolean).join(' · ');
+        return '<section class="ap-dir-card"><div class="ap-dir-card__head"><strong>' + escapeHtml(rec.name || 'פרטי הסניף') + '</strong>' + statusChip(rec.status) + (rec.activeToday ? '<span class="ap-chip is-today">פעיל היום</span>' : '') + (rec.participated ? '<span class="ap-chip is-interest">נבחנו השבוע</span>' : '<span class="ap-chip">לא נבחנו השבוע</span>') + '</div>' +
+            (place ? '<p>' + escapeHtml(place) + '</p>' : '') +
+            (days.length ? '<div class="ap-dir-meta">' + days.map(function (day) { return dayChip(day, today); }).join('') + '</div>' : '<p class="ap-muted">אין ימי פעילות רשומים.</p>') +
+            (people.length ? contactActions(rec) : '<p class="ap-muted">אין עדיין פרטי רכז.</p>') +
+            (rec.notes ? '<p class="ap-dir-notes">' + escapeHtml(rec.notes) + '</p>' : '') +
+            '</section>';
+    }
+
+    function branchDirectoryHint(name) {
+        var rec = directoryRecord(name);
+        if (!rec || !rec.hasInfo) return '';
+        var today = (state.directory && state.directory.today) || '';
+        var days = (rec.days || []).filter(function (day) { return day.day; }).slice(0, 4);
+        var who = rec.lead ? '<span>' + escapeHtml(rec.lead) + '</span>' : '';
+        return '<div class="ap-branch-meta">' + days.map(function (day) { return dayChip(day, today); }).join('') +
+            statusChip(rec.status) +
+            (rec.activeToday ? '<span class="ap-chip is-today">היום</span>' : '') +
+            who +
+            '<button type="button" class="ap-ghost ap-mini" data-dir-jump="' + escapeHtml(rec.name) + '">פרטים</button></div>';
+    }
+
+    function directoryDashNote() {
+        var pack = state.directory;
+        if (!pack || pack.needsPublish || pack.missing) return '';
+        var today = (pack.branches || []).filter(function (rec) { return rec.activeToday; });
+        if (!today.length) return '';
+        var examined = today.filter(function (rec) { return rec.participated; }).length;
+        var waiting = today.filter(function (rec) { return !rec.participated; });
+        var nudge = today.filter(function (rec) { return rec.status === 'צריך דירבון' || rec.status === 'לא עונה'; });
+        var noPhone = today.filter(function (rec) { return !rec.phone && !rec.phone2; });
+        var chips = waiting.slice(0, 8).map(function (rec) {
+            return '<button type="button" data-dir-jump="' + escapeHtml(rec.name) + '">' + escapeHtml(rec.name) + '</button>';
+        }).join('');
+        var more = waiting.length > 8 ? '<span>ועוד ' + (waiting.length - 8) + '</span>' : '';
+        return '<div class="ap-today"><p class="ap-dir-note"><strong>היום יום ' + escapeHtml(pack.todayName || '') + ' · ' + today.length + ' סניפים פעילים לפי הלוז · ' + examined + ' מהם כבר נבחנו.</strong> <button type="button" class="ap-ghost ap-mini" data-open-directory="today">לאלפון</button></p>' +
+            '<div class="ap-today__stats"><span><b>' + waiting.length + '</b> פעילים היום ועוד לא נבחנו</span><span><b>' + nudge.length + '</b> לדירבון או לא עונים</span><span><b>' + noPhone.length + '</b> בלי טלפון</span></div>' +
+            (chips ? '<div class="ap-chips ap-today__chips">' + chips + more + '</div>' : '') +
+            '</div>';
+    }
+
+    function answersDirectoryHtml() {
+        var query = normName(state.answerQuery);
+        if (!query || !state.directory || state.directory.needsPublish) return '';
+        var rec = directoryRecord(query);
+        if (!rec) return '';
+        if (!rec.hasInfo) {
+            return '<section class="ap-card ap-dir-card"><strong>פרטי קשר</strong><p>אין עדיין פרטים על ' + escapeHtml(rec.name) + '.</p>' +
+                (can('admin') ? '<button type="button" class="ap-ghost" data-dir-jump="' + escapeHtml(rec.name) + '">מילוי באלפון</button>' : '') + '</section>';
+        }
+        return directoryCard(rec) + (can('admin') ? '<div class="ap-actions"><button type="button" class="ap-ghost" data-dir-jump="' + escapeHtml(rec.name) + '">עריכה באלפון</button></div>' : '');
+    }
+
+    function draftFrom(rec) {
+        rec = rec || {};
+        return {
+            name: rec.name || '',
+            city: rec.city || '',
+            address: rec.address || '',
+            area: rec.area || '',
+            lead: rec.lead || '',
+            phone: rec.phone || '',
+            email: rec.email || '',
+            lead2: rec.lead2 || '',
+            phone2: rec.phone2 || '',
+            email2: rec.email2 || '',
+            status: rec.status || '',
+            notes: rec.notes || '',
+            days: (rec.days || []).filter(function (day) { return day.day || day.from || day.to; }).map(function (day) {
+                return { row: day.row || '', day: day.day || 'א', from: day.from || '', to: day.to || '' };
+            })
+        };
+    }
+
+    function dayRowHtml(day) {
+        return '<div class="ap-dir-day" data-day-row data-row="' + escapeHtml(day.row || '') + '"><select name="day">' +
+            DAY_OPTIONS.map(function (option) {
+                return '<option value="' + option[0] + '"' + (day.day === option[0] ? ' selected' : '') + '>' + option[1] + '</option>';
+            }).join('') +
+            '</select><input name="from" dir="ltr" value="' + escapeHtml(day.from || '') + '" placeholder="משעה" inputmode="numeric" maxlength="5"><input name="to" dir="ltr" value="' + escapeHtml(day.to || '') + '" placeholder="עד שעה" inputmode="numeric" maxlength="5"><button type="button" class="ap-ghost ap-mini" data-remove-day>הסרת יום</button></div>';
+    }
+
+    function directoryForm(rec) {
+        var data = state.dirDraft && state.dirOpen === rec.name ? state.dirDraft : draftFrom(rec);
+        var secondOpen = !!(data.lead2 || data.phone2 || data.email2);
+        var withId = state.section === 'directory' || state.section === 'profile';
+        var statusField = state.role === 'coordinator' ? '' : '<label class="ap-field">סטטוס<select name="status"><option value="">בלי סטטוס</option>' + DIR_STATUSES.map(function (status) {
+            return '<option value="' + status + '"' + (data.status === status ? ' selected' : '') + '>' + status + '</option>';
+        }).join('') + '</select></label>';
+        return '<form class="ap-dir-form' + (state.role === 'coordinator' ? '' : ' ap-edit') + '"' + (withId ? ' id="ap-dir-form"' : '') + ' data-name="' + escapeHtml(rec.name) + '">' +
+            '<div class="ap-fields"><label class="ap-field">עיר<input name="city" maxlength="40" value="' + escapeHtml(data.city) + '"></label><label class="ap-field">אזור<input name="area" maxlength="40" value="' + escapeHtml(data.area) + '"></label><label class="ap-field">כתובת<input name="address" maxlength="120" value="' + escapeHtml(data.address) + '"></label>' +
+            '<label class="ap-field">רכז<input name="lead" maxlength="40" value="' + escapeHtml(data.lead) + '"></label><label class="ap-field">נייד<input name="phone" maxlength="20" value="' + escapeHtml(data.phone) + '" inputmode="tel"></label><label class="ap-field">אימייל<input name="email" maxlength="80" value="' + escapeHtml(data.email) + '" inputmode="email"></label>' +
+            statusField + '<label class="ap-field ap-span">הערה<textarea name="notes" maxlength="500" rows="2">' + escapeHtml(data.notes) + '</textarea></label></div>' +
+            '<details class="ap-dir-more"' + (secondOpen ? ' open' : '') + '><summary>רכז נוסף</summary><div class="ap-fields"><label class="ap-field">שם<input name="lead2" maxlength="40" value="' + escapeHtml(data.lead2) + '"></label><label class="ap-field">נייד<input name="phone2" maxlength="20" value="' + escapeHtml(data.phone2) + '" inputmode="tel"></label><label class="ap-field">אימייל<input name="email2" maxlength="80" value="' + escapeHtml(data.email2) + '" inputmode="email"></label></div></details>' +
+            '<p class="ap-dir-label">ימי פעילות</p><div class="ap-dir-days">' + (data.days || []).map(dayRowHtml).join('') + '</div><div class="ap-actions"><button type="button" class="ap-ghost" data-add-day>הוספת יום</button><button class="ap-primary" type="submit">שמירת הפרטים</button>' +
+            (can('admin') ? '<button type="button" class="ap-danger" data-dir-delete="' + escapeHtml(rec.name) + '">הסרת הנתונים</button>' : '') +
+            '</div></form>';
+    }
+
+    function directoryBody(rec) {
+        var editable = state.role === 'coordinator' || can('admin');
+        if (!editable) return directoryCard(rec);
+        var lead = rec.hasInfo
+            ? (state.role === 'coordinator' ? scheduleList(rec) + contactActions(rec) : contactActions(rec))
+            : '<p class="ap-muted">אין עדיין פרטים על ' + escapeHtml(rec.name) + '. אפשר למלא אותם כאן.</p>';
+        return lead + directoryForm(rec);
+    }
+
+    function loadProfile() {
+        return ensureDirectory().then(function () {
+            renderProfile();
+        });
+    }
+
+    function renderProfile() {
+        var pack = state.directory || { branches: [] };
+        if (pack.needsPublish) {
+            view(head('פרטי הסניף', '') + '<p class="ap-error">פרטי הסניף יופיעו אחרי פרסום הסקריפט המעודכן.</p>');
+            return;
+        }
+        var allowed = (pack.branches || []).map(function (rec) { return rec.name; });
+        if (!allowed.length) {
+            view(head('פרטי הסניף', '') + '<p class="ap-empty">לחשבון הזה עדיין לא שויכו סניפים.</p>');
+            return;
+        }
+        if (allowed.indexOf(state.profileBranch) === -1) state.profileBranch = allowed[0];
+        var rec = directoryRecord(state.profileBranch) || { name: state.profileBranch, hasInfo: false, days: [] };
+        if (state.dirOpen !== rec.name || !state.dirDraft) {
+            state.dirOpen = rec.name;
+            state.dirDraft = draftFrom(rec);
+        }
+        var switcher = allowed.length > 1 ? '<div class="ap-profile-switch">' + allowed.map(function (name) {
+            return '<button type="button" class="ap-ghost' + (name === state.profileBranch ? ' is-on' : '') + '" data-profile-branch="' + escapeHtml(name) + '">' + escapeHtml(name) + '</button>';
+        }).join('') + '</div>' : '';
+        view(
+            head('פרטי הסניף', allowed.length > 1 ? 'בחרו סניף ועדכנו את הימים, הכתובת ופרטי הרכזים.' : 'ימי הפעילות ופרטי הקשר. השמירה מעדכנת את הלוז.') +
+            (pack.missing ? '<p class="ap-error">' + escapeHtml(pack.error || 'גיליון הלוז לא נמצא') + '</p>' : '') +
+            switcher +
+            '<section class="ap-card ap-profile"><h3>' + escapeHtml(rec.name) + '</h3>' + directoryBody(rec) + '</section>'
+        );
+    }
+
+    function onProfileClick(target) {
+        var button = target.closest('[data-profile-branch]');
+        if (!button) return;
+        var name = button.getAttribute('data-profile-branch');
+        state.profileBranch = name;
+        state.dirOpen = name;
+        state.dirDraft = draftFrom(directoryRecord(name) || { name: name, days: [] });
+        renderProfile();
+    }
+
+    function isNudge(rec) {
+        if (rec.status === 'לא בעניין') return false;
+        if (!rec.phone && !rec.phone2) return false;
+        if (rec.participated) return false;
+        return !!(rec.hasInfo || rec.status === 'צריך דירבון' || rec.status === 'לא עונה');
+    }
+
+    function filteredDirectory() {
+        var query = state.dirQuery.trim();
+        return ((state.directory && state.directory.branches) || []).filter(function (rec) {
+            if (state.dirPart === 'week' && !rec.participated) return false;
+            if (state.dirPart === 'absent' && rec.participated) return false;
+            if (state.dirPart === 'never' && rec.ever) return false;
+            if (state.dirPart === 'quiet' && !rec.quiet) return false;
+            if (state.dirPart === 'nudge' && !isNudge(rec)) return false;
+            if (state.dirPart === 'empty' && rec.hasInfo) return false;
+            if (state.dirDay === 'today' && !rec.activeToday) return false;
+            if (state.dirDay !== 'all' && state.dirDay !== 'today' && !(rec.days || []).some(function (day) { return day.day === state.dirDay; })) return false;
+            if (state.dirStatus === 'none' && rec.status) return false;
+            if (state.dirStatus !== 'all' && state.dirStatus !== 'none' && rec.status !== state.dirStatus) return false;
+            if (state.dirArea !== 'all' && rec.area !== state.dirArea) return false;
+            if (state.dirMissingPhone && (rec.phone || rec.phone2 || !rec.hasInfo)) return false;
+            if (!query) return true;
+            var blob = [rec.name, rec.city, rec.area, rec.address, rec.lead, rec.lead2, rec.phone, rec.phone2, rec.email, rec.email2, rec.notes, rec.status, prettyPhone(rec.phone), prettyPhone(rec.phone2)].join(' ');
+            return blob.indexOf(query) !== -1;
+        });
+    }
+
+    function loadDirectory() {
+        return ensureDirectory().then(function () {
+            if (state.dirFocus) {
+                var rec = directoryRecord(state.dirFocus) || { name: state.dirFocus, days: [] };
+                state.dirOpen = rec.name;
+                state.dirDraft = draftFrom(rec);
+                state.dirFocus = '';
+            }
+            renderDirectory();
+            var open = document.getElementById('ap-dir-open');
+            if (open && open.scrollIntoView) open.scrollIntoView({ block: 'nearest' });
+        });
+    }
+
+    function renderDirectory() {
+        var pack = state.directory || { branches: [] };
+        if (pack.needsPublish) {
+            view(head('אלפון', '') + '<p class="ap-error">האלפון ייפתח אחרי פרסום Code.gs המעודכן על אותה פריסה.</p>');
+            return;
+        }
+        var rows = filteredDirectory();
+        var all = pack.branches || [];
+        var areas = [];
+        all.forEach(function (rec) {
+            if (rec.area && areas.indexOf(rec.area) === -1) areas.push(rec.area);
+        });
+        areas.sort();
+        var withInfo = all.filter(function (rec) { return rec.hasInfo; }).length;
+        var todayCount = all.filter(function (rec) { return rec.activeToday; }).length;
+        var nudgeCount = all.filter(isNudge).length;
+        view(
+            head('אלפון', 'פרטי קשר, לוז וסטטוס. הרשימה באתר נשארת גיליון «סניפים».') +
+            (pack.missing ? '<p class="ap-error">' + escapeHtml(pack.error || 'גיליון הלוז לא נמצא') + '</p>' : '') +
+            '<section class="ap-stats">' +
+            stat('עם פרטים', withInfo, 'מתוך ' + all.length + ' סניפים', '') +
+            stat('פעילים היום', todayCount, pack.todayName ? 'יום ' + pack.todayName : '', 'is-green') +
+            stat('כדאי ליצור קשר', nudgeCount, 'יש טלפון ועוד לא נבחנו', 'is-gold') +
+            stat('בלי סטטוס', all.filter(function (rec) { return rec.hasInfo && !rec.status; }).length, 'יש פרטים בלי קטלוג', 'is-rose') +
+            '</section>' +
+            '<section class="ap-card ap-dir-tools"><div class="ap-actions"><button type="button" class="ap-ghost' + (state.dirDay === 'today' ? ' is-on' : '') + '" data-dir-preset="today">פעילים היום</button><button type="button" class="ap-ghost' + (state.dirPart === 'week' ? ' is-on' : '') + '" data-dir-preset="week">נבחנו השבוע</button><button type="button" class="ap-ghost' + (state.dirPart === 'absent' ? ' is-on' : '') + '" data-dir-preset="absent">לא נבחנו השבוע</button><button type="button" class="ap-ghost' + (state.dirPart === 'nudge' ? ' is-on' : '') + '" data-dir-preset="nudge">כדאי ליצור קשר</button><button type="button" class="ap-ghost' + (state.dirPart === 'empty' ? ' is-on' : '') + '" data-dir-preset="empty">בלי פרטים</button></div>' +
+            '<div class="ap-search"><input id="ap-dir-query" placeholder="חיפוש שם, עיר, רכז או טלפון" value="' + escapeHtml(state.dirQuery) + '">' +
+            '<select id="ap-dir-part"><option value="all">כל ההשתתפות</option><option value="week">נבחנו השבוע</option><option value="absent">לא נבחנו השבוע</option><option value="never">לא נבחנו אף פעם</option><option value="quiet">נרשמו ולא נבחנו</option><option value="nudge">כדאי ליצור קשר</option><option value="empty">בלי פרטים</option></select>' +
+            '<select id="ap-dir-day"><option value="all">כל הימים</option><option value="today">פעילים היום</option>' + DAY_OPTIONS.map(function (option) {
+                return '<option value="' + option[0] + '">יום ' + option[1] + '</option>';
+            }).join('') + '</select>' +
+            '<select id="ap-dir-status"><option value="all">כל הסטטוסים</option><option value="none">בלי סטטוס</option>' + DIR_STATUSES.map(function (status) {
+                return '<option value="' + status + '">' + status + '</option>';
+            }).join('') + '</select>' +
+            (areas.length ? '<select id="ap-dir-area"><option value="all">כל האזורים</option>' + areas.map(function (area) {
+                return '<option value="' + escapeHtml(area) + '">' + escapeHtml(area) + '</option>';
+            }).join('') + '</select>' : '') +
+            '<label class="ap-check"><input id="ap-dir-phone" type="checkbox"' + (state.dirMissingPhone ? ' checked' : '') + '>בלי טלפון</label></div></section>' +
+            '<p class="ap-muted">' + rows.length + ' סניפים מוצגים</p>' +
+            '<div class="ap-dir-list">' + (rows.length ? rows.map(function (rec) {
+                var open = state.dirOpen === rec.name;
+                return '<article class="ap-dir-item"' + (open ? ' id="ap-dir-open"' : '') + '>' + directorySummary(rec) + (open ? '<div class="ap-dir-body">' + directoryBody(rec) + '</div>' : '') + '</article>';
+            }).join('') : '<p class="ap-empty">אין סניפים שמתאימים לסינון.</p>') + '</div>'
+        );
+        var part = document.getElementById('ap-dir-part');
+        var day = document.getElementById('ap-dir-day');
+        var status = document.getElementById('ap-dir-status');
+        var areaBox = document.getElementById('ap-dir-area');
+        if (part) part.value = state.dirPart;
+        if (day) day.value = state.dirDay;
+        if (status) status.value = state.dirStatus;
+        if (areaBox) areaBox.value = state.dirArea;
+    }
+
+    function directorySummary(rec) {
+        var today = (state.directory && state.directory.today) || '';
+        var days = (rec.days || []).filter(function (day) { return day.day; }).slice(0, 4);
+        var place = [rec.city, rec.area].filter(Boolean).join(' · ');
+        var whoName = rec.lead || (rec.phone ? prettyPhone(rec.phone) : 'בלי רכז');
+        return '<button type="button" class="ap-dir' + (state.dirOpen === rec.name ? ' is-open' : '') + '" data-dir-toggle="' + escapeHtml(rec.name) + '"><span class="ap-dir__main"><strong>' + escapeHtml(rec.name) + '</strong><span class="ap-muted">' + escapeHtml(place || (rec.hasInfo ? 'יש פרטים' : 'אין עדיין פרטים')) + '</span></span><span class="ap-dir-meta">' +
+            days.map(function (day) { return dayChip(day, today); }).join('') + statusChip(rec.status) +
+            (rec.activeToday ? '<span class="ap-chip is-today">היום</span>' : '') +
+            (rec.inList ? '' : '<span class="ap-chip">לא ברשימת האתר</span>') +
+            '</span><span class="ap-dir__who"><b>' + escapeHtml(whoName) + '</b>' + (rec.lead && rec.phone ? '<span>' + escapeHtml(prettyPhone(rec.phone)) + '</span>' : '') + '</span></button>';
+    }
+
+    function captureDirForm() {
+        var form = document.getElementById('ap-dir-form');
+        if (!form || (state.section !== 'directory' && state.section !== 'profile')) return;
+        state.dirDraft = directoryPayload(form);
+        state.dirDraft.days = (state.dirDraft.days || []).map(function (day) {
+            return { row: day.row, day: day.day, from: day.from, to: day.to };
+        });
+    }
+
+    function directoryPayload(form) {
+        var days = [];
+        Array.prototype.forEach.call(form.querySelectorAll('[data-day-row]'), function (row) {
+            days.push({
+                row: row.getAttribute('data-row') || '',
+                day: row.querySelector('[name="day"]').value,
+                from: row.querySelector('[name="from"]').value.trim(),
+                to: row.querySelector('[name="to"]').value.trim()
+            });
+        });
+        return {
+            name: form.getAttribute('data-name'),
+            city: form.elements.city.value.trim(),
+            address: form.elements.address.value.trim(),
+            area: form.elements.area.value.trim(),
+            lead: form.elements.lead.value.trim(),
+            phone: form.elements.phone.value.trim(),
+            email: form.elements.email.value.trim(),
+            lead2: form.elements.lead2.value.trim(),
+            phone2: form.elements.phone2.value.trim(),
+            email2: form.elements.email2.value.trim(),
+            status: form.elements.status ? form.elements.status.value : '',
+            notes: form.elements.notes.value.trim(),
+            days: days
+        };
+    }
+
+    function onDirectoryDay(target) {
+        var form = target.closest('form');
+        if (!form) return;
+        if (form.id === 'ap-dir-form') {
+            captureDirForm();
+            if (!state.dirDraft) return;
+            if (target.closest('[data-add-day]')) state.dirDraft.days.push({ row: '', day: 'א', from: '', to: '' });
+            else {
+                var rows = form.querySelectorAll('[data-day-row]');
+                var index = Array.prototype.indexOf.call(rows, target.closest('[data-day-row]'));
+                if (index >= 0) state.dirDraft.days.splice(index, 1);
+            }
+            if (state.section === 'profile') renderProfile();
+            else renderDirectory();
+            return;
+        }
+        var box = form.querySelector('.ap-dir-days');
+        if (!box) return;
+        if (target.closest('[data-add-day]')) box.insertAdjacentHTML('beforeend', dayRowHtml({ row: '', day: 'א', from: '', to: '' }));
+        else {
+            var row = target.closest('[data-day-row]');
+            if (row) row.remove();
+        }
+    }
+
+    function openDirectoryAt(name) {
+        state.dirQuery = '';
+        state.dirPart = 'all';
+        state.dirDay = 'all';
+        state.dirStatus = 'all';
+        state.dirArea = 'all';
+        state.dirMissingPhone = false;
+        state.dirOpen = '';
+        state.dirDraft = null;
+        state.dirFocus = name || '';
+        openSection('directory');
+    }
+
+    function onDirectoryClick(target) {
+        var preset = target.closest('[data-dir-preset]');
+        if (preset) {
+            var kind = preset.getAttribute('data-dir-preset');
+            state.dirPart = 'all';
+            state.dirDay = 'all';
+            state.dirStatus = 'all';
+            state.dirArea = 'all';
+            state.dirQuery = '';
+            state.dirMissingPhone = false;
+            if (kind === 'today') state.dirDay = 'today';
+            else state.dirPart = kind;
+            captureDirForm();
+            renderDirectory();
+            return;
+        }
+        var toggle = target.closest('[data-dir-toggle]');
+        if (toggle) {
+            var name = toggle.getAttribute('data-dir-toggle');
+            captureDirForm();
+            if (state.dirOpen === name) {
+                state.dirOpen = '';
+                state.dirDraft = null;
+            } else {
+                state.dirOpen = name;
+                state.dirDraft = draftFrom(directoryRecord(name) || { name: name });
+            }
+            renderDirectory();
+            return;
+        }
+        var remove = target.closest('[data-dir-delete]');
+        if (remove && can('admin')) {
+            var branchName = remove.getAttribute('data-dir-delete');
+            ask('להסיר את פרטי «' + branchName + '» מהאלפון? השם יישאר ברשימת הסניפים של האתר.', 'הסרה').then(function (ok) {
+                if (!ok) return;
+                api('adminDeleteDirectory', { name: branchName }).then(function () {
+                    toast('הפרטים הוסרו מהאלפון');
+                    state.dirOpen = '';
+                    state.dirDraft = null;
+                    return loadDirectory();
+                }).catch(showError);
+            });
+        }
     }
 })();
