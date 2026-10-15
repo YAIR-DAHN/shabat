@@ -71,7 +71,8 @@
         dirOpen: '',
         dirDraft: null,
         dirFocus: '',
-        profileBranch: ''
+        profileBranch: '',
+        assigned: []
     };
 
     function escapeHtml(value) {
@@ -1252,6 +1253,7 @@
     function logout() {
         state.pin = '';
         state.loginName = '';
+        state.assigned = [];
         state.role = 'viewer';
         state.section = 'dashboard';
         sessionStorage.removeItem(SESSION);
@@ -1280,6 +1282,7 @@
                 state.name = result.name;
                 state.role = result.role;
                 state.sheetsUrl = result.sheetsUrl || SHEETS;
+                state.assigned = result.role === 'coordinator' ? (result.branches || []) : [];
                 if (result.role === 'coordinator') state.section = 'mine';
                 enterApp();
             }).catch(function (err) {
@@ -1559,7 +1562,13 @@
                 event.preventDefault();
                 var saveDir = form.querySelector('[type="submit"]');
                 if (saveDir) saveDir.disabled = true;
-                api('adminSaveDirectory', { branch: directoryPayload(form) }).then(function () {
+                var branchPayload = directoryPayload(form);
+                if (state.role === 'coordinator' && !coordinatorNames().some(function (name) { return normName(name) === normName(branchPayload.name); })) {
+                    if (saveDir) saveDir.disabled = false;
+                    showError(new Error('אפשר לערוך רק סניף שמשויך אליך.'));
+                    return;
+                }
+                api('adminSaveDirectory', { branch: branchPayload }).then(function () {
                     toast('פרטי הסניף נשמרו');
                     state.dirDraft = null;
                     state.dirOpen = '';
@@ -1603,6 +1612,7 @@
                 state.name = result.name;
                 state.role = result.role;
                 state.sheetsUrl = result.sheetsUrl || state.sheetsUrl;
+                state.assigned = result.role === 'coordinator' ? (result.branches || []) : [];
                 if (result.role === 'coordinator') state.section = 'mine';
                 enterApp();
             }).catch(function (err) {
@@ -2076,8 +2086,8 @@
     function ensureDirectory() {
         return api('adminListDirectory', { weekId: state.weekId }).then(function (result) {
             result.weekId = state.weekId;
-            state.directory = result;
-            return result;
+            state.directory = limitDirectory(result);
+            return state.directory;
         }).catch(function (error) {
             var message = error && error.message || '';
             state.directory = {
@@ -2261,7 +2271,7 @@
         return '<form class="ap-dir-form' + (state.role === 'coordinator' ? '' : ' ap-edit') + '"' + (withId ? ' id="ap-dir-form"' : '') + ' data-name="' + escapeHtml(rec.name) + '">' +
             '<div class="ap-fields"><label class="ap-field">עיר<input name="city" maxlength="40" value="' + escapeHtml(data.city) + '"></label><label class="ap-field">אזור<input name="area" maxlength="40" value="' + escapeHtml(data.area) + '"></label><label class="ap-field">כתובת<input name="address" maxlength="120" value="' + escapeHtml(data.address) + '"></label>' +
             '<label class="ap-field">רכז<input name="lead" maxlength="40" value="' + escapeHtml(data.lead) + '"></label><label class="ap-field">נייד<input name="phone" maxlength="20" value="' + escapeHtml(data.phone) + '" inputmode="tel"></label><label class="ap-field">אימייל<input name="email" maxlength="80" value="' + escapeHtml(data.email) + '" inputmode="email"></label>' +
-            statusField + '<label class="ap-field ap-span">הערה<textarea name="notes" maxlength="500" rows="2">' + escapeHtml(data.notes) + '</textarea></label></div>' +
+            statusField + (state.role === 'coordinator' ? '' : '<label class="ap-field ap-span">הערה<textarea name="notes" maxlength="500" rows="2">' + escapeHtml(data.notes) + '</textarea></label>') + '</div>' +
             '<details class="ap-dir-more"' + (secondOpen ? ' open' : '') + '><summary>רכז נוסף</summary><div class="ap-fields"><label class="ap-field">שם<input name="lead2" maxlength="40" value="' + escapeHtml(data.lead2) + '"></label><label class="ap-field">נייד<input name="phone2" maxlength="20" value="' + escapeHtml(data.phone2) + '" inputmode="tel"></label><label class="ap-field">אימייל<input name="email2" maxlength="80" value="' + escapeHtml(data.email2) + '" inputmode="email"></label></div></details>' +
             '<p class="ap-dir-label">ימי פעילות</p><div class="ap-dir-days">' + (data.days || []).map(dayRowHtml).join('') + '</div><div class="ap-actions"><button type="button" class="ap-ghost" data-add-day>הוספת יום</button><button class="ap-primary" type="submit">שמירת הפרטים</button>' +
             (can('admin') ? '<button type="button" class="ap-danger" data-dir-delete="' + escapeHtml(rec.name) + '">הסרת הנתונים</button>' : '') +
@@ -2277,6 +2287,39 @@
         return lead + directoryForm(rec);
     }
 
+    function coordinatorNames() {
+        if (state.assigned && state.assigned.length) return state.assigned.slice();
+        if (state.mine && state.mine.branches && state.mine.branches.length) return state.mine.branches.slice();
+        return [];
+    }
+
+    function limitDirectory(result) {
+        if (!result || state.role !== 'coordinator') return result;
+        var allowed = coordinatorNames();
+        var kept = [];
+        var seen = {};
+        allowed.forEach(function (name) {
+            var key = normName(name);
+            if (!key || seen[key]) return;
+            seen[key] = true;
+            var found = (result.branches || []).filter(function (rec) { return normName(rec.name) === key; })[0];
+            if (found) {
+                found.name = name;
+                found.notes = '';
+                kept.push(found);
+            } else {
+                kept.push({ name: name, hasInfo: false, days: [], inList: true, notes: '', city: '', area: '', address: '', lead: '', phone: '', email: '', lead2: '', phone2: '', email2: '', status: '' });
+            }
+        });
+        result.branches = kept;
+        return result;
+    }
+
+    function coordinatorBranchNames(pack) {
+        if (state.role !== 'coordinator') return ((pack && pack.branches) || []).map(function (rec) { return rec.name; });
+        return coordinatorNames();
+    }
+
     function loadProfile() {
         return ensureDirectory().then(function () {
             renderProfile();
@@ -2289,7 +2332,7 @@
             view(head('פרטי הסניף', '') + '<p class="ap-error">פרטי הסניף יופיעו אחרי פרסום הסקריפט המעודכן.</p>');
             return;
         }
-        var allowed = (pack.branches || []).map(function (rec) { return rec.name; });
+        var allowed = coordinatorBranchNames(pack);
         if (!allowed.length) {
             view(head('פרטי הסניף', '') + '<p class="ap-empty">לחשבון הזה עדיין לא שויכו סניפים.</p>');
             return;
@@ -2315,6 +2358,7 @@
         var button = target.closest('[data-profile-branch]');
         if (!button) return;
         var name = button.getAttribute('data-profile-branch');
+        if (state.role === 'coordinator' && !coordinatorNames().some(function (item) { return normName(item) === normName(name); })) return;
         state.profileBranch = name;
         state.dirOpen = name;
         state.dirDraft = draftFrom(directoryRecord(name) || { name: name, days: [] });
@@ -2460,7 +2504,7 @@
             phone2: form.elements.phone2.value.trim(),
             email2: form.elements.email2.value.trim(),
             status: form.elements.status ? form.elements.status.value : '',
-            notes: form.elements.notes.value.trim(),
+            notes: form.elements.notes ? form.elements.notes.value.trim() : '',
             days: days
         };
     }
