@@ -30,6 +30,10 @@ function hideElementLoading(element) {
 }
 
 async function fetchFromAPI(action, method = 'GET', data = null) {
+    if (typeof readCache === 'function') {
+        const cached = await readCache(action, data);
+        if (cached) return cached;
+    }
     const url = new URL(CONFIG.api.url);
     url.searchParams.append('action', action);
     
@@ -40,7 +44,8 @@ async function fetchFromAPI(action, method = 'GET', data = null) {
     
     try {
         const response = await fetch(url.toString(), {
-            method: 'GET'  // תמיד נשתמש ב-GET
+            method: 'GET',
+            credentials: 'omit'
         });
         console.log('Response status:', response.status);
         console.log('Response headers:', [...response.headers.entries()]);

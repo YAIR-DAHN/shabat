@@ -66,7 +66,48 @@ function hideElementLoading(element) {
     }
 }
 
+const CACHE_READS = {
+    getBranches: true,
+    getQuestions: true,
+    getWinners: true,
+    getUpdates: true,
+    getSiteSettings: true,
+    getAiLikes: true,
+    getGoodDeeds: true,
+    testConnection: true,
+    adminOverview: true,
+    adminListQuestions: true,
+    adminListAnswers: true,
+    adminListBranches: true,
+    adminListUpdates: true,
+    adminListWinners: true,
+    adminListRegistrations: true,
+    adminListStaff: true,
+    adminListDirectory: true,
+    coordinatorOverview: true,
+    getAiGuesses: true,
+    getAiLikeAudit: true
+};
+
+async function readCache(action, data) {
+    if (!CONFIG.api.cacheUrl || !CACHE_READS[action]) return null;
+    try {
+        const url = new URL(CONFIG.api.cacheUrl);
+        url.searchParams.append('action', action);
+        if (data) url.searchParams.append('data', encodeURIComponent(JSON.stringify(data)));
+        const response = await fetch(url.toString(), { method: 'GET', credentials: 'omit' });
+        if (!response.ok) return null;
+        const json = await response.json();
+        if (!json || json.miss === true) return null;
+        return json;
+    } catch (error) {
+        return null;
+    }
+}
+
 async function fetchFromAPI(action, method = 'GET', data = null) {
+    const cached = await readCache(action, data);
+    if (cached) return cached;
     const url = new URL(CONFIG.api.url); // Use CONFIG.api.url directly
     url.searchParams.append('action', action);
     
@@ -77,7 +118,8 @@ async function fetchFromAPI(action, method = 'GET', data = null) {
     
     try {
         const response = await fetch(url.toString(), {
-            method: 'GET'
+            method: 'GET',
+            credentials: 'omit'
         });
         const text = await response.text();
         try {

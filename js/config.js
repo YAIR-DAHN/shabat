@@ -1,6 +1,7 @@
 const CONFIG = {
     api: {
-        url: 'https://script.google.com/macros/s/AKfycbxsphKMs_o6i0KWWFaNsKqhqroPNgadzJDr4bOe3Bt25GoKA08AgCUzTA_rVOPt4JP3/exec'
+        url: 'https://script.google.com/macros/s/AKfycbwSts-TZ4bsySeSxXCqKHlSUk4T79frFdo68YSmR8NkcH-jtLwEslldz8L2e2xFvbtP/exec',
+        cacheUrl: 'https://shabat-cache.yairdahn.workers.dev/read'
     },
 
     quiz: {
