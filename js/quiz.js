@@ -256,7 +256,7 @@ async function submitQuiz() {
     submitQuizToServer();
 }
 
-var DEFAULT_CLOSING = 'התשובות נקלטו בהצלחה!\nמתחילים ללמוד את עמודים 8-9\nהחידון הבא יפתח ביום ראשון\nהבא בשעה 17:00!';
+var DEFAULT_CLOSING = 'התשובות נקלטו בהצלחה!\nמתחילים ללמוד את עמודים 10-11\nהחידון הבא יפתח ביום ראשון\nהבא בשעה 17:00!';
 var quizCopy = {
     openingShow: !!(CONFIG.quiz && CONFIG.quiz.showAnnouncement),
     openingText: (CONFIG.quiz && CONFIG.quiz.announcementText) || '',
