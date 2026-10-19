@@ -256,6 +256,35 @@ async function submitQuiz() {
     submitQuizToServer();
 }
 
+var DEFAULT_CLOSING = 'התשובות נקלטו בהצלחה!\nמתחילים ללמוד את עמודים 8-9\nהחידון הבא יפתח ביום ראשון\nהבא בשעה 17:00!';
+var quizCopy = {
+    openingShow: !!(CONFIG.quiz && CONFIG.quiz.showAnnouncement),
+    openingText: (CONFIG.quiz && CONFIG.quiz.announcementText) || '',
+    closingText: ''
+};
+
+function escapeQuizText(text) {
+    return String(text || '')
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/\n/g, '<br>');
+}
+
+function closingMessageHtml() {
+    return escapeQuizText(quizCopy.closingText || DEFAULT_CLOSING);
+}
+
+async function loadQuizCopy() {
+    try {
+        var result = await fetchFromAPI('getSiteSettings');
+        if (!result || typeof result.openingShow !== 'boolean') return;
+        quizCopy.openingShow = result.openingShow && !!String(result.openingText || '').trim();
+        quizCopy.openingText = result.openingText || '';
+        quizCopy.closingText = result.closingText || '';
+    } catch (error) {}
+}
+
 async function submitQuizToServer() {
     showLoading();
     try {
@@ -284,9 +313,7 @@ async function submitQuizToServer() {
                     <div class="success-container">
                         <span class="material-icons success-icon">check_circle</span>
                         <h1>אשריך!</h1>
-                        <p>התשובות נקלטו בהצלחה! <br>  מתחילים ללמוד את עמודים 8- 9 
-החידון הבא יפתח ביום ראשון 
-הבא בשעה 17:00!</p>
+                        <p>${closingMessageHtml()}</p>
                         <button onclick="window.location.href='index.html'">חזרה לדף הבית</button>
                     </div>
                 </div>
@@ -883,16 +910,19 @@ document.addEventListener('DOMContentLoaded', async () => {
     quizSection.style.display = 'none';
     quizSection.classList.add('hidden');
 
+    await loadQuizCopy();
+
     // טיפול בהודעה לפני השעשועון
-    if (CONFIG.quiz.showAnnouncement) {
+    if (quizCopy.openingShow) {
         const announcement = document.getElementById('quiz-announcement');
         const closeBtn = document.querySelector('.close-announcement');
         const startQuizBtn = document.querySelector('.start-quiz-btn');
         const announcementText = document.getElementById('announcement-text');
         
         // עדכון תוכן ההודעה מהקונפיגורציה
-        if (CONFIG.quiz.announcementText) {
-            announcementText.textContent = CONFIG.quiz.announcementText;
+        if (quizCopy.openingText && announcementText) {
+            announcementText.style.whiteSpace = 'pre-line';
+            announcementText.textContent = quizCopy.openingText;
         }
         
         // סגירת ההודעה והתחלת השעשועון

@@ -176,6 +176,9 @@
             if (result.success === false || (result.error && result.success !== true)) {
                 throw new Error(result.error || 'הפעולה לא הושלמה');
             }
+            if (typeof invalidateSheetCache === 'function' && action !== 'adminLogin' && action !== 'adminOverview' && action !== 'coordinatorOverview' && action.indexOf('adminList') !== 0 && action.indexOf('get') !== 0) {
+                invalidateSheetCache();
+            }
             return result;
         });
     }
@@ -258,6 +261,14 @@
         job().catch(function (error) {
             view('<p class="ap-error">' + escapeHtml(error.message || 'לא הצלחנו לטעון.') + '</p>');
         });
+    }
+
+    function reloadFromSheet() {
+        if (typeof invalidateSheetCache === 'function') invalidateSheetCache();
+        state.directory = null;
+        state.overview = null;
+        openSection(state.section, { replace: true });
+        toast('הנתונים נטענים מהגיליון');
     }
 
     function head(title, text) {
@@ -631,7 +642,7 @@
                 var count = state.questions.filter(function (q) { return q.weekId === item.id; }).length;
                 return '<button type="button" class="ap-week' + (item.id === state.questionWeek ? ' is-on' : '') + '" data-week="' + escapeHtml(item.id) + '"><strong>' + escapeHtml(item.name) + '</strong><span>' + chip(item.status) + ' · ' + count + ' שאלות</span></button>';
             }).join('') + '</div>' +
-            (week ? '<section class="ap-card ap-weekbar"><label class="ap-field">שם השבוע<input id="ap-week-name" value="' + escapeHtml(week.name) + '" maxlength="40"' + lock + '></label><label class="ap-field">נושא<input id="ap-week-topic" value="' + escapeHtml(week.topic) + '" maxlength="80" placeholder="למשל: לחם משנה"' + lock + '></label><div class="ap-actions ap-edit"><button type="button" class="ap-ghost" data-rename-week>שמירת שם</button>' +
+            (week ? '<section class="ap-card ap-weekbar"><label class="ap-field">שם השבוע<input id="ap-week-name" value="' + escapeHtml(week.name) + '" maxlength="40"' + lock + '></label><label class="ap-field">נושא<input id="ap-week-topic" value="' + escapeHtml(week.topic) + '" maxlength="80" placeholder="למשל: לחם משנה"' + lock + '></label><label class="ap-field ap-check ap-span"><input id="ap-week-opening-show" type="checkbox"' + (week.openingShow ? ' checked' : '') + lock + '> הצג הודעה בתחילת החידון</label><label class="ap-field ap-span">הודעת פתיחה<textarea id="ap-week-opening" maxlength="600" rows="3" placeholder="מוצגת רק אם הסימון למעלה דולק"' + lock + '>' + escapeHtml(week.openingText || '') + '</textarea></label><label class="ap-field ap-span">הודעת סיום<textarea id="ap-week-closing" maxlength="600" rows="3" placeholder="מוצגת אחרי שהתשובות נקלטו. שורה חדשה נשמרת."' + lock + '>' + escapeHtml(week.closingText || '') + '</textarea></label><div class="ap-actions ap-edit"><button type="button" class="ap-ghost" data-rename-week>שמירת השבוע</button>' +
             (week.status !== 'פעיל' ? '<button type="button" class="ap-primary" data-publish>פרסום השבוע באתר</button>' : '<span class="ap-chip is-live">השבוע באוויר</span>') +
             '<button type="button" class="ap-ghost" data-duplicate>שכפול לטיוטה</button>' +
             (week.status === 'טיוטה' ? '<button type="button" class="ap-danger" data-delete-week>מחיקת הטיוטה</button>' : '') +
@@ -1320,6 +1331,8 @@
             openSection(button.getAttribute('data-section'));
         });
         document.getElementById('ap-logout').addEventListener('click', logout);
+        var sheetRefresh = document.getElementById('ap-sheet-refresh');
+        if (sheetRefresh) sheetRefresh.addEventListener('click', reloadFromSheet);
         document.getElementById('ap-pin-open').addEventListener('click', function () {
             document.getElementById('ap-pin-modal').hidden = false;
         });
@@ -1349,8 +1362,7 @@
         document.getElementById('ap-view').addEventListener('click', function (event) {
             var target = event.target;
             if (target.closest('[data-refresh]')) {
-                state.directory = null;
-                openSection(state.section);
+                reloadFromSheet();
                 return;
             }
             if (target.closest('[data-add-day]') || target.closest('[data-remove-day]')) {
@@ -1665,6 +1677,7 @@
         }).then(function (result) {
             if (!result || result.success === false || result.error) throw new Error((result && result.error) || 'לא הצלחנו לבטל את התיקון.');
             toast('הספירה חזרה לגיליון');
+            if (typeof invalidateSheetCache === 'function') invalidateSheetCache();
             return loadGallery();
         }).catch(function (err) {
             clear.disabled = false;
@@ -1765,7 +1778,10 @@
             api('adminUpdateWeek', {
                 id: state.questionWeek,
                 name: document.getElementById('ap-week-name').value.trim(),
-                topic: document.getElementById('ap-week-topic').value.trim()
+                topic: document.getElementById('ap-week-topic').value.trim(),
+                openingShow: document.getElementById('ap-week-opening-show').checked,
+                openingText: document.getElementById('ap-week-opening').value.trim(),
+                closingText: document.getElementById('ap-week-closing').value.trim()
             }).then(function () {
                 toast('השבוע עודכן');
                 return loadQuestions();
@@ -1857,7 +1873,13 @@
         var source = state.questions.filter(function (q) { return q.weekId === state.questionWeek && q.id; });
         var week = state.weeks.filter(function (item) { return item.id === state.questionWeek; })[0];
         var copyName = ((week ? week.name : 'שבוע') + ' עותק').slice(0, 40);
-        api('adminCreateWeek', { name: copyName, topic: week ? week.topic : '' }).then(function (created) {
+        api('adminCreateWeek', {
+            name: copyName,
+            topic: week ? week.topic : '',
+            openingShow: week ? week.openingShow : false,
+            openingText: week ? week.openingText : '',
+            closingText: week ? week.closingText : ''
+        }).then(function (created) {
             var chain = Promise.resolve();
             source.forEach(function (q) {
                 chain = chain.then(function () {

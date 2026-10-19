@@ -34,39 +34,9 @@ async function fetchFromAPI(action, method = 'GET', data = null) {
         const cached = await readCache(action, data);
         if (cached) return cached;
     }
-    const url = new URL(CONFIG.api.url);
-    url.searchParams.append('action', action);
-    
-    // עבור GET עם data, נוסיף את הנתונים כפרמטרים בURL
-    if (data) {
-        url.searchParams.append('data', encodeURIComponent(JSON.stringify(data)));
-    }
-    
-    try {
-        const response = await fetch(url.toString(), {
-            method: 'GET',
-            credentials: 'omit'
-        });
-        console.log('Response status:', response.status);
-        console.log('Response headers:', [...response.headers.entries()]);
-        
-        const text = await response.text();
-        console.log('Response text:', text);
-        
-        try {
-            const jsonResponse = JSON.parse(text);
-            if (jsonResponse.error) {
-                throw new Error(jsonResponse.error);
-            }
-            return jsonResponse;
-        } catch (e) {
-            console.error('Failed to parse response:', text);
-            throw new Error('Invalid JSON response');
-        }
-    } catch (error) {
-        console.error('Error fetching from API:', error);
-        throw error;
-    }
+    const jsonResponse = await requestAppsScript(action, data);
+    if (jsonResponse && jsonResponse.error) throw new Error(jsonResponse.error);
+    return jsonResponse;
 }
 
 async function testAppScriptConnection() {

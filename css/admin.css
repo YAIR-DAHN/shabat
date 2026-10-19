@@ -318,6 +318,16 @@ button.ap-top__link {
     opacity: 0.35;
 }
 
+.ap-sheet-refresh {
+    border: 1px solid #d5e0ea;
+    background: #fff;
+    color: var(--site-blue-dark);
+    border-radius: 12px;
+    padding: 8px 12px;
+    font-weight: 800;
+    white-space: nowrap;
+}
+
 .ap-project {
     background: #fff;
     border-radius: 20px;
@@ -1242,8 +1252,10 @@ body[data-role="coordinator"] #ap-open-gallery { display: none !important; }
         font-size: 0.95rem;
     }
 
-    .ap-back {
+    .ap-back,
+    .ap-sheet-refresh {
         padding: 6px 10px;
+        font-size: 0.85rem;
     }
 
     .ap-head {

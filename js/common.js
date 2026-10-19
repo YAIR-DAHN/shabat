@@ -89,46 +89,156 @@ const CACHE_READS = {
     getAiLikeAudit: true
 };
 
+var sheetSkipUntil = {};
+
+function cacheMemoryKey(action, data) {
+    return 'shabbat-cache:' + action + ':' + ((data && data.weekId) || '') + ':' + ((data && data.source) || '');
+}
+
+function invalidateSheetCache() {
+    var until = Date.now() + 6 * 60 * 1000;
+    Object.keys(CACHE_READS).forEach(function (action) {
+        sheetSkipUntil[action] = until;
+        dropCacheMemory(action);
+    });
+}
+
+function dropCacheMemory(action) {
+    var prefix = 'shabbat-cache:' + action + ':';
+    [sessionStorage, localStorage].forEach(function (store) {
+        try {
+            var keys = [];
+            for (var i = 0; i < store.length; i++) {
+                var key = store.key(i);
+                if (key && key.indexOf(prefix) === 0) keys.push(key);
+            }
+            keys.forEach(function (key) { store.removeItem(key); });
+        } catch (error) {}
+    });
+}
+
+function readCacheRecord(action, data) {
+    try {
+        const store = data && data.pin ? sessionStorage : localStorage;
+        const saved = JSON.parse(store.getItem(cacheMemoryKey(action, data)) || 'null');
+        if (!saved || !saved.at || Date.now() - saved.at > 6 * 60 * 60 * 1000) return null;
+        return saved;
+    } catch (error) {
+        return null;
+    }
+}
+
+function readCacheMemory(action, data) {
+    const saved = readCacheRecord(action, data);
+    return saved && saved.body || null;
+}
+
+function writeCacheMemory(action, data, body, sheetUntil) {
+    try {
+        const store = data && data.pin ? sessionStorage : localStorage;
+        store.setItem(cacheMemoryKey(action, data), JSON.stringify({
+            at: Date.now(),
+            body: body,
+            sheetUntil: sheetUntil || 0
+        }));
+    } catch (error) {}
+}
+
 async function readCache(action, data) {
     if (!CONFIG.api.cacheUrl || !CACHE_READS[action]) return null;
+    const saved = readCacheRecord(action, data);
+    if (saved && saved.sheetUntil > Date.now()) return saved.body;
+    if (sheetSkipUntil[action] > Date.now()) return null;
+    const controller = typeof AbortController === 'function' ? new AbortController() : null;
+    const timer = controller ? setTimeout(function () { controller.abort(); }, 2500) : null;
     try {
         const url = new URL(CONFIG.api.cacheUrl);
         url.searchParams.append('action', action);
         if (data) url.searchParams.append('data', encodeURIComponent(JSON.stringify(data)));
-        const response = await fetch(url.toString(), { method: 'GET', credentials: 'omit' });
-        if (!response.ok) return null;
+        const response = await fetch(url.toString(), {
+            method: 'GET',
+            credentials: 'omit',
+            signal: controller ? controller.signal : undefined
+        });
+        if (!response.ok) return readCacheMemory(action, data);
         const json = await response.json();
         if (!json || json.miss === true) return null;
+        const fresh = readCacheRecord(action, data);
+        if (fresh && fresh.sheetUntil > Date.now()) return fresh.body;
+        writeCacheMemory(action, data, json);
         return json;
     } catch (error) {
-        return null;
+        return readCacheMemory(action, data);
+    } finally {
+        if (timer) clearTimeout(timer);
+    }
+}
+
+function scriptUrl(action, data, callback) {
+    const url = new URL(CONFIG.api.url);
+    url.searchParams.append('action', action);
+    if (callback) url.searchParams.append('callback', callback);
+    if (data) url.searchParams.append('data', encodeURIComponent(JSON.stringify(data)));
+    url.searchParams.append('nc', String(Date.now()));
+    return url.toString();
+}
+
+function parseScriptJson(text) {
+    const trimmed = String(text || '').trim();
+    if (!trimmed || trimmed.charAt(0) === '<') {
+        throw new Error('Invalid JSON response');
+    }
+    return JSON.parse(trimmed);
+}
+
+function requestByScript(action, data) {
+    return new Promise(function (resolve, reject) {
+        const callback = 'shabbatCb' + Date.now() + Math.floor(Math.random() * 1000);
+        const script = document.createElement('script');
+        let timer = setTimeout(fail, 20000);
+        function cleanup() {
+            clearTimeout(timer);
+            timer = null;
+            try { delete window[callback]; } catch (error) { window[callback] = undefined; }
+            if (script.parentNode) script.parentNode.removeChild(script);
+        }
+        function fail() {
+            cleanup();
+            reject(new Error('Invalid JSON response'));
+        }
+        window[callback] = function (json) {
+            cleanup();
+            resolve(json);
+        };
+        script.onerror = fail;
+        script.src = scriptUrl(action, data, callback);
+        document.head.appendChild(script);
+    });
+}
+
+async function requestAppsScript(action, data) {
+    try {
+        const response = await fetch(scriptUrl(action, data), {
+            method: 'GET',
+            credentials: 'omit',
+            cache: 'no-store'
+        });
+        return parseScriptJson(await response.text());
+    } catch (error) {
+        return requestByScript(action, data);
     }
 }
 
 async function fetchFromAPI(action, method = 'GET', data = null) {
     const cached = await readCache(action, data);
     if (cached) return cached;
-    const url = new URL(CONFIG.api.url); // Use CONFIG.api.url directly
-    url.searchParams.append('action', action);
-    
-    // תמיד נשתמש ב-GET ונעביר נתונים כפרמטרים בURL
-    if (data) {
-        url.searchParams.append('data', encodeURIComponent(JSON.stringify(data)));
-    }
-    
     try {
-        const response = await fetch(url.toString(), {
-            method: 'GET',
-            credentials: 'omit'
-        });
-        const text = await response.text();
-        try {
-            const jsonResponse = JSON.parse(text);
-            return jsonResponse; // החזרת התגובה גם אם יש שגיאה
-        } catch (e) {
-            console.error('Failed to parse response:', text);
-            throw new Error('Invalid JSON response');
+        const json = await requestAppsScript(action, data);
+        if (sheetSkipUntil[action] > Date.now()) {
+            writeCacheMemory(action, data, json, sheetSkipUntil[action]);
+            delete sheetSkipUntil[action];
         }
+        return json;
     } catch (error) {
         console.error('Error fetching from API:', error);
         throw error;
