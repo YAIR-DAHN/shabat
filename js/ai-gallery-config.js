@@ -52,6 +52,13 @@ window.AI_GALLERY = {
             credit: 'בר שקיה | רמת גן שקמה',
             open: true
         },
+        {
+            id: 'week1-7',
+            week: 2,
+            src: 'assets/aiImages/7.jpeg',
+            credit: '',
+            open: true
+        },
     ]
 };
 
