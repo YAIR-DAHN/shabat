@@ -793,8 +793,16 @@
     }
 
     document.addEventListener('DOMContentLoaded', function () {
-        renderTeaser();
-        renderBoard();
-        initPhotoGuide();
+        if (typeof loadAiGallery === 'function') {
+            loadAiGallery().then(function () {
+                renderTeaser();
+                renderBoard();
+                initPhotoGuide();
+            });
+        } else {
+            renderTeaser();
+            renderBoard();
+            initPhotoGuide();
+        }
     });
 })();

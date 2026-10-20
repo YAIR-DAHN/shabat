@@ -1,86 +1,46 @@
 /**
  * גלריית תמונות ה-AI.
- * כדי להוסיף תמונה: שמים את הקובץ בתיקייה assets/aiImages
- * ומוסיפים שורה למערך images.
- *
- * week       מספר שבוע הלימוד
- * credit     קרדיט, אפשר להשאיר ריק
- * open       false סוגר את הניחושים לתמונה הזו
+ * התמונות עכשיו נטענות מ-Google Sheets דרך ה-API.
+ * ניהול התמונות נעשה דרך פאנל הניהול.
  */
 window.AI_GALLERY = {
     prize: 'גיפט קארד בשווי 200 ₪',
-    images: [
-        {
-            id: 'week1-1',
-            week: 1,
-            src: 'assets/aiImages/1.jpeg',
-            credit: '',
-            open: true
-        },
-        {
-            id: 'week1-2',
-            week: 1,
-            src: 'assets/aiImages/2.jpeg',
-            credit: '',
-            open: true
-        },
-        {
-            id: 'week1-3',
-            week: 1,
-            src: 'assets/aiImages/3.jpeg',
-            credit: 'ראובן בן שמחון | גבעת שמואל',
-            open: true
-        },
-        {
-            id: 'week1-4',
-            week: 1,
-            src: 'assets/aiImages/4.jpeg',
-            credit: 'בן אהרוני | חדרה בית אליעזר',
-            open: true
-        },
-        {
-            id: 'week1-5',
-            week: 1,
-            src: 'assets/aiImages/5.jpeg',
-            credit: 'שמואל עירוב | רמת גן שקמה',
-            open: true
-        },
-        {
-            id: 'week1-6',
-            week: 1,
-            src: 'assets/aiImages/6.jpeg',
-            credit: 'בר שקיה | רמת גן שקמה',
-            open: true
-        },
-        {
-            id: 'week1-7',
-            week: 2,
-            src: 'assets/aiImages/7.jpeg',
-            credit: '',
-            open: true
-        },
-        {
-            id: 'week1-8',
-            week: 2,
-            src: 'assets/aiImages/8.jpeg',
-            credit: '',
-            open: true
-        },
-        {
-            id: 'week1-9',
-            week: 2,
-            src: 'assets/aiImages/9.jpeg',
-            credit: 'איתי חדד | מצליח',
-            open: true
-        },
-        {
-            id: 'week2-10',
-            week: 2,
-            src: 'assets/aiImages/10.jpeg',
-            credit: '',
-            open: true
-        },
-    ]
+    images: [],
+    loaded: false,
+    loading: false,
+    listeners: []
+};
+
+window.loadAiGallery = function () {
+    if (window.AI_GALLERY.loaded || window.AI_GALLERY.loading) {
+        return Promise.resolve(window.AI_GALLERY.images);
+    }
+
+    window.AI_GALLERY.loading = true;
+
+    if (typeof fetchFromAPI !== 'function') {
+        console.error('fetchFromAPI is not available');
+        window.AI_GALLERY.loading = false;
+        return Promise.resolve([]);
+    }
+
+    return fetchFromAPI('getAiGallery')
+        .then(function (result) {
+            if (result && result.success && Array.isArray(result.images)) {
+                window.AI_GALLERY.images = result.images;
+                window.AI_GALLERY.loaded = true;
+            }
+            window.AI_GALLERY.loading = false;
+            window.AI_GALLERY.listeners.forEach(function (fn) {
+                fn();
+            });
+            return window.AI_GALLERY.images;
+        })
+        .catch(function (err) {
+            console.error('Failed to load gallery:', err);
+            window.AI_GALLERY.loading = false;
+            return [];
+        });
 };
 
 window.aiWeekLabel = function (week) {

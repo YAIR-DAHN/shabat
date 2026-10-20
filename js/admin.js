@@ -1048,7 +1048,8 @@
     function loadGallery() {
         return Promise.all([
             fetchFromAPI('getAiGuesses', 'GET', { pin: state.pin }),
-            fetchFromAPI('getAiLikeAudit', 'GET', { pin: state.pin })
+            fetchFromAPI('getAiLikeAudit', 'GET', { pin: state.pin }),
+            typeof loadAiGallery === 'function' ? loadAiGallery() : Promise.resolve([])
         ]).then(function (results) {
             var guesses = results[0] || {};
             var likes = results[1] || {};
@@ -1102,19 +1103,76 @@
     }
 
     function renderGallery() {
-        var tab = state.galleryTab === 'likes' ? 'likes' : 'guesses';
+        var tab = state.galleryTab === 'manage' ? 'manage' : (state.galleryTab === 'likes' ? 'likes' : 'guesses');
         var audit = state.likeAudit || { likes: [], counts: {}, raw: {}, fixes: {} };
         var likeTotal = 0;
         Object.keys(audit.counts || {}).forEach(function (id) { likeTotal += Number(audit.counts[id]) || 0; });
         var images = galleryImages();
+        var content = '';
+        
+        if (tab === 'manage') {
+            content = typeof window.GalleryAdmin !== 'undefined' ? window.GalleryAdmin.render(state.pin) : '<p class="ap-error">מודול הניהול לא נטען</p>';
+        } else if (tab === 'likes') {
+            content = renderLikes(images, audit);
+        } else {
+            content = renderGuesses(images);
+        }
+        
         view(
             head('תמונות', 'הניחושים והלייקים נשמרים בגיליון. השם והטלפון לא מופיעים באתר לנערים.') +
-            '<div class="ap-actions"><button type="button" class="ap-ghost' + (tab === 'guesses' ? ' is-on' : '') + '" data-gallery-tab="guesses">ניחושים · ' + (state.guesses || []).length + '</button><button type="button" class="ap-ghost' + (tab === 'likes' ? ' is-on' : '') + '" data-gallery-tab="likes">לייקים · ' + likeTotal + '</button></div>' +
-            (tab === 'guesses' ? renderGuesses(images) : renderLikes(images, audit))
+            '<div class="ap-actions">' +
+            '<button type="button" class="ap-ghost' + (tab === 'guesses' ? ' is-on' : '') + '" data-gallery-tab="guesses">ניחושים · ' + (state.guesses || []).length + '</button>' +
+            '<button type="button" class="ap-ghost' + (tab === 'likes' ? ' is-on' : '') + '" data-gallery-tab="likes">לייקים · ' + likeTotal + '</button>' +
+            '<button type="button" class="ap-ghost' + (tab === 'manage' ? ' is-on' : '') + '" data-gallery-tab="manage">ניהול תמונות · ' + images.length + '</button>' +
+            '</div>' +
+            content
         );
+        
         var filter = document.getElementById('ap-gallery-filter');
         if (filter) filter.value = state.galleryFilter;
+        
+        // Event listeners לטאב ניהול תמונות
+        if (tab === 'manage') {
+            initGalleryManageListeners();
+        }
     }
+    
+    function initGalleryManageListeners() {
+        var uploadForm = document.getElementById('ap-upload-form');
+        if (uploadForm) {
+            uploadForm.addEventListener('submit', function (e) {
+                window.GalleryAdmin.submitUploadForm(e, state.pin);
+            });
+        }
+        
+        var fileInput = document.getElementById('ap-image-file');
+        if (fileInput) {
+            fileInput.addEventListener('change', window.GalleryAdmin.handleFileSelect);
+        }
+        
+        document.querySelectorAll('[data-edit]').forEach(function (btn) {
+            btn.addEventListener('click', function () {
+                window.GalleryAdmin.editImage(this.getAttribute('data-edit'), state.pin);
+            });
+        });
+        
+        document.querySelectorAll('[data-delete]').forEach(function (btn) {
+            btn.addEventListener('click', function () {
+                window.GalleryAdmin.deleteImage(this.getAttribute('data-delete'), state.pin);
+            });
+        });
+    }
+    
+    window.reloadGalleryAdmin = function (pin) {
+        if (typeof loadAiGallery === 'function') {
+            window.AI_GALLERY.loaded = false;
+            loadAiGallery().then(function () {
+                loadGallery().then(function () {
+                    renderGallery();
+                });
+            });
+        }
+    };
 
     function renderGuesses(images) {
         var rows = filteredGuesses();
