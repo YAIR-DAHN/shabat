@@ -66,6 +66,13 @@ window.AI_GALLERY = {
             credit: '',
             open: true
         },
+        {
+            id: 'week1-9',
+            week: 2,
+            src: 'assets/aiImages/9.jpeg',
+            credit: '',
+            open: true
+        },
     ]
 };
 
