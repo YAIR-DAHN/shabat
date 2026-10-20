@@ -70,7 +70,7 @@ window.AI_GALLERY = {
             id: 'week1-9',
             week: 2,
             src: 'assets/aiImages/9.jpeg',
-            credit: '',
+            credit: 'איתי חדד | מצליח',
             open: true
         },
         {
