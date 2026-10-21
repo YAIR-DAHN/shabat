@@ -86,7 +86,8 @@ const CACHE_READS = {
     adminListDirectory: true,
     coordinatorOverview: true,
     getAiGuesses: true,
-    getAiLikeAudit: true
+    getAiLikeAudit: true,
+    getAiGallery: true
 };
 
 var sheetSkipUntil = {};

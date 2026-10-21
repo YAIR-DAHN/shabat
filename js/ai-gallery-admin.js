@@ -161,12 +161,12 @@
                     
                     return fetchFromAPI('addAiImage', 'GET', {
                         pin: pin,
-                        image: JSON.stringify({
+                        image: {
                             driveId: driveId,
                             week: week,
                             credit: credit,
                             open: open
-                        })
+                        }
                     });
                 })
                 .then(function (result) {
@@ -175,6 +175,8 @@
                     }
                     
                     showUploadStatus('התמונה נוספה בהצלחה!');
+                    if (typeof invalidateSheetCache === 'function') invalidateSheetCache();
+                    window.AI_GALLERY.loaded = false;
                     
                     // איפוס הטופס
                     document.getElementById('ap-upload-form').reset();
@@ -273,12 +275,12 @@
 
         fetchFromAPI('updateAiImage', 'GET', {
             pin: pin,
-            image: JSON.stringify({
+            image: {
                 id: imageId,
                 week: parseInt(newWeek, 10) || image.week,
                 credit: newCredit,
                 open: newOpen
-            })
+            }
         })
             .then(function (result) {
                 if (!result || result.error) {
@@ -286,6 +288,8 @@
                 }
 
                 alert('התמונה עודכנה בהצלחה');
+                if (typeof invalidateSheetCache === 'function') invalidateSheetCache();
+                window.AI_GALLERY.loaded = false;
                 
                 if (typeof window.reloadGalleryAdmin === 'function') {
                     window.reloadGalleryAdmin(pin);
@@ -320,6 +324,8 @@
                 }
 
                 alert('התמונה נמחקה בהצלחה');
+                if (typeof invalidateSheetCache === 'function') invalidateSheetCache();
+                window.AI_GALLERY.loaded = false;
                 
                 if (typeof window.reloadGalleryAdmin === 'function') {
                     window.reloadGalleryAdmin(pin);

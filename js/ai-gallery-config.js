@@ -24,17 +24,32 @@ window.loadAiGallery = function () {
         return Promise.resolve([]);
     }
 
+    function driveSrcBroken(images) {
+        return Array.isArray(images) && images.some(function (image) {
+            return /drive\.google\.com\/uc|export=view/.test(String(image && image.src || ''));
+        });
+    }
+
+    function takeGallery(result) {
+        if (result && result.success && Array.isArray(result.images)) {
+            window.AI_GALLERY.images = result.images;
+            window.AI_GALLERY.loaded = true;
+        }
+        window.AI_GALLERY.loading = false;
+        window.AI_GALLERY.listeners.forEach(function (fn) {
+            fn();
+        });
+        return window.AI_GALLERY.images;
+    }
+
     return fetchFromAPI('getAiGallery')
         .then(function (result) {
-            if (result && result.success && Array.isArray(result.images)) {
-                window.AI_GALLERY.images = result.images;
-                window.AI_GALLERY.loaded = true;
+            if (driveSrcBroken(result && result.images) && typeof invalidateSheetCache === 'function') {
+                invalidateSheetCache();
+                window.AI_GALLERY.loaded = false;
+                return fetchFromAPI('getAiGallery').then(takeGallery);
             }
-            window.AI_GALLERY.loading = false;
-            window.AI_GALLERY.listeners.forEach(function (fn) {
-                fn();
-            });
-            return window.AI_GALLERY.images;
+            return takeGallery(result);
         })
         .catch(function (err) {
             console.error('Failed to load gallery:', err);
