@@ -1,6 +1,6 @@
 const CONFIG = {
     api: {
-        url: 'https://script.google.com/macros/s/AKfycbxXHpSd_7B74QSzBZB5h_wkupfRNS5jkhzJZoa0e-PmqcJ__HooNla9L4yz3ymfhI9-/exec',
+        url: 'https://script.google.com/macros/s/AKfycbwSts-TZ4bsySeSxXCqKHlSUk4T79frFdo68YSmR8NkcH-jtLwEslldz8L2e2xFvbtP/exec',
         cacheUrl: 'https://shabat-cache.yairdahn.workers.dev/read'
     },
 
