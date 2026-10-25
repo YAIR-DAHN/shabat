@@ -68,20 +68,14 @@
 
         <div class="winners-container">
             <div class="winners-header">
-                <span class="material-icons winners-icon">emoji_events</span>
-                <h2>זוכי השעשועון השבועי</h2>
-                <p>ברכות לזוכים שהשקיעו והשתתפו בחוויה</p>
+                <h2 id="winnersWeekTitle">זוכי השעשועון</h2>
+                <p id="winnersWeekMeta">טוען את הרשימה</p>
             </div>
-
-            <div class="winners-list" id="winnersList">
-                <!-- Winners will be loaded here -->
-            </div>
-
-            <div class="no-winners" id="noWinners" style="display: none;">
-                <span class="material-icons">info</span>
-                <p>עדיין אין זוכים בשעשועון השבועי </p>
-                
-                <p>  -היה הראשון לזכות!</p>
+            <div class="week-tabs" id="weekTabs" role="tablist" aria-label="בחירת שבוע" hidden></div>
+            <div class="winners-list" id="winnersList" role="tabpanel"></div>
+            <div class="no-winners" id="noWinners" hidden>
+                <span class="material-icons">emoji_events</span>
+                <p>עדיין אין זוכים בשעשועון השבועי.</p>
             </div>
         </div>
     </main>

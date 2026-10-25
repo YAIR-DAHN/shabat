@@ -1794,120 +1794,204 @@ body {
 .winners-container {
     background: white;
     border-radius: 20px;
-    padding: 2rem;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+    padding: 1.25rem;
+    box-shadow: 0 10px 30px rgba(18, 41, 74, 0.08);
     margin-bottom: 2rem;
 }
 
 .winners-header {
     text-align: center;
-    margin-bottom: 2rem;
-}
-
-.winners-icon {
-    font-size: 3rem;
-    color: #FFD700;
     margin-bottom: 1rem;
-    display: block;
 }
 
 .winners-header h2 {
-    font-size: 2rem;
+    font-family: var(--site-font-display);
+    font-size: 1.7rem;
     font-weight: 700;
-    color: #2c3e50;
-    margin-bottom: 1rem;
+    color: var(--site-blue-dark);
+    margin: 0 0 0.25rem;
 }
 
 .winners-header p {
-    font-size: 1.1rem;
-    color: #666;
-    line-height: 1.6;
+    margin: 0;
+    font-size: 1rem;
+    color: var(--site-muted);
+}
+
+.week-tabs {
+    display: flex;
+    justify-content: safe center;
+    gap: 0.5rem;
+    overflow-x: auto;
+    padding: 0.15rem 0.15rem 0.85rem;
+    margin-bottom: 0.35rem;
+    scrollbar-width: none;
+}
+
+.week-tabs::-webkit-scrollbar {
+    display: none;
+}
+
+.week-tab {
+    flex: 0 0 auto;
+    min-height: 44px;
+    border: 1px solid var(--site-blue-soft);
+    background: var(--site-blue-light);
+    color: var(--site-blue-dark);
+    border-radius: 999px;
+    padding: 0.45rem 0.9rem;
+    font: inherit;
+    font-weight: 700;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+}
+
+.week-tab span {
+    min-width: 1.4rem;
+    height: 1.4rem;
+    border-radius: 999px;
+    background: rgba(18, 41, 74, 0.08);
+    font-size: 0.8rem;
+    font-weight: 800;
+    display: inline-grid;
+    place-items: center;
+    padding: 0 0.35rem;
+}
+
+.week-tab.is-on {
+    background: var(--site-blue-dark);
+    border-color: var(--site-blue-dark);
+    color: white;
+}
+
+.week-tab.is-on span {
+    background: rgba(255, 255, 255, 0.18);
 }
 
 .winners-list {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 1.5rem;
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 0.8rem;
 }
 
 .winner-card {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    color: white;
-    padding: 1.5rem;
-    border-radius: 15px;
-    display: flex;
-    align-items: center;
-    gap: 1.5rem;
-    box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3);
-    transition: all 0.3s ease;
+    background: linear-gradient(180deg, #ffffff 0%, var(--site-blue-light) 160%);
+    color: var(--site-ink);
+    padding: 1rem 1rem 0.85rem;
+    border-radius: 16px;
+    border: 1px solid var(--site-blue-soft);
+    box-shadow: 0 8px 20px rgba(18, 41, 74, 0.06);
+    min-width: 0;
 }
 
-.winner-card:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 15px 35px rgba(102, 126, 234, 0.4);
+.winner-card__top {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 0.75rem;
+    margin-bottom: 0.7rem;
+}
+
+.winner-card h3 {
+    margin: 0;
+    font-size: 1.2rem;
+    font-weight: 800;
+    line-height: 1.35;
+    color: var(--site-blue-dark);
+    overflow-wrap: anywhere;
 }
 
 .winner-medal {
+    width: 2.4rem;
+    height: 2.4rem;
+    border-radius: 50%;
+    background: var(--site-yellow);
+    display: grid;
+    place-items: center;
     flex-shrink: 0;
 }
 
 .winner-medal .material-icons {
-    font-size: 3rem;
-    color: #FFD700;
-}
-
-.winner-info {
-    flex: 1;
-}
-
-.winner-info h3 {
-    font-size: 1.5rem;
-    font-weight: 600;
-    margin-bottom: 1rem;
-    color: white;
+    font-size: 1.35rem;
+    color: var(--site-gold);
 }
 
 .winner-details {
     display: flex;
     flex-direction: column;
-    gap: 0.5rem;
+    align-items: flex-start;
+    gap: 0.45rem;
 }
 
 .winner-detail {
     display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    font-size: 1rem;
+    align-items: flex-start;
+    gap: 0.35rem;
+    margin: 0;
+    font-size: 0.98rem;
+    line-height: 1.4;
+    color: var(--site-ink);
 }
 
-.winner-detail .material-icons {
-    font-size: 1.2rem;
-    color: #FFD700;
+.winner-detail .material-icons,
+.winner-date .material-icons {
+    font-size: 1.05rem;
+    color: var(--site-blue);
+    margin-top: 0.1rem;
+}
+
+.winner-prize {
+    margin: 0;
+    background: var(--site-yellow);
+    color: var(--site-blue-dark);
+    border-radius: 999px;
+    padding: 0.2rem 0.7rem;
+    font-size: 0.86rem;
+    font-weight: 700;
+}
+
+.winner-date {
+    display: flex;
+    align-items: center;
+    gap: 0.3rem;
+    margin: 0.75rem 0 0;
+    color: var(--site-muted);
+    font-size: 0.88rem;
 }
 
 .no-winners {
     text-align: center;
-    padding: 3rem 2rem;
-    color: #666;
+    padding: 2.5rem 1rem;
+    color: var(--site-muted);
 }
 
 .no-winners .material-icons {
-    font-size: 4rem;
-    color: #FFD700;
-    margin-bottom: 1rem;
-    opacity: 0.7;
-}
-
-.no-winners h2 {
-    font-size: 1.8rem;
-    font-weight: 600;
-    color: #2c3e50;
-    margin-bottom: 1rem;
+    font-size: 3rem;
+    color: var(--site-gold);
+    margin-bottom: 0.5rem;
 }
 
 .no-winners p {
-    font-size: 1.1rem;
+    font-size: 1.05rem;
     line-height: 1.6;
+}
+
+@media (min-width: 720px) {
+    .winners-container {
+        padding: 1.6rem 1.5rem 1.4rem;
+    }
+
+    .winners-list {
+        grid-template-columns: 1fr 1fr;
+    }
+}
+
+@media (min-width: 1040px) {
+    .winners-list {
+        grid-template-columns: 1fr 1fr 1fr;
+    }
 }
 
 .error-message {
@@ -1926,52 +2010,6 @@ body {
     line-height: 1.6;
 }
 
-/* Responsive Design for Winners */
-@media (max-width: 768px) {
-    .winners-container {
-        padding: 1.5rem;
-    }
-    
-    .winner-card {
-        flex-direction: column;
-        text-align: center;
-        gap: 1rem;
-    }
-    
-    .winner-medal .material-icons {
-        font-size: 2.5rem;
-    }
-    
-    .winner-info h3 {
-        font-size: 1.3rem;
-    }
-    
-    .winners-header h2 {
-        font-size: 1.6rem;
-    }
-}
-
-@media (max-width: 480px) {
-    .winners-container {
-        padding: 1rem;
-    }
-    
-    .winner-card {
-        padding: 1rem;
-    }
-    
-    .winner-medal .material-icons {
-        font-size: 2rem;
-    }
-    
-    .winner-info h3 {
-        font-size: 1.2rem;
-    }
-    
-    .winners-header h2 {
-        font-size: 1.4rem;
-    }
-} 
 
 /* Page Hero */
 .page-hero {
