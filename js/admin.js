@@ -284,7 +284,7 @@
     }
 
     function head(title, text) {
-        return '<header class="ap-head"><div><h2>' + title + '</h2>' + (text ? '<p>' + text + '</p>' : '') + '</div><button type="button" class="ap-ghost" data-refresh>רענון</button></header>';
+        return '<header class="ap-head"><div><h2>' + title + '</h2>' + (text ? '<p>' + text + '</p>' : '') + '</div></header>';
     }
 
     function loadDashboard() {
@@ -336,113 +336,308 @@
             view(head('דשבורד', 'עדיין אין שבוע פעיל.') + '<p class="ap-empty">אחרי כניסה ראשונה נוצר שבוע 1. אם הגליון ריק, התחילו בהוספת שאלות.</p>');
             return;
         }
-        var dist = selected.distribution || { perfect: 0, high: 0, mid: 0, low: 0 };
-        var scored = dist.perfect + dist.high + dist.mid + dist.low;
         var regs = data.registrations || { total: 0, unique: 0, quiet: [], quietCount: 0 };
-        var sorted = (selected.branches || []).slice().sort(function (a, b) {
+        var known = uniqueBranches().length;
+        var prev = previousWeek(weeks, selected.id);
+        view(
+            '<div class="ap-dash">' +
+            dashHero(data, weeks, regs, known) +
+            dashWeekBar(selected, weeks, prev) +
+            dashKpis(selected, prev, known) +
+            dashAttention(selected, regs) +
+            '<div class="ap-dash-grid">' + dashBranches(selected) + dashQuestions(selected) + '</div>' +
+            '<div class="ap-dash-grid is-even">' + dashDistribution(selected) + hoursSection() + '</div>' +
+            '<div class="ap-dash-grid is-even">' + dashWeeks(weeks, selected) + dashRecent(selected) + '</div>' +
+            dashManage(selected) +
+            '</div>'
+        );
+    }
+
+    function icon(name) {
+        return '<span class="material-icons" aria-hidden="true">' + name + '</span>';
+    }
+
+    function fmtNum(value) {
+        var n = Number(value);
+        if (value === '' || value == null || !isFinite(n)) return String(value == null ? '—' : value);
+        return n.toLocaleString('he-IL');
+    }
+
+    function pct(part, whole) {
+        return whole ? Math.round(part / whole * 100) : 0;
+    }
+
+    function clamp(value) {
+        return Math.max(0, Math.min(100, Number(value) || 0));
+    }
+
+    function uniqueBranches() {
+        var seen = {};
+        return state.branches.filter(function (name) {
+            if (seen[name]) return false;
+            seen[name] = true;
+            return true;
+        });
+    }
+
+    function delta(diff) {
+        var n = Number(diff);
+        if (!isFinite(n)) return '';
+        var amount = Math.round(Math.abs(n) * 10) / 10;
+        if (amount < 0.05) return '<span class="ap-delta is-flat">' + icon('trending_flat') + '0</span>';
+        return '<span class="ap-delta ' + (n > 0 ? 'is-up' : 'is-down') + '">' + icon(n > 0 ? 'trending_up' : 'trending_down') + fmtNum(amount) + '</span>';
+    }
+
+    function kpi(o) {
+        return '<article class="ap-kpi ' + (o.tone || '') + '"><div class="ap-kpi__top"><span class="ap-kpi__label">' + o.label + '</span><span class="ap-kpi__icon">' + icon(o.icon) + '</span></div>' +
+            '<strong class="ap-kpi__value">' + escapeHtml(o.value) + '</strong>' +
+            (o.progress != null ? '<span class="ap-progress"><span style="width:' + clamp(o.progress) + '%"></span></span>' : '') +
+            '<div class="ap-kpi__foot">' + (o.delta || '') + '<span>' + escapeHtml(o.hint || '') + '</span></div>' +
+            (o.action || '') + '</article>';
+    }
+
+    function scoreCell(value) {
+        var cls = scoreClass(value);
+        return '<span class="ap-scorecell"><b class="ap-score ' + cls + '">' + fmtScore(value) + '</b><span class="ap-meter ' + cls + '"><span style="width:' + clamp(value) + '%"></span></span></span>';
+    }
+
+    function chipList(chips, limit, total) {
+        var extra = (total || chips.length) - Math.min(chips.length, limit);
+        return chips.slice(0, limit).join('') + (extra > 0 ? '<span class="is-more">ועוד ' + extra + '</span>' : '');
+    }
+
+    function secHead(iconName, title, text, tools) {
+        return '<header class="ap-sec-head"><div><h3>' + icon(iconName) + title + '</h3>' + (text ? '<p>' + text + '</p>' : '') + '</div>' + (tools || '') + '</header>';
+    }
+
+    function dashHero(data, weeks, regs, known) {
+        var total = 0;
+        var weight = 0;
+        var weighted = 0;
+        weeks.forEach(function (week) {
+            var count = Number(week.count) || 0;
+            total += count;
+            if (count && isFinite(Number(week.avg))) {
+                weighted += Number(week.avg) * count;
+                weight += count;
+            }
+        });
+        var strong = strongestWeek(weeks);
+        var items = [
+            ['quiz', 'נבחנים בחידונים', fmtNum(total), weight ? 'ממוצע כללי ' + fmtScore(weighted / weight) : 'הגשות מכל השבועות'],
+            ['account_tree', 'סניפים שהשתתפו', fmtNum(projectBranchCount(weeks, data.selected)), known ? 'מתוך ' + known + ' ברשימה' : 'לפחות פעם אחת'],
+            ['how_to_reg', 'נרשמים', fmtNum(regs.total), fmtNum(regs.unique) + ' טלפונים שונים'],
+            ['emoji_events', 'השבוע החזק', strong ? weekTitle(strong) : '—', strong ? 'ממוצע ' + fmtScore(strong.avg) + ' · ' + fmtNum(strong.count) + ' נבחנים' : 'עדיין אין נתונים']
+        ];
+        return '<section class="ap-hero"><div class="ap-hero__head"><div><p class="ap-hero__kicker">תוכנית שבת · כל השבועות יחד</p><h2>דשבורד</h2></div>' + quizControl(data.quizOpen) + '</div>' +
+            '<div class="ap-hero__stats">' + items.map(function (item) {
+                return '<div class="ap-hero__stat">' + icon(item[0]) + '<div><span>' + item[1] + '</span><b>' + escapeHtml(item[2]) + '</b><small>' + escapeHtml(item[3]) + '</small></div></div>';
+            }).join('') + '</div></section>';
+    }
+
+    function quizControl(open) {
+        var tone = open === true ? ' is-open' : open === false ? ' is-closed' : '';
+        var label = open === true ? 'החידון פתוח לנערים' : open === false ? 'החידון סגור לנערים' : 'החידון לפי הגדרת הקובץ';
+        return '<div class="ap-quiz' + tone + '"><span class="ap-quiz__dot"></span><div class="ap-quiz__text"><b>' + label + '</b><small>' + quizText(open) + '</small></div><div class="ap-quiz__actions ap-edit">' +
+            (open === true ? '' : '<button type="button" class="ap-hero__btn" data-quiz="true">' + icon('lock_open') + 'פתיחה</button>') +
+            (open === false ? '' : '<button type="button" class="ap-hero__btn is-quiet" data-quiz="false">' + icon('lock') + 'סגירה</button>') +
+            '</div></div>';
+    }
+
+    function dashWeekBar(selected, weeks, prev) {
+        var meta = [];
+        if (selected.topic) meta.push(escapeHtml(selected.topic));
+        meta.push(selected.questionCount + ' שאלות');
+        meta.push(fmtNum(selected.liveCount) + ' בגיליון הפתוח · ' + fmtNum(selected.archiveCount) + ' בארכיון');
+        if (prev) meta.push('השינויים מחושבים מול ' + escapeHtml(weekTitle(prev)));
+        return '<section class="ap-weekbar2"><div><p class="ap-eyebrow">סקירה שבועית</p><h3>' + escapeHtml(weekTitle(selected)) + chip(selected.status) + '</h3><p class="ap-weekbar2__meta">' + meta.join(' · ') + '</p></div>' +
+            (weeks.length > 1 ? '<div class="ap-seg" role="group" aria-label="בחירת שבוע">' + weeks.map(function (week) {
+                var on = week.id === selected.id;
+                return '<button type="button" class="ap-seg__btn' + (on ? ' is-on' : '') + '" data-dash-week="' + escapeHtml(week.id) + '" aria-pressed="' + on + '">' +
+                    (week.status === 'פעיל' ? '<i class="ap-live-dot" title="פעיל באתר"></i>' : '') + escapeHtml(weekTitle(week)) + '</button>';
+            }).join('') + '</div>' : '') +
+            '</section>';
+    }
+
+    function dashKpis(selected, prev, known) {
+        var guess = weekGuessStats(selected);
+        var branchCount = (selected.branches || []).length;
+        var prevBranches = prev && prev.branchNames ? prev.branchNames.length : null;
+        return '<section class="ap-kpis">' +
+            kpi({ label: 'נבחנים', icon: 'groups', value: fmtNum(selected.attempts), hint: selected.questionCount + ' שאלות בחידון', delta: prev ? delta(selected.attempts - prev.count) : '' }) +
+            kpi({ label: 'ציון ממוצע', icon: 'speed', tone: 'is-gold', value: fmtScore(selected.avg), progress: selected.avg, hint: 'מתוך 100', delta: prev && prev.count ? delta(selected.avg - prev.avg) : '' }) +
+            kpi({ label: 'ציון מלא', icon: 'military_tech', tone: 'is-green', value: fmtNum(selected.perfect), hint: selected.attempts ? pct(selected.perfect, selected.attempts) + '% מהנבחנים' : 'אין נבחנים', delta: prev && prev.perfect != null ? delta(selected.perfect - prev.perfect) : '' }) +
+            kpi({ label: 'סניפים', icon: 'account_tree', tone: 'is-rose', value: fmtNum(branchCount), progress: known ? pct(branchCount, known) : null, hint: known ? pct(branchCount, known) + '% מתוך ' + known + ' ברשימה' : 'השתתפו השבוע', delta: prevBranches != null ? delta(branchCount - prevBranches) : '' }) +
+            kpi({ label: 'חידת התמונה', icon: 'image_search', tone: 'is-violet', value: guess.ready ? fmtNum(guess.guesses) : '…', hint: guess.ready ? guess.images + ' תמונות פתוחות' : 'טוען ניחושים', action: '<button type="button" class="ap-link" data-open-gallery>לניחושים וללייקים' + icon('chevron_left') + '</button>' }) +
+            '</section>';
+    }
+
+    function dashAttention(selected, regs) {
+        var items = [];
+        var pack = state.directory;
+        if (pack && !pack.needsPublish && !pack.missing) {
+            var today = (pack.branches || []).filter(function (rec) { return rec.activeToday; });
+            if (today.length) {
+                var waiting = today.filter(function (rec) { return !rec.participated; });
+                var nudge = today.filter(function (rec) { return rec.status === 'צריך דירבון' || rec.status === 'לא עונה'; }).length;
+                var noPhone = today.filter(function (rec) { return !rec.phone && !rec.phone2; }).length;
+                var notes = ['יום ' + escapeHtml(pack.todayName || '') + ': ' + today.length + ' סניפים פעילים לפי הלוז, ' + (today.length - waiting.length) + ' מהם כבר נבחנו.'];
+                if (nudge) notes.push(nudge + ' לדירבון או לא עונים.');
+                if (noPhone) notes.push(noPhone + ' בלי טלפון.');
+                items.push({
+                    tone: 'is-blue',
+                    icon: 'today',
+                    count: waiting.length,
+                    title: 'פעילים היום ועוד לא נבחנו',
+                    text: notes.join(' '),
+                    chips: chipList(waiting.map(function (rec) {
+                        return '<button type="button" data-dir-jump="' + escapeHtml(rec.name) + '">' + escapeHtml(rec.name) + '</button>';
+                    }), 8),
+                    actions: '<button type="button" class="ap-ghost ap-mini" data-open-directory="today">' + icon('contacts') + 'לאלפון</button>'
+                });
+            }
+        }
+        if (regs.quietCount) {
+            items.push({
+                tone: 'is-rose',
+                icon: 'person_search',
+                count: regs.quietCount,
+                title: 'נרשמו ועדיין לא נבחנו',
+                text: 'סניפים עם רישום ובלי אף תשובה בשבוע המוצג. לחיצה פותחת את הנרשמים של הסניף.',
+                chips: chipList((regs.quiet || []).map(function (row) {
+                    return '<button type="button" data-quiet="' + escapeHtml(row.name) + '">' + escapeHtml(row.name) + ' · ' + row.count + '</button>';
+                }), 8, regs.quietCount)
+            });
+        }
+        var branchList = uniqueBranches();
+        if (branchList.length) {
+            var participated = {};
+            (selected.branches || []).forEach(function (branch) { participated[branch.name] = true; });
+            var absent = branchList.filter(function (name) { return !participated[name]; });
+            if (absent.length) {
+                items.push({
+                    tone: 'is-gold',
+                    icon: 'domain_disabled',
+                    count: absent.length,
+                    title: 'סניפים שלא נבחנו השבוע',
+                    text: (selected.branches || []).length + ' מתוך ' + branchList.length + ' הסניפים ברשימה נבחנו.',
+                    chips: state.showAbsent ? absent.map(function (name) { return '<span>' + escapeHtml(name) + '</span>'; }).join('') : '',
+                    scroll: true,
+                    actions: '<button type="button" class="ap-ghost ap-mini" data-absent>' + icon(state.showAbsent ? 'expand_less' : 'expand_more') + (state.showAbsent ? 'הסתרת הרשימה' : 'הצגת הרשימה') + '</button>'
+                });
+            }
+        }
+        if (selected.duplicatePhones) {
+            var plan = state.insightAttempts ? duplicatePlan(state.insightAttempts) : null;
+            items.push({
+                tone: 'is-red',
+                icon: 'content_copy',
+                count: selected.duplicatePhones,
+                title: 'טלפונים שהגישו יותר מפעם אחת',
+                text: plan && plan.remove ? 'ניקוי ימחק ' + plan.remove + ' שורות מהגיליון הפתוח וישאיר לכל טלפון את הציון הגבוה.' : 'כדאי לבדוק לפני בחירת זוכים.',
+                actions: '<button type="button" class="ap-ghost ap-mini" data-open-answers="dup">' + icon('visibility') + 'צפייה</button>' +
+                    (!plan || plan.remove ? '<button type="button" class="ap-danger ap-mini ap-edit" data-clear-dup>' + icon('cleaning_services') + 'ניקוי כפילויות</button>' : '')
+            });
+        }
+        if (!items.length) return '<section class="ap-allgood">' + icon('check_circle') + 'אין כרגע משהו שדורש טיפול בשבוע הזה.</section>';
+        return '<section class="ap-attn">' + secHead('notifications_active', 'דורש טיפול', 'מה כדאי לעשות עכשיו כדי להעלות את ההשתתפות') +
+            '<div class="ap-attn__grid">' + items.map(function (item) {
+                return '<article class="ap-alert ' + item.tone + '"><div class="ap-alert__head"><span class="ap-alert__icon">' + icon(item.icon) + '</span><div><strong>' + fmtNum(item.count) + '</strong><b>' + item.title + '</b></div></div>' +
+                    (item.text ? '<p>' + item.text + '</p>' : '') +
+                    (item.chips ? '<div class="ap-chips' + (item.scroll ? ' is-scroll' : '') + '">' + item.chips + '</div>' : '') +
+                    (item.actions ? '<div class="ap-alert__actions">' + item.actions + '</div>' : '') +
+                    '</article>';
+            }).join('') + '</div></section>';
+    }
+
+    function dashBranches(selected) {
+        var all = selected.branches || [];
+        var query = state.dashQuery.trim();
+        var sorted = all.slice().sort(function (a, b) {
             if (state.branchSort === 'avg') return b.avg - a.avg || b.count - a.count;
             return b.count - a.count || b.avg - a.avg;
         }).filter(function (branch) {
             if (state.dashMin > 1 && branch.count < state.dashMin) return false;
-            return !state.dashQuery.trim() || branch.name.indexOf(state.dashQuery.trim()) !== -1;
+            return !query || branch.name.indexOf(query) !== -1;
         });
-        var hardest = (selected.questions || []).slice().sort(function (a, b) { return a.rate - b.rate; })[0];
+        var tools = '<div class="ap-tools"><label class="ap-searchbox">' + icon('search') + '<input id="ap-dash-branch" type="search" placeholder="חיפוש סניף" aria-label="חיפוש סניף" value="' + escapeHtml(state.dashQuery) + '"></label>' +
+            '<div class="ap-seg is-sm" role="group" aria-label="מיון סניפים"><button type="button" class="ap-seg__btn' + (state.branchSort === 'count' ? ' is-on' : '') + '" data-sort="count">לפי כמות</button><button type="button" class="ap-seg__btn' + (state.branchSort === 'avg' ? ' is-on' : '') + '" data-sort="avg">לפי ממוצע</button></div>' +
+            '<button type="button" class="ap-pill' + (state.dashMin >= 5 ? ' is-on' : '') + '" data-min="5" aria-pressed="' + (state.dashMin >= 5) + '">5+ נבחנים</button></div>';
+        var count = sorted.length === all.length ? all.length + ' סניפים' : sorted.length + ' מתוך ' + all.length + ' סניפים';
+        return '<section class="ap-card ap-panel">' + secHead('leaderboard', 'סניפים', count + ' · לחיצה על שורה פותחת את התשובות', tools) +
+            (sorted.length ? '<div class="ap-table-wrap"><table class="ap-table ap-table--dash"><thead><tr><th>#</th><th>סניף</th><th>נבחנים</th><th>ממוצע</th><th>ציון מלא</th><th>מתחת ל-60</th></tr></thead><tbody>' +
+            sorted.map(function (branch, index) {
+                return '<tr data-branch-jump="' + escapeHtml(branch.name) + '"><td class="ap-rank">' + (index + 1) + '</td><td><span class="ap-branch-name">' + escapeHtml(branch.name) + '</span>' + branchDirectoryHint(branch.name) + '</td>' +
+                    '<td class="ap-num">' + branch.count + '</td><td>' + scoreCell(branch.avg) + '</td><td class="ap-num">' + branch.perfect + '</td><td class="ap-num' + (branch.low ? ' is-warn' : '') + '">' + branch.low + '</td></tr>';
+            }).join('') + '</tbody></table></div>' : '<p class="ap-empty">' + (all.length ? 'אין סניפים שמתאימים לסינון.' : 'עדיין אין תשובות.') + '</p>') +
+            '</section>';
+    }
+
+    function dashQuestions(selected) {
+        var list = selected.questions || [];
+        var hardest = list.slice().sort(function (a, b) { return a.rate - b.rate; })[0];
+        return '<section class="ap-card ap-panel">' + secHead('quiz', 'שאלות', 'אחוז התשובות הנכונות לכל שאלה') +
+            (list.length ? (hardest && list.length > 1 ? '<div class="ap-hardest">' + icon('psychology') + '<div><small>השאלה הקשה ביותר · ' + fmtScore(hardest.rate) + '% צדקו</small><p>' + escapeHtml(hardest.question) + '</p></div></div>' : '') +
+            '<ol class="ap-qlist">' + list.map(function (q, index) {
+                var cls = scoreClass(q.rate);
+                return '<li' + (q === hardest && list.length > 1 ? ' class="is-hard"' : '') + '><span class="ap-qlist__n">' + (index + 1) + '</span><div><p>' + escapeHtml(q.question) + '</p>' +
+                    '<div class="ap-qlist__bar"><span class="ap-meter ' + cls + '"><span style="width:' + clamp(q.rate) + '%"></span></span><b class="ap-score ' + cls + '">' + fmtScore(q.rate) + '%</b></div>' +
+                    '<small>' + q.correctCount + ' מתוך ' + q.total + ' ענו נכון</small></div></li>';
+            }).join('') + '</ol>' : '<p class="ap-empty">אין שאלות משויכות לשבוע.</p>') +
+            '</section>';
+    }
+
+    function dashDistribution(selected) {
+        var dist = selected.distribution || { perfect: 0, high: 0, mid: 0, low: 0 };
+        var scored = dist.perfect + dist.high + dist.mid + dist.low;
         var bars = [
-            ['is-perfect', dist.perfect, '100'],
-            ['is-high', dist.high, '80–99'],
-            ['is-mid', dist.mid, '60–79'],
+            ['is-perfect', dist.perfect, 'ציון מלא'],
+            ['is-high', dist.high, ltr('80–99')],
+            ['is-mid', dist.mid, ltr('60–79')],
             ['is-low', dist.low, 'מתחת ל-60']
         ];
-        var totalAttempts = weeks.reduce(function (sum, week) { return sum + (Number(week.count) || 0); }, 0);
-        var weight = 0;
-        var weighted = 0;
-        weeks.forEach(function (week) {
-            if (week.count && isFinite(Number(week.avg))) {
-                weighted += Number(week.avg) * week.count;
-                weight += week.count;
-            }
-        });
-        var seenNames = {};
-        var knownBranches = 0;
-        state.branches.forEach(function (name) {
-            if (seenNames[name]) return;
-            seenNames[name] = true;
-            knownBranches++;
-        });
-        var strong = strongestWeek(weeks);
-        var guessStats = weekGuessStats(selected);
-        var title = weekTitle(selected);
-        view(
-            head('דשבורד', '') +
-            '<section class="ap-project"><div class="ap-project__title"><strong>מבט כללי</strong><span>כל השבועות יחד</span></div><section class="ap-stats">' +
-            stat('נבחנים בחידונים', totalAttempts, weight ? 'ממוצע כללי ' + fmtScore(weighted / weight) : 'הגשות מכל השבועות', '') +
-            stat('סניפים שהשתתפו', projectBranchCount(weeks, selected), knownBranches ? 'מתוך ' + knownBranches + ' ברשימה' : 'לפחות סניף אחד בכל שבוע', 'is-gold') +
-            stat('נרשמים', regs.total, regs.unique + ' טלפונים שונים', 'is-rose') +
-            stat('השבוע החזק', strong ? weekTitle(strong) : '—', strong ? 'ממוצע ' + fmtScore(strong.avg) + ' · ' + strong.count + ' נבחנים' : 'עדיין אין נתונים', 'is-green') +
-            '</section></section>' +
-            '<header class="ap-weekhead"><div><p class="ap-muted">סקירה שבועית</p><h3>הצגת נתונים של ' + escapeHtml(title) + '</h3></div><div class="ap-actions"><label class="ap-field">בחירת שבוע<select id="ap-dash-week">' +
+        return '<section class="ap-card ap-panel">' + secHead('bar_chart', 'התפלגות ציונים', scored ? fmtNum(scored) + ' נבחנים עם ציון' : 'עדיין אין ציונים בשבוע הזה') +
+            (scored ? '<div class="ap-stack">' + bars.map(function (bar) {
+                if (!bar[1]) return '';
+                var share = pct(bar[1], scored);
+                return '<i class="' + bar[0] + '" style="flex-grow:' + bar[1] + '" title="' + bar[1] + ' · ' + share + '%">' + (share >= 8 ? share + '%' : '') + '</i>';
+            }).join('') + '</div><div class="ap-dist">' + bars.map(function (bar) {
+                return '<div class="ap-dist__item ' + bar[0] + '"><span><i></i>' + bar[2] + '</span><b>' + fmtNum(bar[1]) + '</b><small>' + pct(bar[1], scored) + '% מהנבחנים</small></div>';
+            }).join('') + '</div>' : '') +
+            (selected.duplicatePhones ? '<p class="ap-muted">' + selected.duplicatePhones + ' טלפונים הגישו יותר מפעם אחת.</p>' : '') +
+            '<div class="ap-actions"><button type="button" class="ap-ghost" data-open-answers="100">' + icon('emoji_events') + 'ציון מלא · לבחירת זוכים</button><button type="button" class="ap-ghost" data-open-answers="low">' + icon('trending_down') + 'מתחת ל-60</button>' +
+            (selected.duplicatePhones ? '<button type="button" class="ap-ghost" data-open-answers="dup">' + icon('content_copy') + 'כפולים</button>' : '') +
+            '</div></section>';
+    }
+
+    function dashWeeks(weeks, selected) {
+        return '<section class="ap-card ap-panel">' + secHead('compare_arrows', 'השוואת שבועות', 'לחיצה על שבוע מציגה את הנתונים שלו') +
+            '<div class="ap-table-wrap"><table class="ap-table ap-table--dash"><thead><tr><th>שבוע</th><th>סטטוס</th><th>נבחנים</th><th>ממוצע</th><th>ציון מלא</th></tr></thead><tbody>' +
             weeks.map(function (week) {
-                return '<option value="' + escapeHtml(week.id) + '"' + (week.id === selected.id ? ' selected' : '') + '>' + escapeHtml(week.name) + '</option>';
-            }).join('') +
-            '</select></label>' + chip(selected.status) +
-            (selected.topic ? '<span class="ap-muted">' + escapeHtml(selected.topic) + '</span>' : '') +
-            '<span class="ap-muted">' + selected.liveCount + ' בגיליון הפתוח · ' + selected.archiveCount + ' בארכיון</span></div></header>' +
-            '<section class="ap-stats ap-stats--five">' +
-            stat('נבחנים', selected.attempts, 'מתוך ' + selected.questionCount + ' שאלות', '') +
-            stat('ממוצע', fmtScore(selected.avg), 'השבוע', 'is-gold') +
-            stat('ציון מלא', selected.perfect, selected.attempts ? Math.round(selected.perfect / selected.attempts * 100) + '% מהנבחנים' : 'אין נבחנים', 'is-green') +
-            stat('סניפים', selected.branches.length, knownBranches ? 'מתוך ' + knownBranches + ' ברשימה' : 'השתתפו השבוע', 'is-rose') +
-            '<article class="ap-stat"><span>חידת התמונה</span><strong>' + (guessStats.ready ? guessStats.guesses : '…') + '</strong><span>' + (guessStats.ready ? guessStats.images + ' תמונות פתוחות' : 'טוען ניחושים') + '</span><button type="button" class="ap-ghost ap-mini" data-open-gallery>לניחושים וללייקים</button></article>' +
-            '</section>' +
-            directoryDashNote() +
-            '<div class="ap-pair is-board">' +
-            '<section class="ap-card"><div class="ap-actions"><strong>סניפים</strong><input id="ap-dash-branch" placeholder="חיפוש סניף" value="' + escapeHtml(state.dashQuery) + '"><button type="button" class="ap-ghost' + (state.branchSort === 'count' ? ' is-on' : '') + '" data-sort="count">לפי כמות</button><button type="button" class="ap-ghost' + (state.branchSort === 'avg' ? ' is-on' : '') + '" data-sort="avg">לפי ממוצע</button><button type="button" class="ap-ghost' + (state.dashMin >= 5 ? ' is-on' : '') + '" data-min="5">לפחות 5</button></div>' +
-            '<p class="ap-muted">לחיצה על שורה פותחת את התשובות של הסניף.</p>' +
-            (sorted.length ? '<div class="ap-table-wrap"><table class="ap-table"><thead><tr><th>סניף</th><th>נבחנים</th><th>ממוצע</th><th>100</th><th>מתחת ל-60</th></tr></thead><tbody>' +
-            sorted.map(function (branch) {
-                return '<tr data-branch-jump="' + escapeHtml(branch.name) + '"><td>' + escapeHtml(branch.name) + branchDirectoryHint(branch.name) + '</td><td>' + branch.count + '</td><td><span class="ap-score ' + scoreClass(branch.avg) + '">' + fmtScore(branch.avg) + '</span> <span class="ap-meter"><span style="width:' + Math.max(0, Math.min(100, branch.avg)) + '%"></span></span></td><td>' + branch.perfect + '</td><td>' + branch.low + '</td></tr>';
-            }).join('') + '</tbody></table></div>' : '<p>' + ((selected.branches || []).length ? 'אין סניפים שמתאימים לסינון.' : 'עדיין אין תשובות.') + '</p>') +
-            '</section>' +
-            '<section class="ap-card"><strong>שאלות</strong>' +
-            (hardest ? '<p>הכי קשה: ' + escapeHtml(hardest.question) + '</p>' : '') +
-            ((selected.questions || []).length ? '<ol class="ap-qstats">' + selected.questions.map(function (q, index) {
-                return '<li><span>' + (index + 1) + '. ' + escapeHtml(q.question) + '</span><b class="ap-score ' + scoreClass(q.rate) + '">' + fmtScore(q.rate) + '%</b><span class="ap-meter"><span style="width:' + Math.max(0, Math.min(100, q.rate)) + '%"></span></span><span class="ap-muted">' + q.correctCount + '/' + q.total + '</span></li>';
-            }).join('') + '</ol>' : '<p>אין שאלות משויכות לשבוע.</p>') +
-            '</section></div>' +
-            '<section class="ap-card"><strong>התפלגות ציונים</strong>' +
-            (scored ? '<div class="ap-bar">' + bars.map(function (bar) {
-                return '<i class="' + bar[0] + '" style="width:' + (bar[1] / scored * 100) + '%"></i>';
-            }).join('') + '</div><div class="ap-legend">' + bars.map(function (bar) {
-                return '<span><b>' + bar[1] + '</b> ' + bar[2] + '</span>';
-            }).join('') + '</div>' : '<p>עדיין אין ציונים בשבוע הזה.</p>') +
-            (selected.duplicatePhones ? '<p>יש ' + selected.duplicatePhones + ' טלפונים שהגישו יותר מפעם אחת.</p>' : '') +
-            '<div class="ap-actions"><button type="button" class="ap-ghost" data-open-answers="100">ציון מלא, לבחירת זוכים</button><button type="button" class="ap-ghost" data-open-answers="low">מתחת ל-60</button>' +
-            (selected.duplicatePhones ? '<button type="button" class="ap-ghost" data-open-answers="dup">כפולים</button>' : '') +
-            '</div></section>' +
-            '<div class="ap-pair">' +
-            insightBlock(selected, weeks) +
-            hoursSection() +
-            '<section class="ap-card"><strong>השוואת שבועות</strong><div class="ap-table-wrap"><table class="ap-table"><thead><tr><th>שבוע</th><th>סטטוס</th><th>נבחנים</th><th>ממוצע</th></tr></thead><tbody>' +
-            weeks.map(function (week) {
-                return '<tr><td>' + escapeHtml(weekTitle(week)) + '</td><td>' + chip(week.status) + '</td><td>' + week.count + '</td><td class="ap-score ' + scoreClass(week.avg) + '">' + fmtScore(week.avg) + '</td></tr>';
-            }).join('') + '</tbody></table></div></section>' +
-            '<section class="ap-card"><strong>הגשות אחרונות</strong>' +
-            ((selected.recent || []).length ? '<ul class="ap-feed">' + selected.recent.map(function (row, index) {
-                return '<li><span class="ap-person"><strong>' + escapeHtml(row.name) + '</strong><span class="ap-muted">' + escapeHtml(row.branch) + '</span></span><b class="ap-score ' + scoreClass(row.score) + '">' + fmtScore(row.score) + '</b><span class="ap-phone">' + escapeHtml(prettyPhone(row.phone)) + '</span><button type="button" class="ap-ghost ap-mini ap-edit" data-recent-winner="' + index + '">לזוכים</button></li>';
-            }).join('') + '</ul>' : '<p>אין הגשות.</p>') +
-            '</section>' +
-            '<section class="ap-card ap-span"><strong>נרשמו ועדיין לא נבחנו</strong><p>' + (regs.quietCount || 0) + ' סניפים עם רישום ובלי תשובה בשבוע המוצג.</p>' +
-            ((regs.quiet || []).length ? '<div class="ap-chips">' + regs.quiet.map(function (row) {
-                return '<button type="button" data-quiet="' + escapeHtml(row.name) + '">' + escapeHtml(row.name) + ' · ' + row.count + '</button>';
-            }).join('') + '</div>' : '<p>כל הסניפים שנרשמו כבר נבחנו, או שעדיין אין רישום.</p>') +
-            '</section></div>' +
-            '<section class="ap-card"><div class="ap-status"><strong>החידון באתר</strong>' + quizStatusChip(data.quizOpen) + '</div><p>' + quizText(data.quizOpen) + '</p><div class="ap-actions ap-edit">' +
-            (data.quizOpen === true ? '' : '<button type="button" class="ap-primary" data-quiz="true">פתיחת החידון</button>') +
-            (data.quizOpen === false ? '' : '<button type="button" class="ap-ghost" data-quiz="false">סגירת החידון</button>') +
-            '</div>' +
-            (selected.status === 'פעיל' ? '<details class="ap-advanced ap-edit"><summary>ארכוב תשובות</summary><p class="ap-help">הארכוב מעתיק את גיליון התשובות לגיליון «ארכיון תשובות» ומרוקן אותו. השאלות נשארות באוויר עד שמפרסמים שבוע אחר.</p><button type="button" class="ap-danger" data-archive>ארכוב וניקוי הגיליון</button></details>' : '') +
-            '</section>'
-        );
+                return '<tr' + (week.id === selected.id ? ' class="is-on"' : '') + ' data-dash-week="' + escapeHtml(week.id) + '"><td><span class="ap-branch-name">' + escapeHtml(weekTitle(week)) + '</span></td><td>' + chip(week.status) + '</td>' +
+                    '<td class="ap-num">' + fmtNum(week.count) + '</td><td>' + (week.count ? scoreCell(week.avg) : '—') + '</td><td class="ap-num">' + fmtNum(week.perfect || 0) + '</td></tr>';
+            }).join('') + '</tbody></table></div></section>';
+    }
+
+    function dashRecent(selected) {
+        var list = selected.recent || [];
+        return '<section class="ap-card ap-panel">' + secHead('history', 'הגשות אחרונות', list.length ? list.length + ' האחרונות בשבוע המוצג' : 'עדיין אין הגשות') +
+            (list.length ? '<ul class="ap-recent">' + list.map(function (row, index) {
+                var name = String(row.name || '').trim();
+                return '<li><span class="ap-avatar" aria-hidden="true">' + escapeHtml(name.charAt(0) || '?') + '</span>' +
+                    '<div class="ap-recent__who"><b>' + escapeHtml(name || 'ללא שם') + '</b><small>' + escapeHtml([row.branch, shortWhen(row.date)].filter(Boolean).join(' · ')) + '</small></div>' +
+                    '<span class="ap-phone">' + escapeHtml(prettyPhone(row.phone)) + '</span>' +
+                    '<b class="ap-scorebadge ' + scoreClass(row.score) + '">' + fmtScore(row.score) + '</b>' +
+                    '<button type="button" class="ap-ghost ap-mini ap-edit" data-recent-winner="' + index + '">' + icon('emoji_events') + 'לזוכים</button></li>';
+            }).join('') + '</ul>' : '') +
+            '</section>';
+    }
+
+    function dashManage(selected) {
+        if (selected.status !== 'פעיל') return '';
+        return '<section class="ap-card ap-panel ap-manage ap-edit"><details><summary>' + icon('inventory_2') + '<span><b>ארכוב תשובות השבוע</b><small>פעולה מתקדמת · מעבירה את הגיליון הפתוח לארכיון</small></span>' + icon('expand_more') + '</summary>' +
+            '<p class="ap-help">הארכוב מעתיק את גיליון התשובות לגיליון «ארכיון תשובות» ומרוקן אותו. השאלות נשארות באוויר עד שמפרסמים שבוע אחר.</p>' +
+            '<button type="button" class="ap-danger" data-archive>' + icon('inventory_2') + 'ארכוב וניקוי הגיליון</button></details></section>';
     }
 
     function stat(label, value, hint, kind) {
@@ -455,24 +650,10 @@
         return 'עדיין לא נבחר כאן. עד אז האתר ממשיך לפי ההגדרה בקובץ.';
     }
 
-    function quizStatusChip(open) {
-        if (open === true) return '<span class="ap-chip is-live">פתוח</span>';
-        if (open === false) return '<span class="ap-chip is-archive">סגור</span>';
-        return '<span class="ap-chip">לפי הקובץ</span>';
-    }
-
     function parseSheetDate(value) {
         var match = String(value || '').match(/(\d{1,2})\/(\d{1,2})\/(\d{4})(?:\s+(\d{1,2}):(\d{2}))?/);
         if (!match) return null;
         return new Date(Number(match[3]), Number(match[2]) - 1, Number(match[1]), Number(match[4] || 0), Number(match[5] || 0));
-    }
-
-    function trendPhrase(diff, unit) {
-        var amount = Math.round(Math.abs(diff) * 10) / 10;
-        var text = String(amount).replace(/\.0$/, '');
-        if (amount < 0.05) return '<span>בלי שינוי ב' + unit + '</span>';
-        if (diff > 0) return '<span class="ap-up">עלייה של ' + text + ' ב' + unit + '</span>';
-        return '<span class="ap-down">ירידה של ' + text + ' ב' + unit + '</span>';
     }
 
     function previousWeek(weeks, selectedId) {
@@ -505,7 +686,6 @@
     function activityStats(attempts) {
         var hours = {};
         var days = {};
-        var dayNames = ['ראשון', 'שני', 'שלישי', 'רביעי', 'חמישי', 'שישי', 'שבת'];
         var dated = 0;
         (attempts || []).forEach(function (row) {
             var when = parseSheetDate(row.date);
@@ -516,76 +696,42 @@
             hours[hour] = (hours[hour] || 0) + 1;
             days[day] = (days[day] || 0) + 1;
         });
-        function bars(map, label) {
-            var keys = Object.keys(map).map(Number).sort(function (a, b) { return a - b; });
-            var peak = keys.slice().sort(function (a, b) { return map[b] - map[a]; })[0];
-            var max = peak === undefined ? 0 : map[peak];
-            return {
-                peak: peak,
-                max: max,
-                html: keys.map(function (key) {
-                    var width = max ? Math.round(map[key] / max * 100) : 0;
-                    return '<div><span>' + label(key) + '</span><i' + (key === peak ? ' class="is-peak"' : '') + '><span style="width:' + width + '%"></span></i><b>' + map[key] + '</b></div>';
-                }).join('')
-            };
-        }
-        return {
-            dated: dated,
-            hours: bars(hours, function (hour) { return (hour < 10 ? '0' : '') + hour + ':00'; }),
-            days: bars(days, function (day) { return dayNames[day]; })
-        };
+        return { dated: dated, hours: hours, days: days };
     }
 
-    function insightBlock(selected, weeks) {
-        var prev = previousWeek(weeks, selected.id);
-        var trend = prev
-            ? '<p>' + trendPhrase(selected.avg - prev.avg, 'ממוצע') + ' · ' + trendPhrase(selected.attempts - prev.count, 'נבחנים') + ' מול ' + escapeHtml(prev.name) + '</p>'
-            : '<p class="ap-muted">ההשוואה לשבוע הקודם תופיע כשיהיה שבוע שני: ממוצע ומספר נבחנים, עלייה או ירידה.</p>';
-        var participated = {};
-        (selected.branches || []).forEach(function (branch) { participated[branch.name] = true; });
-        var seenBranch = {};
-        var branchList = [];
-        state.branches.forEach(function (name) {
-            if (seenBranch[name]) return;
-            seenBranch[name] = true;
-            branchList.push(name);
-        });
-        var absent = branchList.filter(function (name) { return !participated[name]; });
-        var known = branchList.length;
-        var participation = known
-            ? '<p>' + selected.branches.length + ' סניפים נבחנו מתוך ' + known + ' ברשימה.</p>'
-            : '<p class="ap-muted">טוען את רשימת הסניפים...</p>';
-        var absentButton = '';
-        var absentList = '';
-        if (known) {
-            absentButton = '<button type="button" class="ap-ghost' + (state.showAbsent ? ' is-on' : '') + '" data-absent>' + (state.showAbsent ? 'הסתרת סניפים שלא נבחנו' : 'סניפים שלא נבחנו') + ' · ' + absent.length + '</button>';
-            if (state.showAbsent) {
-                absentList = absent.length
-                    ? '<div class="ap-chips ap-absent">' + absent.map(function (name) {
-                        return '<span>' + escapeHtml(name) + '</span>';
-                    }).join('') + '</div>'
-                    : '<p>כל הסניפים שברשימה נבחנו השבוע.</p>';
-            }
-        }
-        var plan = state.insightAttempts ? duplicatePlan(state.insightAttempts) : null;
-        var dup = '';
-        if (selected.duplicatePhones) {
-            dup = '<p>' + selected.duplicatePhones + ' טלפונים הגישו יותר מפעם אחת' + (plan ? '. ניקוי ימחק ' + plan.remove + ' שורות מהגיליון הפתוח וישאיר לכל טלפון את הציון הגבוה' : '') + '.</p>' +
-                '<button type="button" class="ap-danger ap-edit" data-clear-dup>ניקוי כפילויות</button>';
-        }
-        return '<section class="ap-card"><strong>מגמת השתתפות</strong>' + trend + participation +
-            '<div class="ap-actions">' + absentButton + '</div>' + absentList + dup + '</section>';
+    function peakOf(entries) {
+        return entries.reduce(function (best, entry) { return entry.value > best.value ? entry : best; }, entries[0]);
+    }
+
+    function columnChart(entries, peakKey) {
+        var max = Math.max.apply(null, entries.map(function (entry) { return entry.value; })) || 1;
+        return '<div class="ap-cols">' + entries.map(function (entry) {
+            var height = entry.value ? Math.max(3, Math.round(entry.value / max * 88)) : 0;
+            return '<div class="ap-col' + (entry.key === peakKey ? ' is-peak' : '') + '" title="' + escapeHtml(entry.label) + ' · ' + entry.value + ' הגשות"><span class="ap-col__track"><b>' + (entry.value || '') + '</b><i style="height:' + height + '%"></i></span><span class="ap-col__label">' + escapeHtml(entry.label) + '</span></div>';
+        }).join('') + '</div>';
     }
 
     function hoursSection() {
-        if (!state.insightAttempts) return '<section class="ap-card"><strong>שעות פעילות</strong><p class="ap-muted">מחשב שעות פעילות...</p></section>';
+        var heading = function (text) {
+            return '<section class="ap-card ap-panel">' + secHead('schedule', 'שעות פעילות', text);
+        };
+        if (!state.insightAttempts) return heading('מחשב שעות פעילות…') + '</section>';
         var stats = activityStats(state.insightAttempts);
-        if (!stats.dated) return '<section class="ap-card"><strong>שעות פעילות</strong><p class="ap-muted">אין שעה שמורה על ההגשות.</p></section>';
-        var peakHour = stats.hours.peak;
-        var peakDay = stats.days.peak;
+        if (!stats.dated) return heading('אין שעה שמורה על ההגשות.') + '</section>';
         var dayNames = ['ראשון', 'שני', 'שלישי', 'רביעי', 'חמישי', 'שישי', 'שבת'];
-        return '<section class="ap-card"><strong>שעות פעילות</strong><p>שיא: ' + (peakHour < 10 ? '0' : '') + peakHour + ':00 · ' + stats.hours.max + ' הגשות. היום העמוס: יום ' + dayNames[peakDay] + ' · ' + stats.days.max + '.</p>' +
-            '<div class="ap-hours">' + stats.hours.html + '</div><p class="ap-muted">לפי יום</p><div class="ap-hours">' + stats.days.html + '</div></section>';
+        var pad = function (hour) { return (hour < 10 ? '0' : '') + hour; };
+        var keys = Object.keys(stats.hours).map(Number);
+        var hours = [];
+        for (var hour = Math.min.apply(null, keys); hour <= Math.max.apply(null, keys); hour++) {
+            hours.push({ key: hour, label: pad(hour), value: stats.hours[hour] || 0 });
+        }
+        var days = dayNames.map(function (name, index) { return { key: index, label: name, value: stats.days[index] || 0 }; });
+        var peakHour = peakOf(hours);
+        var peakDay = peakOf(days);
+        return heading('שיא בשעה ' + pad(peakHour.key) + ':00 · ' + peakHour.value + ' הגשות · היום העמוס: ' + dayNames[peakDay.key]) +
+            '<p class="ap-chart-label">לפי שעה</p>' + columnChart(hours, peakHour.key) +
+            '<p class="ap-chart-label">לפי יום</p>' + columnChart(days, peakDay.key) +
+            '</section>';
     }
 
     function weekTitle(week) {
@@ -1976,6 +2122,15 @@
             renderDashboard();
             return;
         }
+        var weekPick = target.closest('[data-dash-week]');
+        if (weekPick) {
+            var weekId = weekPick.getAttribute('data-dash-week');
+            if (weekId !== state.weekId) {
+                state.weekId = weekId;
+                openSection('dashboard');
+            }
+            return;
+        }
         var sort = target.closest('[data-sort]');
         if (sort) {
             state.branchSort = sort.getAttribute('data-sort');
@@ -1984,9 +2139,13 @@
         }
         var quiz = target.closest('[data-quiz]');
         if (quiz) {
-            api('adminSetQuizOpen', { open: quiz.getAttribute('data-quiz') === 'true' }).then(function () {
-                toast('סטטוס החידון עודכן');
-                return loadDashboard();
+            var opening = quiz.getAttribute('data-quiz') === 'true';
+            (opening ? Promise.resolve(true) : ask('לסגור את החידון? הנערים יראו שהחידון סגור עד שיפתחו אותו שוב.', 'סגירת החידון')).then(function (ok) {
+                if (!ok) return;
+                return api('adminSetQuizOpen', { open: opening }).then(function () {
+                    toast(opening ? 'החידון נפתח לנערים' : 'החידון נסגר');
+                    return loadDashboard();
+                });
             }).catch(showError);
             return;
         }
@@ -2515,25 +2674,6 @@
             (rec.activeToday ? '<span class="ap-chip is-today">היום</span>' : '') +
             who +
             '<button type="button" class="ap-ghost ap-mini" data-dir-jump="' + escapeHtml(rec.name) + '">פרטים</button></div>';
-    }
-
-    function directoryDashNote() {
-        var pack = state.directory;
-        if (!pack || pack.needsPublish || pack.missing) return '';
-        var today = (pack.branches || []).filter(function (rec) { return rec.activeToday; });
-        if (!today.length) return '';
-        var examined = today.filter(function (rec) { return rec.participated; }).length;
-        var waiting = today.filter(function (rec) { return !rec.participated; });
-        var nudge = today.filter(function (rec) { return rec.status === 'צריך דירבון' || rec.status === 'לא עונה'; });
-        var noPhone = today.filter(function (rec) { return !rec.phone && !rec.phone2; });
-        var chips = waiting.slice(0, 8).map(function (rec) {
-            return '<button type="button" data-dir-jump="' + escapeHtml(rec.name) + '">' + escapeHtml(rec.name) + '</button>';
-        }).join('');
-        var more = waiting.length > 8 ? '<span>ועוד ' + (waiting.length - 8) + '</span>' : '';
-        return '<div class="ap-today"><p class="ap-dir-note"><strong>היום יום ' + escapeHtml(pack.todayName || '') + ' · ' + today.length + ' סניפים פעילים לפי הלוז · ' + examined + ' מהם כבר נבחנו.</strong> <button type="button" class="ap-ghost ap-mini" data-open-directory="today">לאלפון</button></p>' +
-            '<div class="ap-today__stats"><span><b>' + waiting.length + '</b> פעילים היום ועוד לא נבחנו</span><span><b>' + nudge.length + '</b> לדירבון או לא עונים</span><span><b>' + noPhone.length + '</b> בלי טלפון</span></div>' +
-            (chips ? '<div class="ap-chips ap-today__chips">' + chips + more + '</div>' : '') +
-            '</div>';
     }
 
     function answersDirectoryHtml() {

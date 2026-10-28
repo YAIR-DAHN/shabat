@@ -48,21 +48,21 @@
             </div>
             <nav id="ap-nav" aria-label="תפריט ניהול"></nav>
             <div class="ap-nav__foot">
-                <a id="ap-sheets" href="https://docs.google.com/spreadsheets/d/1vzNdXWaZe1FKk4SFy0mWhbJ7s64zC-HAMOdMnXV52v4/edit" target="_blank" rel="noopener">גוגל שיטס</a>
-                <button type="button" id="ap-pin-open">החלפת קוד</button>
-                <button type="button" id="ap-logout">יציאה</button>
+                <a id="ap-sheets" href="https://docs.google.com/spreadsheets/d/1vzNdXWaZe1FKk4SFy0mWhbJ7s64zC-HAMOdMnXV52v4/edit" target="_blank" rel="noopener"><span class="material-icons" aria-hidden="true">table_view</span>גוגל שיטס</a>
+                <button type="button" id="ap-pin-open"><span class="material-icons" aria-hidden="true">key</span>החלפת קוד</button>
+                <button type="button" id="ap-logout"><span class="material-icons" aria-hidden="true">logout</span>יציאה</button>
             </div>
         </aside>
         <div class="ap-main">
             <header class="ap-top">
                 <div class="ap-top__start">
-                    <button type="button" class="ap-back" id="ap-back" disabled>חזרה</button>
+                    <button type="button" class="ap-back" id="ap-back" disabled aria-label="חזרה"><span class="material-icons" aria-hidden="true">arrow_forward</span><span class="ap-back__text">חזרה</span></button>
                     <div>
                         <p class="ap-top__hello" id="ap-hello">שלום</p>
                         <p class="ap-top__note">שמירה מציגה את הנתונים מהגיליון. עריכה ישירה בשיטס מופיעה כאן אחרי הרענון, או תוך כמה דקות.</p>
                     </div>
                 </div>
-                <button type="button" class="ap-sheet-refresh" id="ap-sheet-refresh">רענון מהגיליון</button>
+                <button type="button" class="ap-sheet-refresh" id="ap-sheet-refresh"><span class="material-icons" aria-hidden="true">sync</span>רענון מהגיליון</button>
             </header>
             <main id="ap-view"></main>
         </div>
