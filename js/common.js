@@ -82,6 +82,7 @@ const CACHE_READS = {
     adminListUpdates: true,
     adminListWinners: true,
     adminListRegistrations: true,
+    adminListParticipants: true,
     adminListStaff: true,
     adminListDirectory: true,
     coordinatorOverview: true,

@@ -10,6 +10,7 @@
         { id: 'dashboard', icon: 'insights', label: 'דשבורד' },
         { id: 'questions', icon: 'quiz', label: 'שאלות' },
         { id: 'answers', icon: 'fact_check', label: 'תשובות' },
+        { id: 'participants', icon: 'groups', label: 'משתתפים' },
         { id: 'branches', icon: 'account_tree', label: 'סניפים' },
         { id: 'directory', icon: 'contacts', label: 'אלפון' },
         { id: 'registrations', icon: 'how_to_reg', label: 'נרשמים' },
@@ -59,6 +60,15 @@
         likeAudit: null,
         updates: [],
         winners: [],
+        people: null,
+        peopleQuery: '',
+        peopleWeek: 'all',
+        peopleBranch: 'all',
+        peopleScore: 'all',
+        peopleSort: 'recent',
+        peopleWon: false,
+        peopleDup: false,
+        peopleOpen: '',
         staff: [],
         mine: null,
         directory: null,
@@ -191,6 +201,7 @@
         var items = state.role === 'coordinator'
             ? [
                 { id: 'mine', icon: 'insights', label: 'הסניף שלי' },
+                { id: 'participants', icon: 'groups', label: 'משתתפים' },
                 { id: 'profile', icon: 'badge', label: 'פרטי הסניף' }
             ]
             : NAV.filter(function (item) { return !item.super || state.role === 'super'; });
@@ -227,7 +238,7 @@
     }
 
     function openSection(id, options) {
-        if (state.role === 'coordinator' && id !== 'mine' && id !== 'profile') id = 'mine';
+        if (state.role === 'coordinator' && id !== 'mine' && id !== 'profile' && id !== 'participants') id = 'mine';
         options = options || {};
         if (!options.back) {
             var snap = navSnapshot(id);
@@ -247,6 +258,7 @@
             dashboard: loadDashboard,
             questions: loadQuestions,
             answers: loadAnswers,
+            participants: loadParticipants,
             branches: loadBranches,
             registrations: loadRegistrations,
             updates: loadUpdates,
@@ -713,6 +725,173 @@
             options: (q.options || []).map(function (option) { return String(option || '').trim(); }).filter(Boolean),
             correctAnswer: String(q.correctAnswer || '').trim()
         };
+    }
+
+    function loadParticipants() {
+        return api('adminListParticipants').then(function (result) {
+            state.people = result;
+            renderParticipants();
+        });
+    }
+
+    function peopleStamp(value) {
+        var match = String(value || '').match(/(\d{1,2})\/(\d{1,2})\/(\d{4})(?:\s+(\d{1,2}):(\d{2}))?/);
+        if (!match) return 0;
+        return Date.UTC(Number(match[3]), Number(match[2]) - 1, Number(match[1]), Number(match[4] || 0), Number(match[5] || 0));
+    }
+
+    function weekQuizzes(person) {
+        if (state.peopleWeek === 'all') return person.quizzes || [];
+        return (person.quizzes || []).filter(function (quiz) {
+            return String(quiz.id) === String(state.peopleWeek);
+        });
+    }
+
+    function weekScore(person) {
+        var scores = weekQuizzes(person).map(function (quiz) { return Number(quiz.score); }).filter(function (score) {
+            return isFinite(score);
+        });
+        if (!scores.length) return null;
+        return Math.max.apply(null, scores);
+    }
+
+    function filteredPeople() {
+        var pack = state.people || { participants: [] };
+        var query = state.peopleQuery.trim();
+        var rows = (pack.participants || []).filter(function (person) {
+            if (state.peopleWeek !== 'all' && !weekQuizzes(person).length) return false;
+            if (state.peopleBranch !== 'all' && (person.branches || [person.branch]).indexOf(state.peopleBranch) === -1) return false;
+            if (state.peopleWon && !person.won) return false;
+            if (state.peopleDup && !person.duplicate) return false;
+            var score = state.peopleWeek === 'all' ? Number(person.avg) : weekScore(person);
+            if (state.peopleScore === 'perfect' && !(isFinite(score) && score >= 99.5)) return false;
+            if (state.peopleScore === 'high' && !(isFinite(score) && score >= 80)) return false;
+            if (state.peopleScore === 'low' && !(isFinite(score) && score < 60)) return false;
+            if (!query) return true;
+            var haystack = [person.name, person.phone, String(person.phone || '').replace(/\D/g, ''), person.branch, (person.branches || []).join(' '), person.coordinator, person.city, person.area, person.prizes].join(' ');
+            return haystack.indexOf(query) !== -1;
+        });
+        rows.sort(function (a, b) {
+            if (state.peopleSort === 'name') return String(a.name).localeCompare(String(b.name), 'he');
+            if (state.peopleSort === 'avg') return (Number(b.avg) || -1) - (Number(a.avg) || -1);
+            if (state.peopleSort === 'weeks') return b.weeks - a.weeks || (Number(b.avg) || 0) - (Number(a.avg) || 0);
+            if (state.peopleSort === 'best') return (Number(b.best) || -1) - (Number(a.best) || -1);
+            return peopleStamp(b.lastDate) - peopleStamp(a.lastDate);
+        });
+        return rows;
+    }
+
+    function peopleMeta(rows) {
+        var scores = rows.map(function (person) {
+            return state.peopleWeek === 'all' ? Number(person.avg) : weekScore(person);
+        }).filter(function (score) { return isFinite(score); });
+        var sum = scores.reduce(function (total, score) { return total + score; }, 0);
+        var avg = scores.length ? fmtScore(sum / scores.length) : '—';
+        var perfect = scores.filter(function (score) { return score >= 99.5; }).length;
+        var winners = rows.filter(function (person) { return person.won; }).length;
+        return '<span><b>' + rows.length + '</b> משתתפים</span><span><b>' + avg + '</b> ממוצע</span><span><b>' + perfect + '</b> ציון מלא</span><span><b>' + winners + '</b> זוכים</span>';
+    }
+
+    function peopleRows(rows) {
+        if (!rows.length) return '<tr><td class="ap-empty" colspan="10">אין משתתפים לפי הסינון הזה.</td></tr>';
+        return rows.map(function (person) {
+            var open = state.peopleOpen === person.id;
+            var quizzes = person.quizzes || [];
+            var shownScore = state.peopleWeek === 'all' ? person.avg : weekScore(person);
+            var detail = quizzes.map(function (quiz) {
+                return '<li><strong>' + escapeHtml(quiz.name) + '</strong><b class="ap-score ' + scoreClass(quiz.score) + '">' + fmtScore(quiz.score) + '</b><span>' + escapeHtml(quiz.date || '') + '</span><span>' + escapeHtml(quiz.branch || '') + '</span>' + (quiz.duplicate ? '<em>כפול</em>' : '') + '</li>';
+            }).join('');
+            return '<tr class="ap-person-row' + (open ? ' is-open' : '') + '" data-person="' + escapeHtml(person.id) + '">' +
+                '<td><strong>' + escapeHtml(person.name) + '</strong>' + (person.duplicate ? '<em class="ap-person-flag">כפול</em>' : '') + (person.registered ? '<em class="ap-person-flag is-reg">נרשם</em>' : '') + '</td>' +
+                '<td class="ap-phone">' + escapeHtml(prettyPhone(person.phone) || '—') + '</td>' +
+                '<td>' + escapeHtml(person.branch || '—') + (person.branches && person.branches.length > 1 ? '<span class="ap-muted"> +' + (person.branches.length - 1) + '</span>' : '') + '</td>' +
+                '<td>' + escapeHtml(person.coordinator || '—') + (person.city ? '<span class="ap-muted"> · ' + escapeHtml(person.city) + '</span>' : '') + '</td>' +
+                '<td>' + person.weeks + '</td>' +
+                '<td><b class="ap-score ' + scoreClass(shownScore) + '">' + fmtScore(shownScore) + '</b></td>' +
+                '<td>' + fmtScore(person.best) + '</td>' +
+                '<td>' + fmtScore(person.lastScore) + '</td>' +
+                '<td>' + escapeHtml(shortWhen(person.lastDate) || '—') + '</td>' +
+                '<td>' + (person.won ? escapeHtml(person.prizes || 'זכה') : '—') + '</td>' +
+                '</tr>' +
+                (open ? '<tr class="ap-person-more"><td colspan="10"><ul>' + detail + '</ul>' +
+                    (person.coordinatorPhone ? '<p>טלפון רכז: <span class="ap-phone">' + escapeHtml(prettyPhone(person.coordinatorPhone)) + '</span></p>' : '') +
+                    (person.area ? '<p>אזור: ' + escapeHtml(person.area) + '</p>' : '') +
+                    '</td></tr>' : '');
+        }).join('');
+    }
+
+    function renderParticipants() {
+        var pack = state.people || { weeks: [], branches: [], participants: [] };
+        var rows = filteredPeople();
+        var weeks = (pack.weeks || []).slice().sort(function (a, b) {
+            var an = parseInt(a.id, 10);
+            var bn = parseInt(b.id, 10);
+            if (isFinite(an) && isFinite(bn) && an !== bn) return an - bn;
+            return String(a.name).localeCompare(String(b.name), 'he');
+        });
+        view(head('משתתפים', 'כל נער שהגיש חידון. אותו טלפון נספר פעם אחת, גם אם השתתף בכמה שבועות. לחיצה על שורה פותחת את הפירוט.') +
+            '<div class="ap-people-meta" id="ap-people-meta">' + peopleMeta(rows) + '</div>' +
+            '<div class="ap-search ap-people-filters">' +
+            '<input id="ap-people-query" placeholder="חיפוש שם, טלפון, סניף או רכז" value="' + escapeHtml(state.peopleQuery) + '">' +
+            '<select id="ap-people-week"><option value="all">כל החידונים</option>' + weeks.map(function (week) {
+                return '<option value="' + escapeHtml(week.id) + '"' + (String(state.peopleWeek) === String(week.id) ? ' selected' : '') + '>' + escapeHtml(week.name) + '</option>';
+            }).join('') + '</select>' +
+            '<select id="ap-people-branch"><option value="all">כל הסניפים</option>' + (pack.branches || []).map(function (name) {
+                return '<option value="' + escapeHtml(name) + '"' + (state.peopleBranch === name ? ' selected' : '') + '>' + escapeHtml(name) + '</option>';
+            }).join('') + '</select>' +
+            '<select id="ap-people-score"><option value="all">כל הציונים</option><option value="perfect">ציון מלא</option><option value="high">80 ומעלה</option><option value="low">מתחת ל-60</option></select>' +
+            '<select id="ap-people-sort"><option value="recent">לפי תאריך</option><option value="name">לפי שם</option><option value="avg">לפי ממוצע</option><option value="weeks">לפי מספר חידונים</option><option value="best">לפי ציון גבוה</option></select>' +
+            '<label class="ap-check"><input id="ap-people-won" type="checkbox"' + (state.peopleWon ? ' checked' : '') + '> רק זוכים</label>' +
+            '<label class="ap-check"><input id="ap-people-dup" type="checkbox"' + (state.peopleDup ? ' checked' : '') + '> רק כפילויות</label>' +
+            '<button type="button" class="ap-primary" data-export="participants">ייצוא לאקסל</button>' +
+            '</div>' +
+            '<div class="ap-table-wrap ap-people"><table class="ap-table"><thead><tr><th>שם</th><th>טלפון</th><th>סניף</th><th>רכז</th><th>חידונים</th><th>' + (state.peopleWeek === 'all' ? 'ממוצע' : 'ציון בחידון') + '</th><th>גבוה</th><th>אחרון</th><th>תאריך</th><th>זכייה</th></tr></thead><tbody id="ap-people-body">' +
+            peopleRows(rows) + '</tbody></table></div>');
+        ['ap-people-score', 'ap-people-sort'].forEach(function (id) {
+            var box = document.getElementById(id);
+            if (!box) return;
+            box.value = id === 'ap-people-score' ? state.peopleScore : state.peopleSort;
+        });
+    }
+
+    function exportParticipants() {
+        var rows = filteredPeople();
+        var weekName = 'כל-החידונים';
+        if (state.peopleWeek !== 'all' && state.people) {
+            (state.people.weeks || []).forEach(function (week) {
+                if (String(week.id) === String(state.peopleWeek)) weekName = week.name;
+            });
+        }
+        var header = ['שם', 'טלפון', 'סניף', 'סניפים נוספים', 'רכז', 'טלפון רכז', 'עיר', 'אזור', 'מספר חידונים', 'הגשות', 'ממוצע', 'ציון גבוה', 'ציון אחרון', 'תאריך אחרון'];
+        if (state.peopleWeek !== 'all') header.push('ציון בחידון הנבחר');
+        header.push('פירוט חידונים', 'זכייה', 'פרסים', 'כפילות באותו חידון', 'נרשם באתר');
+        var table = [header].concat(rows.map(function (person) {
+            var extra = (person.branches || []).filter(function (name) { return name !== person.branch; }).join(', ');
+            var detail = (person.quizzes || []).map(function (quiz) {
+                return quiz.name + ': ' + fmtScore(quiz.score) + (quiz.date ? ' (' + quiz.date + ')' : '') + (quiz.duplicate ? ' כפול' : '');
+            }).join(' | ');
+            var line = [
+                person.name,
+                prettyPhone(person.phone),
+                person.branch,
+                extra,
+                person.coordinator,
+                prettyPhone(person.coordinatorPhone),
+                person.city,
+                person.area,
+                person.weeks,
+                person.attempts,
+                fmtScore(person.avg),
+                fmtScore(person.best),
+                fmtScore(person.lastScore),
+                person.lastDate
+            ];
+            if (state.peopleWeek !== 'all') line.push(fmtScore(weekScore(person)));
+            line.push(detail, person.won ? 'כן' : 'לא', person.prizes, person.duplicate ? 'כן' : 'לא', person.registered ? 'כן' : 'לא');
+            return line;
+        }));
+        downloadExcel('משתתפים-' + String(weekName).replace(/[\\/:*?"<>|]/g, '-') + '.xls', table);
+        toast('הקובץ ירד עם ' + rows.length + ' שורות, לפי הסינון שעל המסך');
     }
 
     function loadAnswers() {
@@ -1234,6 +1413,30 @@
             '</article>';
     }
 
+    function downloadExcel(filename, rows) {
+        function cell(value) {
+            return '<Cell><Data ss:Type="String">' + String(value == null ? '' : value)
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;') + '</Data></Cell>';
+        }
+        var xml = '<?xml version="1.0" encoding="UTF-8"?>' +
+            '<?mso-application progid="Excel.Sheet"?>' +
+            '<Workbook xmlns="urn:schemas-microsoft-com:office:spreadsheet" xmlns:ss="urn:schemas-microsoft-com:office:spreadsheet">' +
+            '<Worksheet ss:Name="משתתפים" ss:RightToLeft="1"><Table>' +
+            rows.map(function (row, index) {
+                return '<Row>' + row.map(cell).join('') + '</Row>';
+            }).join('') +
+            '</Table></Worksheet></Workbook>';
+        var blob = new Blob([xml], { type: 'application/vnd.ms-excel;charset=utf-8' });
+        var link = document.createElement('a');
+        link.href = URL.createObjectURL(blob);
+        link.download = filename;
+        link.click();
+        setTimeout(function () { URL.revokeObjectURL(link.href); }, 1000);
+    }
+
     function downloadCsv(filename, rows) {
         var csv = rows.map(function (row) {
             return row.map(function (cell) {
@@ -1453,6 +1656,7 @@
             if (state.section === 'questions') onQuestionsClick(target);
             if (target.closest('summary button')) event.preventDefault();
             if (state.section === 'answers') onAnswersClick(target);
+            if (state.section === 'participants') onParticipantsClick(target);
             if (state.section === 'branches') onBranchesClick(target);
             if (state.section === 'updates') onUpdatesClick(target);
             if (state.section === 'winners') onWinnersClick(target);
@@ -1486,6 +1690,17 @@
                 captureStaffDraft(event.target.form);
                 renderStaff();
             }
+            if (event.target.id === 'ap-people-week' || event.target.id === 'ap-people-branch' || event.target.id === 'ap-people-score' || event.target.id === 'ap-people-sort' || event.target.id === 'ap-people-won' || event.target.id === 'ap-people-dup') {
+                state.peopleWeek = document.getElementById('ap-people-week').value;
+                state.peopleBranch = document.getElementById('ap-people-branch').value;
+                state.peopleScore = document.getElementById('ap-people-score').value;
+                state.peopleSort = document.getElementById('ap-people-sort').value;
+                state.peopleWon = document.getElementById('ap-people-won').checked;
+                state.peopleDup = document.getElementById('ap-people-dup').checked;
+                renderParticipants();
+                var focus = document.getElementById(event.target.id);
+                if (focus) focus.focus();
+            }
             if (event.target.id === 'ap-answer-source') {
                 state.answerSource = event.target.value;
                 openSection('answers');
@@ -1514,6 +1729,14 @@
         });
 
         document.getElementById('ap-view').addEventListener('input', function (event) {
+            if (event.target.id === 'ap-people-query') {
+                state.peopleQuery = event.target.value;
+                var peopleBody = document.getElementById('ap-people-body');
+                var peopleMetaBox = document.getElementById('ap-people-meta');
+                var shownPeople = filteredPeople();
+                if (peopleBody) peopleBody.innerHTML = peopleRows(shownPeople);
+                if (peopleMetaBox) peopleMetaBox.innerHTML = peopleMeta(shownPeople);
+            }
             if (event.target.id === 'ap-answer-query') {
                 state.answerQuery = event.target.value;
                 var shown = filteredAnswers();
@@ -2142,6 +2365,19 @@
                 api('adminDeleteStaff', { name: remove.getAttribute('data-delete-staff') }).then(loadStaff).catch(showError);
             });
         }
+    }
+
+    function onParticipantsClick(target) {
+        if (target.closest('[data-export="participants"]')) {
+            exportParticipants();
+            return;
+        }
+        var row = target.closest('[data-person]');
+        if (!row) return;
+        var id = row.getAttribute('data-person');
+        state.peopleOpen = state.peopleOpen === id ? '' : id;
+        var body = document.getElementById('ap-people-body');
+        if (body) body.innerHTML = peopleRows(filteredPeople());
     }
 
     function onExportClick(target) {
